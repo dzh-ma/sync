@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
     password: str
 
     @field_validator("password")
-    def validate_password(self, cls, value):
+    def validate_password(self, value: str) -> str:
         """Validating password against criteria to improve strength."""
         if len(value) < 8:
             raise ValueError("Password must be at least 8 characters long.")
@@ -22,10 +22,11 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     """Response model for user account details."""
-    id: str
+    id: UUID
     email: EmailStr
     is_verified: bool = False
     created_at: Optional[datetime]
 
     class Config:
+        """Pydantic configuration for UserResponse model."""
         orm_mode = True
