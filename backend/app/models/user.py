@@ -1,12 +1,13 @@
-from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from bson import ObjectId
+from pydantic import BaseModel, EmailStr
 
 class UserCreate(BaseModel):
+    '''User account detaill.'''
     email: EmailStr
     password: str
 
 class UserResponse(BaseModel):
+    '''User verification information details.'''
     id: str
     email: EmailStr
     is_verified: bool

@@ -34,3 +34,5 @@ app.include_router(user_router, prefix = "/api/v1/users", tags = ["Users"])
 def read_root():
     '''Startup message.'''
     return {"message": "Welcome to the Sync Smart Home"}
+
+
