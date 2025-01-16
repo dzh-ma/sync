@@ -1,17 +1,31 @@
+"""This module serves to manage user data."""
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from uuid import UUID
+from typing import Optional
+from pydantic import BaseModel, EmailStr, field_validator
 
 class UserCreate(BaseModel):
-    '''User account detaill.'''
+    '''User input for account creation.'''
     email: EmailStr
     password: str
 
+    @field_validator("password")
+    def validate_password(self, cls, value):
+        """Validating password against criteria to improve strength."""
+        if len(value) < 8:
+            raise ValueError("Password must be at least 8 characters long.")
+        if not any(char.isdigit() for char in value):
+            raise ValueError("Password must contain at least 1 number.")
+        if not any(char.isalpha() for char in value):
+            raise ValueError("Password must contain at least 1 letter.")
+        return value
+
 class UserResponse(BaseModel):
-    '''User verification information details.'''
+    """Response model for user account details."""
     id: str
     email: EmailStr
-    is_verified: bool
-    created_at: datetime
+    is_verified: bool = False
+    created_at: Optional[datetime]
 
     class Config:
         orm_mode = True

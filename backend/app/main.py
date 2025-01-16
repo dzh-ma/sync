@@ -1,6 +1,5 @@
 """This module acts as a middlepoint between the database and the frontend."""
 from contextlib import asynccontextmanager
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,17 +9,23 @@ from app.db.database import init_db
 @asynccontextmanager
 async def lifespan(app_context: FastAPI):
     '''Defines application lifespan event handler'''
-    await init_db()
-    app_context.state.custom_attribute = "value"    # Placeholder
-    yield
-    print("Application is shutting down.")
+    try:
+        await init_db()
+        app_context.state.custom_attribute = "value"    # Placeholder
+        print("Application startup complete.")
+        yield
+    except Exception as e:
+        print(f"Failed to initialize the database: {e}")
+        raise e
+    finally:
+        print("Application is shutting down.")
 
 app = FastAPI(lifespan = lifespan)
 
 # Frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = ["*"],
+    allow_origins = ["*"],      # Change `"*"` to specific origins in production
     allow_credentials = True,
     allow_methods = ["*"],
     allow_headers = ["*"],
@@ -29,10 +34,7 @@ app.add_middleware(
 # Include routers
 app.include_router(user_router, prefix = "/api/v1/users", tags = ["Users"])
 
-# Root endpoint
-@app.get("/")
-def read_root():
-    '''Startup message.'''
-    return {"message": "Welcome to the Sync Smart Home"}
-
-
+@app.get("/", response_model = dict)
+def read_root() -> dict:
+    '''Root endpoint.'''
+    return {"message": "Welcome to the Sync Smart Home."}
