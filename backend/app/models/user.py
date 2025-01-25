@@ -1,8 +1,8 @@
 """This module serves to manage user data."""
+# from uuid import UUID
 from datetime import datetime
-from uuid import UUID
 from typing import Optional
-from pydantic import BaseModel, EmailStr, field_validator
+from pydantic import BaseModel, EmailStr, ConfigDict, field_validator
 
 class UserCreate(BaseModel):
     '''User input for account creation.'''
@@ -10,7 +10,8 @@ class UserCreate(BaseModel):
     password: str
 
     @field_validator("password")
-    def validate_password(self, value: str) -> str:
+    @classmethod
+    def validate_password(cls, value: str) -> str:
         """Validating password against criteria to improve strength."""
         if len(value) < 8:
             raise ValueError("Password must be at least 8 characters long.")
@@ -22,11 +23,10 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     """Response model for user account details."""
-    id: UUID
+    # id: UUID
+    id: str
     email: EmailStr
     is_verified: bool = False
     created_at: Optional[datetime]
 
-    class Config:
-        """Pydantic configuration for UserResponse model."""
-        orm_mode = True
+    model_config = ConfigDict(from_attributes = True)
