@@ -32,7 +32,7 @@ async def lifespan(app_context: FastAPI):
 
 app = FastAPI(lifespan = lifespan)
 
-# Frontend communication
+# Front-end communication
 app.add_middleware(
     CORSMiddleware,
     allow_origins = ALLOWED_ORIGINS,      # Change `"*"` to specific origins/domain in production
@@ -44,7 +44,7 @@ app.add_middleware(
 # Include routers
 app.include_router(user_router, prefix = "/api/v1/users", tags = ["Users"])
 
-# Root response moedl
+# Root response model
 class RootResponse(BaseModel):
     message: str
 

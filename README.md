@@ -2,29 +2,29 @@
 
 | Member                  | Role             | Formal Role            |
 |-------------------------|------------------|------------------------|
-| Laiba (ls2092)          | Frontend         | Organizational Manager |
-| Razin (rm2131)          | Frontend         | Reporter               |
-| Rhea (RheaDcosta5)      | Frontend         | Process Designer       |
-| Aadi (AADISDEV)         | Frontend/Backend | Project Administrator  |
-| Gaurav (GauravHw2028)   | Frontend/Backend | Project Researcher     |
-| Nawid (MohammadNawid)   | Frontend/Backend | Usability Analyst      |
-| Matthew (MatthewBerry1) | Backend          | Liaison                |
-| Matin (dzh-ma)          | Backend          | Technical Manager      |
+| Laiba (ls2092)          | Front-end         | Organizational Manager |
+| Razin (rm2131)          | Front-end         | Reporter               |
+| Rhea (RheaDcosta5)      | Front-end         | Process Designer       |
+| Aadi (AADISDEV)         | Front-end/Back-end | Project Administrator  |
+| Gaurav (GauravHw2028)   | Front-end/Back-end | Project Researcher     |
+| Nawid (MohammadNawid)   | Front-end/Back-end | Usability Analyst      |
+| Matthew (MatthewBerry1) | Back-end          | Liaison                |
+| Matin (dzh-ma)          | Back-end          | Technical Manager      |
 
 ---
 
 # Tech Stack
 
-## Frontend
+## Front-end
 
 1. **React.js**
-    - Ensure compatibility with existing UI libraries and mockups.
-    - Validate reusability of components and support for dynamic user interfaces.
+    - Ensure compatibility with existing UI libraries and mock-ups.
+    - Validate re-usability of components and support for dynamic user interfaces.
 2. **CSS Frameworks (e.g., Tailwind CSS, Bootstrap)**
     - Ensure responsiveness across various screen sizes.
     - Validate support for theme customization and accessibility compliance.
 
-## Backend
+## Back-end
 
 1. **FastAPI**
     - Test endpoint performance under varying loads.
@@ -40,13 +40,13 @@
 
 1. **Node-RED**
     - Simulate and test workflows for device automation.
-    - Ensure seamless communication between devices and the backend.
+    - Ensure seamless communication between devices and the back-end.
 
 ## Infrastructure
 
 1. **Docker**
     - Configure containerized environments for all components.
-    - Test orchestration with Docker Compose to ensure smooth interactions between containers (e.g., backend, frontend, middleware).
+    - Test orchestration with Docker Compose to ensure smooth interactions between containers (e.g., back-end, front-end, middleware).
 
 ## Security
 
@@ -54,12 +54,12 @@
     - Validate token generation, revocation, and session expiration functionalities.
     - Ensure proper handling of role-based access control.
 2. **SSL/TLS** (Data Encryption)
-    - Verify secure communication between frontend, backend, and third-party integrations using certificates.
+    - Verify secure communication between front-end, back-end, and third-party integrations using certificates.
 
 ## Usability Tools
 
 1. **Figma**
-    - Validate UI mockups against stakeholder requirements and user feedback.
+    - Validate UI mock-ups against stakeholder requirements and user feedback.
     - Incorporate usability testing feedback to improve design iterations.
 2. **Grafana**
     - Configure dashboards to visualize real-time and historical energy consumption metrics.
@@ -70,7 +70,7 @@
     - Test individual FastAPI endpoints and React components for expected functionality.
     - Use tools like `pytest` for Python and `Jest` for React.
 2. **Integration Testing**
-    - Ensure seamless communication between frontend, backend, and the database.
+    - Ensure seamless communication between front-end, back-end, and the database.
     - Use tools like `Postman` or `Cypress` for API and end-to-end testing.
 3. **Performance Testing**
     - Simulate load tests using tools like `Apache JMeter` or `k6` to evaluate system scalability and fault tolerance.
@@ -95,8 +95,8 @@
 
 1. *Technical Preparation.*
     - Ensure all necessary technical tools are installed & configured.
-        1) **IDEs**: Configure NeoVim to support necessary tools.
-        2) **Docker**: Set up containers for backend (FastAPI), frontend (React) & tools like Node-RED
+        1) **IDEs**: Configure respective IDE to support necessary tools.
+        2) **Docker**: Set up containers for back-end (FastAPI), front-end (React) & tools like Node-RED
         3) **Node-RED**: Test integration for automation workflows.
         4) **FastAPI & React**: Verify that these frameworks are operational in your development environment.
     - Test libraries & modules to ensure compatibility with the project requirements.
@@ -112,7 +112,7 @@
 
 1. **Functional development environments.**
     - Fully configured IDEs tailored to the project's tech stack.
-    - Docker environments set up for backend (FastAPI), frontend (React) & middleware (Node-RED).
+    - Docker environments set up for back-end (FastAPI), front-end (React) & middleware (Node-RED).
     - Verified integrations for libraries & modules critical to development.
 2. **Validated prototype.**
     - UI/UX prototype reviewed & confirmed to meet functional requirements (e.g., accessibility, intuitive navigation).
@@ -133,17 +133,17 @@
 
 ### Required Tools
 
-1. **Developemnt tools.**
+1. **Development tools.**
     - *IDEs*: NeoVim configured with plugins for Python (FastAPI) & JavaScript (React).
     - *Version control*: GitHub for collaborative coding & issue tracking.
     - *Package managers*: `pip` for Python, `npm`/`yarn` for Node.js & React.
 2. **Containerization.**
     - *Docker*: For isolated development environments.
-    - *Docker Compose*: To manage multi-container setups for the backend, frontend & middleware.
+    - *Docker Compose*: To manage multi-container setups for the back-end, front-end & middleware.
 3. **Middleware & Frameworks.**
     - *Node-RED*: For workflow automation & testing device integrations.
-    - *FastAPI*: Backend framework for building REST APIs.
-    - *React*: Frontend framework for UI/UV components.
+    - *FastAPI*: Back-end framework for building REST APIs.
+    - *React*: Front-end framework for UI/UV components.
 4. **Testing & Validation.**
     - *Postman*: API testing.
     - *Selenium*: UI functionality testing.
@@ -217,8 +217,8 @@
 
 ### Required Tools
 
-- **Backend**: FastAPI, Docker & NoSQL database.
-- **Frontend**: React for form handling & validation.
+- **Back-end**: FastAPI, Docker & NoSQL database.
+- **Front-end**: React for form handling & validation.
 - **Testing**: Postman (API testing) & Selenium (UI testing).
 
 ## Sprint 9: Profile Creation and Management
@@ -245,7 +245,7 @@
     - **Task**: Implement editing functionality.
         - Allow admins to update profile details.
         - Ensure proper validation for edited fields.
-        - Implement backend logic to update database entires seamlessly.
+        - Implement back-end logic to update database entires seamlessly.
     - **Assigned team members**: Aadi, Nawid, Matthew.
 3. *Password Management (FR 2-3, FR 2-4, FR 2-5).*
     - **Task**: Code password setup & update features.
@@ -288,8 +288,8 @@
 
 ### Required Tools
 
-- *Backend*: FastAPI, MongoDB (NoSQL).
-- *Frontend*: React for forms & profile UI.
+- *Back-end*: FastAPI, MongoDB (NoSQL).
+- *Front-end*: React for forms & profile UI.
 - *Testing*: Postman (API testing) & Cypress/Selenium (UI testing).
 
 ## Sprint 10: Profile Access and Device Control
@@ -313,7 +313,7 @@
         - Child & guest profiles with restricted or view-only permissions.
     - **Subtasks**:
         1) Develop UI to configure access settings.
-        2) Create backend logi to enforce role-based access.
+        2) Create back-end logi to enforce role-based access.
         3) Validate database schema to handle role-based permissions.
     - **Assigned team members**: Aadi, Matin & Nawid.
 2. *Develop device control features (FR 4-1 to 4-2).*
@@ -327,19 +327,19 @@
 3. *Implement automation rules (FR 5-1 to 5-2).*
     - **Task**: Enable device automation based on user-defined schedules.
         - Add options to configure schedules (daily, custom).
-        - Integrate scheduling logic with the backend & devices.
+        - Integrate scheduling logic with the back-end & devices.
     - **Subtasks**:
         1) Build a scheduling interface in the UI.
-        2) Extend backend to handle-time 
+        2) Extend back-end to handle-time 
         3) Test middleware communication with devices for schedule execution.
     - **Assigned team members**: Gaurav, Matin & Nawid.
 4. *End-to-end testing.*
     - **Task**: Validate the workflows for access control, device control & automation.
         - Test UI for intuitive navigation & usability.
-        - Verify backend logic & middleware.
+        - Verify back-end logic & middleware.
     - **Subtasks**:
         1) Perform unit tests on each functionality.
-        2) Conduct integration tests between UI, backend & middleware.
+        2) Conduct integration tests between UI, back-end & middleware.
         3) Simulate real-world scenarios (e.g., multiple user roles managing devices).
     - **Assigned team members**: Rhea, Laiba & Razin.
 5. *Documentation.*
@@ -356,7 +356,7 @@
 1. **Fully role-based access control.**
     - Configurable profile-based access settings.
 2. **Remote device management features.**
-    - UI & backend support for managing & automating devices.
+    - UI & back-end support for managing & automating devices.
 3. **End-to-end testing reports.**
     - Functional & usability test results for all features.
 4. **Documentation.**
@@ -372,8 +372,8 @@
 ### Required Tools
 
 - *Development.*
-    - FastAPI for backend API.
-    - React for frontend development
+    - FastAPI for back-end API.
+    - React for front-end development
     - Node-RED for testing automation logic.
 - *Testing.*
     - Postman for API testing.
@@ -401,10 +401,10 @@
 1. *Develop scheduling features (FR 5-1 to 5-2).*
     - **Task**: Enable users to schedule device operations.
         - Add UI for creating, updating & deleting schedules.
-        - Backend support for time-based triggers.
+        - Back-end support for time-based triggers.
     - **Subtasks**:
-        1) Build a calendar or list-based interface for scheduling in the frontend.
-        2) Develop backend logic to store & process schedule configurations.
+        1) Build a calendar or list-based interface for scheduling in the front-end.
+        2) Develop back-end logic to store & process schedule configurations.
         3) Integrate middleware to execute device actions based on the schedule.
     - **Assigned team members**: Aadi, Matin & Gaurav.
 2. *Develop energy consumption summary features (FR 6-1 to 6-3).*
@@ -413,7 +413,7 @@
         - Provide comparisons across time periods (e.g., daily, weekly, monthly).
     - **Subtasks**:
         1) Build interactive charts & tables using a visualization tool (e.g., Grafana, Chart.js).
-        2) Implement backend endpoints to aggregate & fetch energy data.
+        2) Implement back-end endpoints to aggregate & fetch energy data.
         3) Design algorithms for generating actionable insights based on energy trends.
     - **Assigned team members**: Gaurav, Laiba & Razin.
 3. *End-to-end testing.*
@@ -421,7 +421,7 @@
         - Test features for usability, accuracy & performance.
     - **Subtasks**:
         1) Conduct unit tests for individual scheduling & summary modules.
-        2) Perform integration testing between UI, backend & middleware.
+        2) Perform integration testing between UI, back-end & middleware.
         3) Simulate scenarios (e.g., overlapping schedules, large data sets).
     - **Assigned team members**: Rhea, Nawid & Razin.
 4. *Documentation.*
@@ -442,7 +442,7 @@
 ### Key Deliverables
 
 1. **Scheduling features.**
-    - Fully functional scheduling UI & backend integration.
+    - Fully functional scheduling UI & back-end integration.
 2. **Energy consumption summary.**
     - Interactive & informative dashboards with energy usage trends.
 3. **End-to-end testing reports.**
@@ -461,8 +461,8 @@
 ### Required Tools
 
 1. *Development.*
-    - FastAPI for backend APIs.
-    - React for frontend scheduling & dashboards.
+    - FastAPI for back-end APIs.
+    - React for front-end scheduling & dashboards.
     - Node-RED for automation testing.
 2. *Visualization.*
     - Grafana or Chart.js for energy data visualizations.
@@ -486,91 +486,97 @@
 *Start Date*: 26/01/2025  
 *End Date*: 05/02/2025  
 
-### Steps To Completion
+### Steps to Success
 
-1. *Develop scheduling features (FR 5-1 to 5-2).*
-    - **Task**: Enable users to schedule device operations.
-        - Add UI for creating, updating & deleting schedules.
-        - Backend support for time-based triggers.
-    - **Subtasks**:
-        1) Build a calendar or list-based interface for scheduling in the frontend.
-        2) Develop backend logic to store & process schedule configurations.
-        3) Integrate middleware to execute device actions based on the schedule.
-    - **Assigned team members**: Aadi, Matin & Gaurav.
-2. *Develop energy consumption summary features (FR 6-1 to 6-3).*
-    - **Task**: Create energy consumption summary dashboards.
-        - Include historical data visualization & insights.
-        - Provide comparisons across time periods (e.g., daily, weekly, monthly).
-    - **Subtasks**:
-        1) Build interactive charts & tables using a visualization tool (e.g., Grafana, Chart.js).
-        2) Implement backend endpoints to aggregate & fetch energy data.
-        3) Design algorithms for generating actionable insights based on energy trends.
-    - **Assigned team members**: Gaurav, Laiba, Razin.
-    - **Assigned team members**: Rhea, Nawid, Razin.
-3. *Reporting functionality.*
-    - **Task**: Develop downoadable reports summarizing energy usage.
-        - Generate PDFs or CSV files with detailed metrics & trends.
-    - **Subtasks**:
-        1) Build bakcend support for generating report files.
-        2) Design a frontend interface for users to request & download reports.
-        3) Include key metrics like energy cost estimates & savings suggestions.
-    - **Assigned team members**: Aadi, Matthew.
-4. *Conduct testing.*
-    - **Task**: Validate the visualization & reporting features.
-        - Test for accuracy, performance & usability.
-    - **Subtasks**:
-        1) Perform unti testing for backend data processing & APIs.
-        2) Conduct integration testing between frontend visualization & backend.
-        3) Test large datasets for performance & scalability.
-    - **Assigned team members**: Rhea, Razin.
-5. *Documentation.*
-    - **Task**: Document energy data & reporting workflows.
-        - Provide technical API documentation & user guides for visualization features.
-    - **Subtasks**:
-        1) Write detailed documentation for backend API usage (e.g., endpoints, parameters).
-        2) Create user manuals explaining how to use visualizations & generate reports.
-    - **Assigned team members**: Matthew, Gaurav.
-6. *Final validation & deployment.*
-    - **Task**: Conduct final review & deploy to the staging environment.
-        - Validate usability & recieve feedback from stakeholders.
-    - **Subtasks**:
-        1) Perform final usability testing with a small group of users.
-        2) Deploy visualizations & reporting features to staging.
-    - **Assigned team members**: All team members.
+1. *Data Aggregation and Backend Preparation*
+    Task: Implement backend logic to process energy data for visualization and reporting.
+        Design database queries to aggregate and summarize energy data.
+        Develop API endpoints for fetching processed data.
+    Subtasks:
+        Design efficient database schemas for historical and real-time data storage.
+        Create endpoints to support data retrieval for visualizations.
+        Ensure backend handles data filtering (e.g., by time periods or devices).
+    Assigned Team Members: Matin, Aadi, Gaurav
+    Timeline: 26/01/2025 - 29/01/2025
+2. *Develop Data Visualization Features*
+    Task: Build frontend components to display energy data visually.
+        Create interactive charts and graphs for energy usage trends.
+        Add filtering and comparison options (e.g., daily, weekly, monthly views).
+    Subtasks:
+        Design UI components for data visualization using a library (e.g., Chart.js, Grafana).
+        Integrate visualization components with backend APIs.
+        Implement dynamic filtering and sorting options for user interaction.
+    Assigned Team Members: Laiba, Razin, Nawid
+    Timeline: 29/01/2025 - 02/02/2025
+3. *Reporting Functionality*
+    Task: Develop downloadable reports summarizing energy usage.
+        Generate PDFs or CSV files with detailed metrics and trends.
+    Subtasks:
+        Build backend support for generating report files.
+        Design a frontend interface for users to request and download reports.
+        Include key metrics like energy cost estimates and savings suggestions.
+    Assigned Team Members: Aadi, Matthew
+    Timeline: 31/01/2025 - 03/02/2025
+4. *Conduct Testing*
+    Task: Validate the visualization and reporting features.
+        Test for accuracy, performance, and usability.
+    Subtasks:
+        Perform unit testing for backend data processing and APIs.
+        Conduct integration testing between frontend visualizations and backend.
+        Test large datasets for performance and scalability.
+    Assigned Team Members: Rhea, Razin
+    Timeline: 02/02/2025 - 03/02/2025
+5. *Documentation*
+    Task: Document energy data and reporting workflows.
+        Provide technical API documentation and user guides for visualization features.
+    Subtasks:
+        Write detailed documentation for backend API usage (e.g., endpoints, parameters).
+        Create user manuals explaining how to use visualizations and generate reports.
+    Assigned Team Members: Matthew, Gaurav
+    Timeline: 03/02/2025 - 04/02/2025
+6. *Final Validation and Deployment*
+    Task: Conduct final review and deploy to the staging environment.
+        Validate usability and receive feedback from stakeholders.
+    Subtasks:
+        Perform final usability testing with a small group of users.
+        Deploy visualizations and reporting features to staging.
+    Assigned Team Members: All team members
+    Timeline: 04/02/2025 - 05/02/2025
 
 ### Key Deliverables
 
-1. **Interactive data visualizations.**
-    - Charts & graphs for energy usage trends with dynamic filtering.
-2. **Reporting features.**
-    - Downloadable energy reports with detailed metrics & insights.
-3. **Documentation.**
-    - API documentation & user guides for data visualization & reporting.
-4. **Testing reports.**
-    - Comprehensive results from performance, usability & integration testing.
+1. **Interactive Data Visualizations:**
+    - Charts and graphs for energy usage trends with dynamic filtering.
+2. **Reporting Features:**
+    - Downloadable energy reports with detailed metrics and insights.
+3. **Documentation:**
+    - API documentation and user guides for data visualization and reporting.
+4. **Testing Reports:**
+    - Comprehensive results from performance, usability, and integration testing.
 
 ### Risk Management
 
-| Risk                                                 | Mitigation                                                      |
-|------------------------------------------------------|-----------------------------------------------------------------|
-| Performance isues with lareg datasets                | Use efficient database queries & caching mechanisms             |
-| Visualizations not user friendly                     | Incorporate feedback from usability testing & improve UI design |
-| Reports missing key metrics or incorrectly formatted | Validate report content & formats through detailed testing      |
+- Risk: Performance issues with large datasets.
+    - Mitigation: Use efficient database queries and caching mechanisms.
+- Risk: Visualizations not intuitive or user-friendly.
+    - Mitigation: Incorporate feedback from usability testing and improve UI design.
+- Risk: Reports missing key metrics or incorrectly formatted.
+    - Mitigation: Validate report content and formats through detailed testing.
 
 ### Required Tools
 
-- *Development.*
-    - FastAPI for backend APIs.
-    - React for frontend visualizations & reporting interface.
-- *Visualizations.*
-    - Chart.js, Grafana or D3.js for creating charts & graphs.
-- *Testing.*
-    - Postman for API testing.
-    - JMeter for performance testing.
-    - Selenium or Cypress for UI testing.
-- *Documentation.*
-    - Markdown for technical documentation.
-    - Figma or similar tools for creating user guides.
+- **Development:**
+    1. FastAPI for backend APIs.
+    2. React for frontend visualizations and reporting interface.
+- **Visualization:**
+    1.  Chart.js, Grafana, or D3.js for creating charts and graphs.
+- **Testing:**
+    1. Postman for API testing.
+    2. JMeter for performance testing.
+    3. Selenium or Cypress for UI testing.
+- **Documentation:**
+    1. Markdown for technical documentation.
+    2. Figma or similar tools for creating user guides.
 
 ## Sprint 13: Implement NFRs – Reliability & Performance
 

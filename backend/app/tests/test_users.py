@@ -53,14 +53,14 @@ def test_register_user_duplicate_email():
     # Attempt to register again with the same email
     response = client.post("/api/v1/users/register", json = duplicate_user)
     assert response.status_code == 400
-    assert response.json()["detail"] == "Registration failed. Please try again."
+    assert response.json()["detail"] == "Registration failed, please try again."
 
 
 def test_register_user_invalid_email():
     """"Test that invalid email formats are rejected."""
     response = client.post("/api/v1/users/register", json = invalid_email_user)
     assert response.status_code == 422
-    assert "Password must be at least 8 characters long" in response.text
+    assert "value is not a valid email address" in response.text
 
 
 @patch("app.db.database.users_collection.insert_one", side_effect = Exception("Database Error"))
@@ -68,7 +68,7 @@ def test_register_user_db_failure(_):
     """Test graceful handling of database insertion failures."""
     response = client.post("/api/v1/users/register", json = valid_user)
     assert response.status_code == 500
-    assert response.json()["detail"].startswith("Failed to register user.")
+    assert response.json()["detail"].startswith("Failed to register user: Database Error")
 
 
 def test_register_user_response_format():
