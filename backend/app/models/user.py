@@ -19,6 +19,22 @@ class UserCreate(BaseModel):
             raise ValueError("Password must contain at least 1 number.")
         if not any(char.isalpha() for char in value):
             raise ValueError("Password must contain at least 1 letter.")
+        if not any(char.islower() for char in value):
+            raise ValueError("Password must contain at least 1 lower letter.")
+        if not any(char.issuper() for char in value):
+            raise ValueError("Password must contain at least 1 upper letter.")
+        if not any(char in '!@#$%^&*()_+-=[]{}|;\':",.<>?/' for char in value):
+            raise ValueError("Password must contain at least 1 special character.")
+        return value
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, value: EmailStr) -> EmailStr:
+        """Validates the email."""
+        if not "@" in value:
+            raise ValueError("Email must contain @.")
+        if not "." in value.split("@")[1]:
+            raise ValueError("Email must contain a dot.")
         return value
 
 class UserResponse(BaseModel):
@@ -30,3 +46,4 @@ class UserResponse(BaseModel):
     created_at: Optional[datetime]
 
     model_config = ConfigDict(from_attributes = True)
+
