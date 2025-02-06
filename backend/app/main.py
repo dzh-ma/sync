@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.routes.user_routes import router as user_router
+from app.routes.data_routes import router as data_router
 from app.db.database import init_db
 
 # Configure logging
@@ -21,7 +22,7 @@ async def lifespan(app_context: FastAPI):
     """Defines application lifespan event handler"""
     try:
         await init_db()
-        app_context.state.custom_attribute = "value"    # Placeholder
+        app_context.state.custom_attribute = "value"    # Placeholder for future app-wide state
         logger.info("Application startup complete.")
         yield
     except Exception as e:
@@ -43,6 +44,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(user_router, prefix = "/api/v1/users", tags = ["Users"])
+app.include_router(data_router, prefix = "/api/v1/data", tags = ["Data"])
 
 # Root response model
 class RootResponse(BaseModel):
@@ -52,4 +54,3 @@ class RootResponse(BaseModel):
 def read_root() -> RootResponse:
     """Root endpoint."""
     return RootResponse(message = "Welcome to the Sync Smart Home.")
-    # return {"message": "Welcome to the Sync Smart Home."}

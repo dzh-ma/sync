@@ -1,5 +1,9 @@
 """This module implements security features."""
+from fastapi import APIRouter
+from app.models.energy_data import EnergyData
+from datetime import datetime
 from passlib.context import CryptContext
+from typing import Optional
 
 # Password hashing context
 pwd_context = CryptContext(schemes = ["bcrypt"], deprecated = "auto")
