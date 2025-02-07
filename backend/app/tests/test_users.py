@@ -11,11 +11,11 @@ client = TestClient(app)
 # Mock data
 valid_user = {
     "email": "testuser@example.com",
-    "password": "ValidPassword123"
+    "password": "ValidPassword123!"
 }
 duplicate_user = {
     "email": "testuser@example.com",
-    "password": "ValidPassword123"
+    "password": "ValidPassword123!"
 }
 invalid_email_user = {
     "email": "not-an-email",
