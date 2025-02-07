@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends, Query
 from datetime import datetime
-from typing import Optional
-
+from typing import Optional, Literal
+from fastapi import APIRouter, Query
 from app.models.energy_data import EnergyData
 from app.db.database import energy_collection
 
@@ -20,8 +19,8 @@ async def get_aggregated_data(
     end_date: Optional[str] = Query(None, description = "End date (YYYY-MM-DD)"),
     device_id: Optional[str] = Query(None, description = "Device ID filter"),
     location: Optional[str] = Query(None, description = "Location filter"),
+    interval: Literal["hour", "day", "week"] = "day",
 ):
-
     """Fetch aggregated energy data based on filters"""
     query = {}
 
@@ -35,9 +34,42 @@ async def get_aggregated_data(
     if location:
         query["location"] = location
 
+    time_group = {
+        "year": {"$year": "$timestamp"},
+        "month": {"$month": "$timestamp"},
+        "day": {"$dayOfMonth": "$timestamp"}
+    }
+
+    if interval == "hour":
+        time_group = {
+            "device_id": "$device_id",
+            "year": {"$year": "$timestamp"},
+            "month": {"$month": "$timestamp"},
+            "day": {"$dayOfMonth": "$timestamp"},
+            "hour": {"$hour": "$timestamp"}
+        }
+    elif interval == "day":
+        time_group = {
+            "device_id": "$device_id",
+            "year": {"$year": "$timestamp"},
+            "month": {"$month": "$timestamp"},
+            "day": {"$dayOfMonth": "$timestamp"}
+        }
+    elif interval == "week":
+        time_group = {
+            "device_id": "$device_id",
+            "year": {"$year": "$timestamp"},
+            "week": {"$isoWeek": "$timestamp"}
+        }
+
     aggregation_pipeline = [
         {"$match": query},
-        {"$group": {"_id": "$device_id", "total_energy": {"$sum": "$energy_consumed"}}}
+        {"$group": {
+            "_id": {
+                "device_id": "$device_id",  # Group by device
+                **time_group                # Group by time interval
+            }, "total_energy": {"$sum": "$energy_consumed"}
+        }}
     ]
 
     result = list(energy_collection.aggregate(aggregation_pipeline))
