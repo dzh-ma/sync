@@ -1,41 +1,45 @@
+```
+author: dzh-ma
+```
+
 # Back-end Structure
 
 This repository contains FastAPI back-end for the Sync Smart Home project.
 
-## 📂 Project Structure
+## Project Structure
 
 - `Dockerfile`: Configures a containerized environment for the back-end.
 - `requirements.txt`: Specifies **Python dependencies & libraries needed** for the back-end to function.
 
-## 📂 `app/` (Back-end Application)
+## `app/` (Back-end Application)
 
 - `__init__.py`: Marks the app directory as a Python package.
 - `main.py`: **Entry point for the FastAPI back-end application.**
 
-## 📂 `core/` (Application Core)
+## `core/` (Application Core)
 
 - `__init__.py`: Initializes the core module.
 - `config.py`: Manages **application settings**, often using environment variables.
 - `security.py`: Implements **security features.**
 
-## 📂 `db/` (Database Management)
+## `db/` (Database Management)
 
 - `__init__.py`: Initializes database module.
 - `database.py`: Handles **database connections.**
 
-## 📂 `models/` (Data Models)
+## `models/` (Data Models)
 
 - `__init__.py`: Initializes **model definitions.**
 - `user.py`: Defines the `User` model, including schema for **storing user data & handling authentication.**
 - `energy_data.py`: Defines the `EnergyData` model, handling **energy consumption records.**
 
-## 📂 `routes/` (API Endpoints)
+## `routes/` (API Endpoints)
 
 - `__init__.py`: Initializes routing module.
 - `user_routes.py`: Implements endpoints related to **user management.**
 - `data_routes.py`: Implements endpoints for **energy data aggregation, filtering & analysis.**
 
-## 📂 `tests/` (Testing Suite)
+## `tests/` (Testing Suite)
 
 - `__init__.py`: Initializes the testing module.
 - `test_users.py`: Contains unit tests for **user-related functionalities.**
@@ -55,3 +59,19 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 ---
 
 # Setup & Running The Back-end
+
+Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# Running Tests
+
+To verify back-end functionality, run:
+```bash
+pytest app/tests/
+```
+
+---
