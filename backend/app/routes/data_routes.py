@@ -7,13 +7,14 @@ from app.db.database import energy_collection
 
 router = APIRouter()
 
-@router.post("/data/add")
+@router.post("/add")
 async def add_energy_data(data: EnergyData):
     """API to add new energy data to the database."""
-    energy_collection.insert_one(data.dict())       # Insert into MongoDB
+    # energy_collection.insert_one(data.dict())       # Insert into MongoDB
+    energy_collection.insert_one(data.model_dump())       # Insert into MongoDB
     return {"message": "Energy data added successfully"}
 
-@router.get("/data/aggregate")
+@router.get("/aggregate")
 async def get_aggregated_data(
     start_date: Optional[str] = Query(None, description = "Start date (YYYY-MM-DD)"),
     end_date: Optional[str] = Query(None, description = "End date (YYYY-MM-DD)"),
