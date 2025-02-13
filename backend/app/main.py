@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from app.routes.user_routes import router as user_router
 from app.routes.data_routes import router as data_router
+from app.routes.report_routes import router as report_router
 from app.db.database import init_db
 
 # Configure logging
@@ -45,6 +46,7 @@ app.add_middleware(
 # Include routers
 app.include_router(user_router, prefix = "/api/v1/users", tags = ["Users"])
 app.include_router(data_router, prefix = "/api/v1/data", tags = ["Data"])
+app.include_router(report_router, prefix = "/api/v1/reports", tags = ["Reports"])
 
 # Root response model
 class RootResponse(BaseModel):
