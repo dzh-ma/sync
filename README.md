@@ -46,7 +46,7 @@ The back-end is powered by *FastAPI* & *MongoDB*.
 
 3. **Ensure MongoDB is running**
     ```bash
-    sudo systemctl start mongod
+    sudo systemctl start mongodb
     ```
 
 4. **Initialize the app using `uvicorn`**
