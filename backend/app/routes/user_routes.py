@@ -1,10 +1,9 @@
 """This module routes data to the database from registration"""
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException
-
 from app.models.user import UserCreate, UserResponse
 from app.db.database import users_collection
-from app.core.security import hash_password
+from app.core.security import hash_password, role_required
 
 router = APIRouter()
 
@@ -36,3 +35,7 @@ async def register_user(user: UserCreate):
         is_verified = False,
         created_at = user_data["created_at"]
     )
+
+@router.get("/admin/dashboard", dependencies = [Depends(role_required("admin"))])
+async def get_admin_dashboard():
+    return {"message": "Welcome, admin!"}
