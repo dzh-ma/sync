@@ -1,8 +1,9 @@
 from datetime import datetime
 from typing import Optional, Literal
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Depends
 from app.models.energy_data import EnergyData
 from app.db.database import energy_collection
+from app.core.security import role_required
 
 router = APIRouter()
 
@@ -75,3 +76,7 @@ async def get_aggregated_data(
     result = list(energy_collection.aggregate(aggregation_pipeline))
 
     return {"aggregated_data": result}
+
+@router.get("/admin/dashboard", dependencies = [Depends(role_required("admin"))])
+async def get_admin_dashboard():
+    return {"message": "Welcome, admin!"}

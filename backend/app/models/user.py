@@ -41,6 +41,7 @@ class UserResponse(BaseModel):
     """Response model for user account details."""
     # id: UUID
     id: str
+    role: str = "user"
     email: EmailStr
     is_verified: bool = False
     created_at: Optional[datetime]

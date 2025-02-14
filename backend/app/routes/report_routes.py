@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from fastapi.responses import FileResponse
 import pandas as pd
 from reportlab.pdfgen import canvas
@@ -8,6 +8,7 @@ from reportlab.lib.pagesizes  import letter
 import os
 import datetime
 from app.db.database import get_energy_data
+from app.core.security import role_required
 
 router = APIRouter()
 
@@ -38,6 +39,7 @@ async def generate_report(
     if format == "csv":
         df = pd.DataFrame(energy_data)
         df["timestamp"] = pd.to_datetime(df["timestamp"]).dt.strftime("%Y-%m-%d %H:%M:%S")  # Format timestamp
+        df.columns = ["Device ID", "Timestamp", "Energy Consumed (kWh)", "Location"]
         df.to_csv(filename, index = False)
     elif format == "pdf":
         doc = SimpleDocTemplate(filename, pagesize=letter)
@@ -74,3 +76,7 @@ async def generate_report(
         filename = os.path.basename(filename),
         media_type = "application/octet-stream"
     )
+
+@router.get("/admin/dashboard", dependencies = [Depends(role_required("admin"))])
+async def get_admin_dashboard():
+    return {"message": "Welcome, admin!"}
