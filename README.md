@@ -63,7 +63,25 @@ The back-end is powered by *FastAPI* & *MongoDB*.
 
 To verify back-end functionality, run:
 ```bash
-pytest app/tests/
+pytest backend/app/tests/
+```
+
+---
+
+# Generating Reports
+
+## Generating CSV
+
+```bash
+curl -X 'POST' \
+    'http://127.0.0.1:8000/api/v1/reports/report?format=csv'
+```
+
+## Generating PDF
+
+```bash
+curl -X 'POST' \
+    'http://127.0.0.1:8000/api/v1/reports/report?format=pdf'
 ```
 
 ---
