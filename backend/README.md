@@ -38,12 +38,14 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 - `__init__.py`: Initializes routing module.
 - `user_routes.py`: Implements endpoints related to **user management.**
 - `data_routes.py`: Implements endpoints for **energy data aggregation, filtering & analysis.**
+- `report_routes.py`: Implements endpoints for **energy consumption report generation.**
 
 ## `tests/` (Testing Suite)
 
 - `__init__.py`: Initializes the testing module.
 - `test_users.py`: Contains unit tests for **user-related functionalities.**
 - `test_data_routes.py`: Contains unit tests for **data aggregation, filtering & retrieval functionalities.**
+- `test_report_generation.py`: Contains unit tests for **report generation.**
 
 ---
 
@@ -55,15 +57,27 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 + **Secure API Endpoints** (JWT authentication & access control).
 + **Comprehensive Testing** (`pytest`).
 + **Containerization** (Docker).
++ **Report Generation** (CSV/PDF)
 
 ---
 
 # Setup & Running The Back-end
 
-Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+1. **Install back-end dependencies**
+    ```bash
+    pip install -r requirements.txt
+    ```
+2. **Ensure MongoDB is running**
+    ```bash
+    sudo systemctl start mongodb
+    ```
+3. **Initialize the app using `uvicorn`**
+    ```bash
+    uvicorn main:app --reload 
+    ```
+4. **API documentation**
+    Once the back-end is running, visit: `http://127.0.0.1:8000/docs`
+
 
 ---
 
