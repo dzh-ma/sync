@@ -2,6 +2,9 @@ from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import FileResponse
 import pandas as pd
 from reportlab.pdfgen import canvas
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+from reportlab.lib import colors
+from reportlab.lib.pagesizes  import letter
 import os
 import datetime
 from app.db.database import get_energy_data
@@ -24,7 +27,7 @@ async def generate_report(
     try:
         energy_data = get_energy_data(start_date, end_date)
     except ValueError as exc:
-        raise HTTPException(status_code = 400, detail = str(exc))
+        raise HTTPException(status_code = 400, detail = str(exc)) from exc
 
     if not energy_data:
         raise HTTPException(status_code = 404, detail = "No energy data available for the selected range.")
@@ -34,19 +37,37 @@ async def generate_report(
 
     if format == "csv":
         df = pd.DataFrame(energy_data)
+        df["timestamp"] = pd.to_datetime(df["timestamp"]).dt.strftime("%Y-%m-%d %H:%M:%S")  # Format timestamp
         df.to_csv(filename, index = False)
     elif format == "pdf":
-        c = canvas.Canvas(filename)
-        c.drawString(100, 750, "Energy Consumption Report")
+        doc = SimpleDocTemplate(filename, pagesize=letter)
+        elements = []
 
-        y_position = 730
+        # Prepare table data
+        data = [["Device ID", "Timestamp", "Energy Cosumed (kWh)", "Location"]]
+        for entry in energy_data:
+            data.append([
+                entry.get("device_id", "N/A"),
+                entry.get("timestamp", "").strftime('%Y-%m-%d %H:%M:%S') if entry.get("timestamp") else "N/A",
+                entry.get("energy_consumed", "N/A"),
+                entry.get("location", "N/A")
+            ])
 
-        # Limit entries for readability
-        for entry in energy_data[:10]:
-            c.drawString(100, y_position, str(entry))
-            y_position -= 20
+        # Create & style table
+        table = Table(data)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.whitesmoke, colors.lightgrey])
+        ]))
 
-        c.save()
+        elements.append(table)
+        doc.build(elements)
 
     return FileResponse(
         path  = os.path.abspath(filename),
