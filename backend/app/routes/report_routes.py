@@ -15,7 +15,7 @@ router = APIRouter()
 REPORTS_DIR = "generated_reports"
 os.makedirs(REPORTS_DIR, exist_ok = True)
 
-@router.post("/report")
+@router.post("/report", dependencies = [Depends(role_required("admin"))])
 async def generate_report(
         format: str = Query("csv", enum = ["csv", "pdf"]),
         start_date: str = Query(None, description = "Start date (YYYY-MM-DD)"),
@@ -76,7 +76,3 @@ async def generate_report(
         filename = os.path.basename(filename),
         media_type = "application/octet-stream"
     )
-
-@router.get("/admin/dashboard", dependencies = [Depends(role_required("admin"))])
-async def get_admin_dashboard():
-    return {"message": "Welcome, admin!"}

@@ -10,7 +10,6 @@ from jose import jwt, JWTError
 pwd_context = CryptContext(schemes = ["bcrypt"], deprecated = "auto")
 
 # Secret key & algorithm for JWT
-# TODO: Change `SECRET_KEY` to a randomly generated & secure key
 SECRET_KEY = "a3f9b657c1742b259b6f865f4b7e12dcf3b2a456b4f8e2dcbad678dfe1aab4e6"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -59,7 +58,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     Decode & validate the current user's token.
     """
     payload = verify_access_token(token)
-    if not payload:
+    if not payload or "role" not in payload:
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED, detail = "Invalid token")
     return payload
 
@@ -73,5 +72,5 @@ def role_required(required_role: str):
                 status_code = status.HTTP_403_FORBIDDEN,
                 detail = f"Permission denied: {required_role} role required"
             )
-            return current_user
+        return current_user
     return role_checker
