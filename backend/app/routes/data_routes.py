@@ -7,7 +7,7 @@ from app.core.security import role_required
 
 router = APIRouter()
 
-@router.post("/add")
+@router.post("/add", dependencies = [Depends(role_required("admin"))])
 async def add_energy_data(data: EnergyData):
     """API to add new energy data to the database."""
     # energy_collection.insert_one(data.dict())       # Insert into MongoDB

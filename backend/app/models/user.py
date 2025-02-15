@@ -1,5 +1,4 @@
 """This module serves to manage user data."""
-# from uuid import UUID
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr, ConfigDict, field_validator
@@ -8,6 +7,7 @@ class UserCreate(BaseModel):
     '''User input for account creation.'''
     email: EmailStr
     password: str
+    role: Optional[str] = "user"    # Default role
 
     @field_validator("password")
     @classmethod
@@ -39,9 +39,8 @@ class UserCreate(BaseModel):
 
 class UserResponse(BaseModel):
     """Response model for user account details."""
-    # id: UUID
     id: str
-    role: str = "user"
+    role: str
     email: EmailStr
     is_verified: bool = False
     created_at: Optional[datetime]
