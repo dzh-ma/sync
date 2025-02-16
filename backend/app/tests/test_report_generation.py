@@ -3,6 +3,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 import os
 
+from app.tests.conftest import seed_energy_data
+
 client = TestClient(app)
 REPORTS_DIR = "generated_reports"
 
@@ -12,7 +14,7 @@ def get_jwt_token():
     """
     response = client.post(
         "/api/v1/users/token",
-        data={"username": "test_user", "password": "TestPassword123!"}
+        data = {"username": "test_user@example.com", "password": "TestPassword123!"},
     )
     assert response.status_code == 200, f"Failed to get token: {response.json()}"
     return response.json().get("access_token")
@@ -69,6 +71,7 @@ def test_generated_report_with_date_filter():
     """
     Test generating a report with date range filtering.
     """
+    seed_energy_data()
     token = get_jwt_token()
     response = client.post(
         "/api/v1/reports/report?format=csv&start_date=2025-02-01&end_date=2025-02-02",
