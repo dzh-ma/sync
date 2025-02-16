@@ -14,6 +14,8 @@ try:
     # Collections for different functions
     users_collection = db["users"]
     energy_collection = db["energy_data"]
+
+    print(f"Connected to MongoDB database: {MONGO_URI}")
 except Exception as e:
     raise ConnectionError(f"Failed to connect to MongoDB: {e}") from e
 
