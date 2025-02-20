@@ -1,8 +1,11 @@
+import os
 import pytest
 from pymongo import MongoClient
 from app.db.database import users_collection
 from app.core.security import hash_password
 from datetime import datetime, timezone
+
+from app.routes.report_routes import REPORTS_DIR
 
 @pytest.fixture(scope="function", autouse=True)
 def setup_test_user():
@@ -53,3 +56,13 @@ def cleanup_energy_data():
     db = client.smart_home
     energy_collection = db["energy_data"]
     energy_collection.delete_many({"timestamp": {"$gte": datetime(2025, 2, 1), "$lt": datetime(2025, 2, 3)}})
+
+@pytest.fixture(autouse = True)
+def cleanup_report():
+    """
+    Remove all previously generated CSV & PDF reports before running tests.
+    """
+    if os.path.exists(REPORTS_DIR):
+        for file in os.listdir(REPORTS_DIR):
+            if file.endswith(".csv") or file.endswith(".pdf"):
+                os.remove(os.path.join(REPORTS_DIR, file))

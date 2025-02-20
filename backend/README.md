@@ -20,12 +20,12 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 
 - `__init__.py`: Initializes the core module.
 - `config.py`: Manages **application settings**, often using environment variables.
-- `security.py`: Implements **security features.**
+- `security.py`: Implements **security features, like JWT authentication.**
 
 ## `db/` (Database Management)
 
 - `__init__.py`: Initializes database module.
-- `database.py`: Handles **database connections.**
+- `database.py`: Handles **MongoDB database connections.**
 
 ## `models/` (Data Models)
 
@@ -43,6 +43,7 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 ## `tests/` (Testing Suite)
 
 - `__init__.py`: Initializes the testing module.
+- `conftest.py`: Contains **fixtures for test setup**, including **user & energy data seeding.**
 - `test_users.py`: Contains unit tests for **user-related functionalities.**
 - `test_data_routes.py`: Contains unit tests for **data aggregation, filtering & retrieval functionalities.**
 - `test_report_generation.py`: Contains unit tests for **report generation.**
@@ -78,7 +79,6 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 4. **API documentation**
     Once the back-end is running, visit: `http://127.0.0.1:8000/docs`
 
-
 ---
 
 # Running Tests
@@ -95,15 +95,37 @@ pytest app/tests/
 ## Generating CSV
 
 ```bash
-curl -X 'POST' \
-    'http://127.0.0.1:8000/api/v1/reports/report?format=csv'
+# Generating access token (if using bash)
+TOKEN=$(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
+    -d "username=test_user@example.com&password=TestPassword123!" \
+    -H "Content-Type: application/x-www-form-urlencoded" | jq -r .access_token)
+
+# Generating access token (if using fish)
+set TOKEN $(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
+    -d "username=test_user@example.com&password=TestPassword123!" \
+    -H "Content-Type: application/x-www-form-urlencoded" | jq -r .access_token)
+
+# Executing command
+curl -X POST "http://127.0.0.1:8000/api/v1/reports/report?format=pdf" \
+    -H "Authorization: Bearer $TOKEN"
 ```
 
 ## Generating PDF
 
 ```bash
-curl -X 'POST' \
-    'http://127.0.0.1:8000/api/v1/reports/report?format=pdf'
+# Generating access token (if using bash)
+TOKEN=$(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
+    -d "username=test_user@example.com&password=TestPassword123!" \
+    -H "Content-Type: application/x-www-form-urlencoded" | jq -r .access_token)
+
+# Generating access token (if using fish)
+set TOKEN $(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
+    -d "username=test_user@example.com&password=TestPassword123!" \
+    -H "Content-Type: application/x-www-form-urlencoded" | jq -r .access_token)
+
+# Executing command
+curl -X POST "http://127.0.0.1:8000/api/v1/reports/report?format=csv" \
+    -H "Authorization: Bearer $TOKEN"
 ```
 
 ---
