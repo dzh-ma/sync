@@ -40,6 +40,13 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 - `data_routes.py`: Implements endpoints for **energy data aggregation, filtering & analysis.**
 - `report_routes.py`: Implements endpoints for **energy consumption report generation.**
 
+## `seeds/` (Database Seeding)
+
+- `seed_user.py`: **Seeds an admin user** for authentication and testing.
+- `insert_sample_data.py`: **Adds initial energy consumption records**.
+- `insert_sample_data_2.py`: **Additional sample dataset for testing**.
+- `insert_sample_data_3.py`: **More sample test data, expanding energy usage scenarios**.
+
 ## `tests/` (Testing Suite)
 
 - `__init__.py`: Initializes the testing module.
