@@ -11,43 +11,45 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 - `Dockerfile`: Configures a containerized environment for the back-end.
 - `requirements.txt`: Specifies **Python dependencies & libraries needed** for the back-end to function.
 
-## `app/` (Back-end Application)
+### `docs/` (Documentation)
+
+### `app/` (Back-end Application)
 
 - `__init__.py`: Marks the app directory as a Python package.
 - `main.py`: **Entry point for the FastAPI back-end application.**
 
-## `core/` (Application Core)
+#### `core/` (Application Core)
 
 - `__init__.py`: Initializes the core module.
 - `config.py`: Manages **application settings**, often using environment variables.
 - `security.py`: Implements **security features, like JWT authentication.**
 
-## `db/` (Database Management)
+#### `db/` (Database Management)
 
 - `__init__.py`: Initializes database module.
 - `database.py`: Handles **MongoDB database connections.**
 
-## `models/` (Data Models)
+#### `models/` (Data Models)
 
 - `__init__.py`: Initializes **model definitions.**
 - `user.py`: Defines the `User` model, including schema for **storing user data & handling authentication.**
 - `energy_data.py`: Defines the `EnergyData` model, handling **energy consumption records.**
 
-## `routes/` (API Endpoints)
+#### `routes/` (API Endpoints)
 
 - `__init__.py`: Initializes routing module.
 - `user_routes.py`: Implements endpoints related to **user management.**
 - `data_routes.py`: Implements endpoints for **energy data aggregation, filtering & analysis.**
 - `report_routes.py`: Implements endpoints for **energy consumption report generation.**
 
-## `seeds/` (Database Seeding)
+#### `seeds/` (Database Seeding)
 
 - `seed_user.py`: **Seeds an admin user** for authentication and testing.
 - `insert_sample_data.py`: **Adds initial energy consumption records**.
 - `insert_sample_data_2.py`: **Additional sample dataset for testing**.
 - `insert_sample_data_3.py`: **More sample test data, expanding energy usage scenarios**.
 
-## `tests/` (Testing Suite)
+#### `tests/` (Testing Suite)
 
 - `__init__.py`: Initializes the testing module.
 - `conftest.py`: Contains **fixtures for test setup**, including **user & energy data seeding.**
@@ -134,5 +136,24 @@ set TOKEN $(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
 curl -X POST "http://127.0.0.1:8000/api/v1/reports/report?format=csv" \
     -H "Authorization: Bearer $TOKEN"
 ```
+
+---
+
+# Viewing All Documentation
+
+1. **Install necessary dependencies**
+    ```bash
+    pip install mkdocs mkdocstrings[python]
+    ```
+2. **Run documentation server**
+    ```bash
+    mkdocs serve
+    ```
+3. **Rebuild documentation server in case of change**
+    ```bash
+    mkdocs build
+    ```
+4. **Viewing documentation in PDF form**
+    Find the following file: `site/pdf/document.pdf`
 
 ---

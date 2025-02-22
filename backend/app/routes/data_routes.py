@@ -1,3 +1,11 @@
+"""
+This module defines API routes for managing & retrieving energy consumption data
+
+It includes:
+- An endpoint for adding new energy data (admin-only access)
+- An endpoint for fetching aggregated energy consumption data with filtering options
+- An admin dashboard route (restricted to users with an "admin" role)
+"""
 from datetime import datetime
 from typing import Optional, Literal
 from fastapi import APIRouter, Query, Depends
@@ -9,8 +17,15 @@ router = APIRouter()
 
 @router.post("/add", dependencies = [Depends(role_required("admin"))])
 async def add_energy_data(data: EnergyData):
-    """API to add new energy data to the database."""
-    # energy_collection.insert_one(data.dict())       # Insert into MongoDB
+    """
+    Add new energy consumption data to the database (admin-only)
+
+    Args:
+        data (EnergyData): The energy data record to be added
+
+    Returns:
+        dict: A confirmation message upon successfully insertion
+    """
     energy_collection.insert_one(data.model_dump())       # Insert into MongoDB
     return {"message": "Energy data added successfully"}
 
@@ -22,7 +37,19 @@ async def get_aggregated_data(
     location: Optional[str] = Query(None, description = "Location filter"),
     interval: Literal["hour", "day", "week"] = "day",
 ):
-    """Fetch aggregated energy data based on filters"""
+    """
+    Retrieve aggregated energy consumption data based on time interval & filters
+
+    Args:
+        start_date (Optional[str]): The start date for filtering (YYYY-MM-DD)
+        end_date (Optional[str]): The end date for filtering (YYYY-MM-DD)
+        device_id (Optional[str]): The ID of the device to filter data
+        location (Optional[str]): The location filter
+        interval (Literal["hour", "day", "week"]): The time interval for aggregation (defaults to "day")
+
+    Returns:
+        dict: Aggregated energy consumption data grouped by the selected interval
+    """
     query = {}
 
     if start_date and end_date:
@@ -79,4 +106,10 @@ async def get_aggregated_data(
 
 @router.get("/admin/dashboard", dependencies = [Depends(role_required("admin"))])
 async def get_admin_dashboard():
+    """
+    Admin dashboard endpoint (restricted access)
+
+    Returns:
+        dict: A welcome message confirming admin access
+    """
     return {"message": "Welcome, admin!"}
