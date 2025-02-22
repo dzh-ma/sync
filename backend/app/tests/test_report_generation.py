@@ -1,3 +1,11 @@
+"""
+This module contains test cases for generating energy consumption reports
+
+Tested functionality:
+- Generating CSV & PDF reports
+- Generating reports with date range filtering
+- Ensuring reports are successfully created & contain valid data
+"""
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
@@ -10,7 +18,13 @@ REPORTS_DIR = "generated_reports"
 
 def get_jwt_token():
     """
-    Helper function to get a valid JWT token for testing.
+    Helper function to get a valid JWT token for authentication in tests
+
+    Returns:
+        str: A valid access token
+
+    Raises:
+        AssertionError: If token retrieval fails
     """
     response = client.post(
         "/api/v1/users/token",
@@ -22,7 +36,9 @@ def get_jwt_token():
 @pytest.fixture(autouse=True)
 def cleanup_generated_reports():
     """
-    Fixture to clean up generated reports after each test.
+    Fixture to remove all generated reports after each test
+
+    Ensures that test-generated CSV & PDF reports don't persist between test runs
     """
     yield
     if os.path.exists(REPORTS_DIR):
@@ -32,7 +48,11 @@ def cleanup_generated_reports():
 
 def test_generate_csv_report():
     """
-    Test the generation of a CSV report.
+    Test the generation of an energy consumption CSV report
+
+    - Sends a request to generate a CSV report
+    - Verifies response status & content type
+    - Ensures that the report is successfully created & contains valid data
     """
     token = get_jwt_token()
     response = client.post(
@@ -51,7 +71,11 @@ def test_generate_csv_report():
 
 def test_generate_pdf_report():
     """
-    Test the generation of a PDF report.
+    Test the generation of an energy consumption PDF report
+
+    - Sends a request to generate a PDF report
+    - Verifies response status & content type
+    - Ensures the report file is successfully created & isn't empty
     """
     token = get_jwt_token()
     response = client.post(
@@ -69,7 +93,12 @@ def test_generate_pdf_report():
 
 def test_generated_report_with_date_filter():
     """
-    Test generating a report with date range filtering.
+    Test generating a report with date range filtering
+
+    - Seeds test energy data before running
+    - Sends a request to generate a filtered report
+    - Verifies response status & content type
+    - Ensure the report file is successfully created
     """
     seed_energy_data()
     token = get_jwt_token()

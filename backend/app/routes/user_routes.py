@@ -1,4 +1,11 @@
-"""This module routes data to the database from registration"""
+"""
+This module defines user-related API routes for registration, authentication & role-based access
+
+It includes:
+- User registration with hashed password storage
+- User authentication & JWT token issuance
+- Admin dashboard access (restricted to users with the "admin" role)
+"""
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
@@ -10,12 +17,24 @@ router = APIRouter()
 
 @router.post("/register", response_model = UserResponse)
 async def register_user(user: UserCreate):
-    """Registers a new user to the database."""
+    """
+    Register a new user in the database
+
+    Args:
+        user (UserCreate): User registration data including email, password & optional role
+
+    Returns:
+        UserResponse: The created user information excluding password
+
+    Raises:
+        HTTPException (400): If the email is already registered
+        HTTPException (500): If there is an error inserted the user into the database
+    """
     # Check if email exists already
     if users_collection.find_one({"email": user.email}):
         raise HTTPException(status_code = 400, detail = "Registration failed, please try again.")
 
-    # Data that will be collected
+    # Prepare user data for insertion
     user_data = {
         "email": user.email,
         "password_hash": hash_password(user.password),
@@ -42,7 +61,16 @@ async def register_user(user: UserCreate):
 @router.post("/token")
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
-    Authenticate user & return a JWT token.
+    Authenticate user & return a JWT token
+
+    Args:
+        form_data (OAuth2PasswordRequestForm): User-provided login credentials
+
+    Returns:
+        dict: A dictionary containing the access token & token type
+
+    Raises:
+        HTTPException (400): If the username or password is incorrect
     """
     user = users_collection.find_one({"email": form_data.username})
     if not user or not verify_password(form_data.password, user["password_hash"]):
@@ -57,4 +85,10 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @router.get("/admin/dashboard", dependencies = [Depends(role_required("admin"))])
 async def get_admin_dashboard():
+    """
+    Admin dashboard  endpoint (restricted access)
+
+    Returns:
+        dict: A welcome message confirming admin access
+    """
     return {"message": "Welcome, admin!"}

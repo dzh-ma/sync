@@ -1,3 +1,10 @@
+"""
+This module provides API endpoints for generating energy consumption reports
+
+It includes:
+- An endpoint to generate reports in CSV or PDF format, optionally filtered by a data range
+- Reports are stored in the `generated_reports` directory
+"""
 from fastapi import APIRouter, HTTPException, Query, Depends
 from fastapi.responses import FileResponse
 import pandas as pd
@@ -12,6 +19,7 @@ from app.core.security import role_required
 
 router = APIRouter()
 
+# Directory for storing generated reports
 REPORTS_DIR = "generated_reports"
 os.makedirs(REPORTS_DIR, exist_ok = True)
 
@@ -22,8 +30,19 @@ async def generate_report(
         end_date: str = Query(None, description = "End date (YYYY-MM-DD)")
 ):
     """
-    Generate an energy consumption report in CSV or PDF format,
-    optionally filtered by date range.
+    Generate an energy consumption report in CSV or PDF format
+
+    Args:
+        format (str): The desired report format, either "csv" or "pdf"
+        start_date (str, optional): The start date for filtering data (YYYY-MM-DD)
+        end_date (str, optional): The end date for filtering data (YYYY-MM-DD)
+
+    Returns:
+        FileResponse: The generated report file
+
+    Raises:
+        HTTPException (400): If an invalid date format is provided
+        HTTPException (404): If no energy data is available for the selected range
     """
     try:
         energy_data = get_energy_data(start_date, end_date)
@@ -37,11 +56,13 @@ async def generate_report(
     filename = f"{REPORTS_DIR}/energy_report_{timestamp}.{format}"
 
     if format == "csv":
+        # Convert data to a DataFrame & format timestamps
         df = pd.DataFrame(energy_data)
         df["timestamp"] = pd.to_datetime(df["timestamp"]).dt.strftime("%Y-%m-%d %H:%M:%S")  # Format timestamp
         df.columns = ["Device ID", "Timestamp", "Energy Consumed (kWh)", "Location"]
         df.to_csv(filename, index = False)
     elif format == "pdf":
+        # Create a PDF report with a structure table
         doc = SimpleDocTemplate(filename, pagesize=letter)
         elements = []
 

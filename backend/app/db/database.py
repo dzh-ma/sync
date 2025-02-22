@@ -1,3 +1,10 @@
+"""
+This module handles MongoDB database connections & operations
+
+It provides:
+- Initialization of MongoDB collections & indexes
+- Functions to fetch energy consumption data with optional filtering
+"""
 import os
 from pymongo import MongoClient
 from datetime import datetime
@@ -20,7 +27,16 @@ except Exception as e:
     raise ConnectionError(f"Failed to connect to MongoDB: {e}") from e
 
 async def init_db():
-    """Initialize the database, such as creating necessary indexes."""
+    """
+    Initialize the database by creating necessary indexes
+
+    This function ensures:
+    - Unique email constraint for users
+    - Indexes on `device_id` & `timestamp` in the energy collection for optimized queries
+
+    Raises:
+        RuntimeError: If there is an error during database initialization
+    """
     try:
         # Create uniqueness of user emails
         users_collection.create_index("email", unique = True)
@@ -33,15 +49,21 @@ async def init_db():
     except Exception as e:
         raise RuntimeError(f"Error during database initialization: {e}") from e
 
+# FIX: Parameters marked as errors
 def get_energy_data(start_date: str = None, end_date: str = None) -> List[Dict]:
     """
-    Fetch energy consumption data from MongoDB with optional date filtering.
+    Fetch energy data consumption from MongoDB with optional date filtering
 
-    :param start_date: Optional start date in 'YYYY-MM-DD' format
-    :param end_date: Optional end date in 'YYYY-MM-DD' format
-    :return: List of energy data documents
+    Args:
+        start_date (str, optional): Start date in `YYYY-MM-DD` format
+        end_date (str, optional): End date in `YYYY-MM-DD` format
+
+    Returns:
+        List[Dict]: A list of energy consumption records
+
+    Raises:
+        ValueError: If the provided date format is incorrect
     """
-
     query = {}
 
     if start_date and end_date:
