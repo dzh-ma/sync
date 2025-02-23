@@ -24,6 +24,9 @@ logger = logging.getLogger(__name__)
 
 # Environment variables
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
+origins = [
+    "http://localhost:5173",
+]
 
 @asynccontextmanager
 async def lifespan(app_context: FastAPI):
@@ -60,7 +63,8 @@ app = FastAPI(lifespan = lifespan)
 # Enable CORS for front-end communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins = ALLOWED_ORIGINS,      # Change `"*"` to specific origins/domain in production
+    # allow_origins = ALLOWED_ORIGINS,      # Change `"*"` to specific origins/domain in production
+    allow_origins = origins,      # Change `"*"` to specific origins/domain in production
     allow_credentials = True,
     allow_methods = ["*"],
     allow_headers = ["*"],
