@@ -74,17 +74,20 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 # Setup & Running The Back-end
 
 1. **Install back-end dependencies**
-    ```bash
-    pip install -r requirements.txt
-    ```
+```bash
+pip install -r requirements.txt
+```
+
 2. **Ensure MongoDB is running**
-    ```bash
-    sudo systemctl start mongodb
-    ```
+```bash
+sudo systemctl start mongodb
+```
+
 3. **Initialize the app using `uvicorn`**
-    ```bash
-    uvicorn main:app --reload 
-    ```
+```bash
+uvicorn main:app --reload 
+```
+
 4. **API documentation**
     Once the back-end is running, visit: `http://127.0.0.1:8000/docs`
 
@@ -142,17 +145,20 @@ curl -X POST "http://127.0.0.1:8000/api/v1/reports/report?format=csv" \
 # Viewing All Documentation
 
 1. **Install necessary dependencies**
-    ```bash
-    pip install mkdocs mkdocstrings[python]
-    ```
+```bash
+pip install mkdocs mkdocstrings[python]
+```
+
 2. **Run documentation server**
-    ```bash
-    mkdocs serve
-    ```
+```bash
+mkdocs serve
+```
+
 3. **Rebuild documentation server in case of change**
-    ```bash
-    mkdocs build
-    ```
+```bash
+mkdocs build
+```
+
 4. **Viewing documentation in PDF form**
     Find the following file: `site/pdf/document.pdf`
 

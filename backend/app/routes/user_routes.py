@@ -7,16 +7,18 @@ It includes:
 - Admin dashboard access (restricted to users with the "admin" role)
 """
 from datetime import datetime, timezone, timedelta
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
+from starlette.types import HTTPExceptionHandler
 from app.models.user import UserCreate, UserResponse
 from app.db.database import users_collection
-from app.core.security import hash_password, role_required, verify_password, create_access_token, role_required
+from app.core.security import hash_password, role_required, verify_password, create_access_token
+from app.utils.email_verification import generate_verification_token, send_verification_email, confirm_verification_token
 
 router = APIRouter()
 
 @router.post("/register", response_model = UserResponse)
-async def register_user(user: UserCreate):
+async def register_user(user: UserCreate, background_tasks: BackgroundTasks):
     """
     Register a new user in the database
 
@@ -47,8 +49,12 @@ async def register_user(user: UserCreate):
     # Database user insert
     try:
         result = users_collection.insert_one(user_data)
-    except Exception as e:
-        raise HTTPException(status_code = 500, detail = f"Failed to register user: {e}") from e
+    except Exception as exc:
+        raise HTTPException(status_code = 500, detail = f"Failed to register user: {exc}") from exc
+
+    # Generate verification token & schedule when verification email sends
+    token = generate_verification_token(user.email)
+    background_tasks.add_task(send_verification_email, user.email, token)
 
     return UserResponse(
         id = str(result.inserted_id),
@@ -92,3 +98,15 @@ async def get_admin_dashboard():
         dict: A welcome message confirming admin access
     """
     return {"message": "Welcome, admin!"}
+
+@router.get("/verify")
+async def verify_email(token: str):
+    # Decode & verify the token to retrieve the email
+    email = confirm_verification_token(token)
+
+    # Update the user's record to set is_verified to True
+    result = users_collection.update_one({"email": email}, {"$set": {"is_verified": True}})
+    if result.modified_count == 0:
+        raise HTTPException(status_code = 400, detail = "User couldn't be verified.")
+
+    return {"message": "Email verified successfully."}

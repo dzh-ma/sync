@@ -1,3 +1,17 @@
+/**
+ * Header Component
+ *
+ * Renders the header section of the Sync Smart Home application. This includes the application
+ * title and a navigation menu with links to various pages such as Home, Login, Register, Dashboard,
+ * Add Energy Data, and Report.
+ *
+ * @component
+ * @example
+ * return (
+ *   <Header />
+ * )
+ */
+
 import React from "react";
 import { Link } from "react-router-dom";
 
