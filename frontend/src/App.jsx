@@ -1,3 +1,16 @@
+/**
+ * App Component
+ *
+ * The root component of the application. It sets up React Router for navigation
+ * and includes the main layout components: Header, Footer, and the various pages.
+ *
+ * @component
+ * @example
+ * return (
+ *   <App />
+ * )
+ */
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';

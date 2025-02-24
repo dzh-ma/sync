@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 origins = [
     "http://localhost:5173",
+    "mongodb://localhost:27017/",
 ]
 
 @asynccontextmanager
