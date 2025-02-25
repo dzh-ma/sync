@@ -9,6 +9,7 @@ It acts as a middleware between the front-end & database, handling:
 import os
 import logging
 from contextlib import asynccontextmanager
+from typing import AsyncGenerator
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -29,8 +30,9 @@ origins = [
     "mongodb://localhost:27017/",
 ]
 
+# WARN: Code changes here were made to reduce warnings
 @asynccontextmanager
-async def lifespan(app_context: FastAPI):
+async def lifespan(app_context: FastAPI) -> AsyncGenerator[None, None]:
     """
     Defines application's lifespan event handler
 

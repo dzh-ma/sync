@@ -28,7 +28,7 @@ async def generate_report(
         format: str = Query("csv", enum = ["csv", "pdf"]),
         start_date: str = Query(None, description = "Start date (YYYY-MM-DD)"),
         end_date: str = Query(None, description = "End date (YYYY-MM-DD)")
-):
+) -> FileResponse:
     """
     Generate an energy consumption report in CSV or PDF format
 

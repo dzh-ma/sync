@@ -16,7 +16,7 @@ from app.core.security import role_required
 router = APIRouter()
 
 @router.post("/add", dependencies = [Depends(role_required("admin"))])
-async def add_energy_data(data: EnergyData):
+async def add_energy_data(data: EnergyData) -> dict:
     """
     Add new energy consumption data to the database (admin-only)
 
@@ -36,7 +36,7 @@ async def get_aggregated_data(
     device_id: Optional[str] = Query(None, description = "Device ID filter"),
     location: Optional[str] = Query(None, description = "Location filter"),
     interval: Literal["hour", "day", "week"] = "day",
-):
+) -> dict:
     """
     Retrieve aggregated energy consumption data based on time interval & filters
 
@@ -105,7 +105,7 @@ async def get_aggregated_data(
     return {"aggregated_data": result}
 
 @router.get("/admin/dashboard", dependencies = [Depends(role_required("admin"))])
-async def get_admin_dashboard():
+async def get_admin_dashboard() -> dict:
     """
     Admin dashboard endpoint (restricted access)
 

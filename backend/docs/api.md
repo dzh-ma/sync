@@ -17,3 +17,5 @@
 ::: app.core.config
 
 ::: app.core.security
+
+::: app.utils.email_verification

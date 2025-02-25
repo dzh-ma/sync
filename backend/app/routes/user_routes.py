@@ -9,7 +9,6 @@ It includes:
 from datetime import datetime, timezone, timedelta
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm
-from starlette.types import HTTPExceptionHandler
 from app.models.user import UserCreate, UserResponse
 from app.db.database import users_collection
 from app.core.security import hash_password, role_required, verify_password, create_access_token
@@ -18,7 +17,7 @@ from app.utils.email_verification import generate_verification_token, send_verif
 router = APIRouter()
 
 @router.post("/register", response_model = UserResponse)
-async def register_user(user: UserCreate, background_tasks: BackgroundTasks):
+async def register_user(user: UserCreate, background_tasks: BackgroundTasks) -> UserResponse:
     """
     Register a new user in the database
 
@@ -65,7 +64,7 @@ async def register_user(user: UserCreate, background_tasks: BackgroundTasks):
     )
 
 @router.post("/token")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(form_data: OAuth2PasswordRequestForm = Depends()) -> dict[str, str]:
     """
     Authenticate user & return a JWT token
 
@@ -90,7 +89,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return {"access_token": access_token, "token_type": "bearer"}
 
 @router.get("/admin/dashboard", dependencies = [Depends(role_required("admin"))])
-async def get_admin_dashboard():
+async def get_admin_dashboard() -> dict[str, str]:
     """
     Admin dashboard  endpoint (restricted access)
 
@@ -100,7 +99,19 @@ async def get_admin_dashboard():
     return {"message": "Welcome, admin!"}
 
 @router.get("/verify")
-async def verify_email(token: str):
+async def verify_email(token: str) -> dict[str, str]:
+    """
+    Verify a user's email address using a verification token
+
+    Args:
+        token (str): The email verification token passed as a query parameter
+
+    Returns:
+        dict[str, str]: A dictionary containing a success message confirming email verification
+
+    Raises:
+        HTTPException: If verification token is expired/invalid, or if user record couldn't be updated
+    """
     # Decode & verify the token to retrieve the email
     email = confirm_verification_token(token)
 

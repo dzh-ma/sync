@@ -7,7 +7,7 @@ Features include:
 - Role-based access control
 """
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Optional, Callable, Any
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
@@ -70,7 +70,7 @@ def needs_rehash(hashed_password: str) -> bool:
     """
     return pwd_context.needs_update(hashed_password)
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """
     Create a JWT token with an expiration time
 
@@ -124,7 +124,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
         raise HTTPException(status_code = status.HTTP_401_UNAUTHORIZED, detail = "Invalid token")
     return payload
 
-def role_required(required_role: str):
+def role_required(required_role: str) -> Callable[..., dict]:
     """
     Dependency function to check to enforce role-based access control
 
@@ -132,12 +132,12 @@ def role_required(required_role: str):
         required_role (str): The required user role
 
     Returns:
-        function: A dependency function that verifies the user's role
+        Callable[..., dict]: A dependency function that verifies the user's role
 
     Raises:
         HTTPException: If the user lacks the required role
     """
-    def role_checker(current_user: dict = Depends(get_current_user)):
+    def role_checker(current_user: dict = Depends(get_current_user)) -> dict:
         if current_user.get("role") != required_role:
             raise HTTPException(
                 status_code = status.HTTP_403_FORBIDDEN,

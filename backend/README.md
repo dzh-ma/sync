@@ -13,6 +13,9 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 
 ### `docs/` (Documentation)
 
+- `api.md`: Defines what Python files will be parsed for documentation.
+- `index.md`: Home section of the server.
+
 ### `app/` (Back-end Application)
 
 - `__init__.py`: Marks the app directory as a Python package.
@@ -46,7 +49,7 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 
 - `seed_user.py`: **Seeds an admin user** for authentication and testing.
 - `insert_sample_data.py`: **Adds initial energy consumption records**.
-- `insert_sample_data_2.py`: **Additional sample dataset for testing**.
+- `insert_sample_data_2.py`: **Additional sample data set for testing**.
 - `insert_sample_data_3.py`: **More sample test data, expanding energy usage scenarios**.
 
 #### `tests/` (Testing Suite)
@@ -57,11 +60,28 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 - `test_data_routes.py`: Contains unit tests for **data aggregation, filtering & retrieval functionalities.**
 - `test_report_generation.py`: Contains unit tests for **report generation.**
 
+#### `utils/` (Utility Functions)
+
+- `__init__.py`: Initializes utilities module.
+- `email_verification.py`: Provides **email verification functionalities.**
+
+> [!IMPORTANT]
+> Create an `email_config.ini` file inside `utils/` before initializing server.
+>> Template:
+>> ```ini email_config.ini
+>> [smtp]
+>> email = PLACEHOLDER_EMAIL
+>> password = PLACEHOLDER_PASSWORD
+>> ```
+>>> [!CAUTION]
+>>> Add `backend/app/utils/email_config.ini` to project root's `.gitignore` file to avoid leaking sensitive information
+
 ---
 
 # Features
 
 + **User Authentication** (FastAPI & OAuth2).
++ **Email Verification** (Token generation & email sending via SMTP)
 + **Energy Data Aggregation** (filtering by *hourly, daily & weekly intervals*).
 + **MongoDB Integration** (NoSQL database).
 + **Secure API Endpoints** (JWT authentication & access control).

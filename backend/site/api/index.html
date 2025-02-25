@@ -335,6 +335,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#app.routes.user_routes.verify_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      verify_email
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -597,6 +606,48 @@
   <a href="#app.core.security.verify_password" class="md-nav__link">
     <span class="md-ellipsis">
       verify_password
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#app.utils.email_verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      email_verification
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="email_verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.utils.email_verification.confirm_verification_token" class="md-nav__link">
+    <span class="md-ellipsis">
+      confirm_verification_token
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#app.utils.email_verification.generate_verification_token" class="md-nav__link">
+    <span class="md-ellipsis">
+      generate_verification_token
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#app.utils.email_verification.send_verification_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      send_verification_email
     </span>
   </a>
   
@@ -720,6 +771,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#app.routes.user_routes.verify_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      verify_email
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -992,6 +1052,48 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#app.utils.email_verification" class="md-nav__link">
+    <span class="md-ellipsis">
+      email_verification
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="email_verification">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#app.utils.email_verification.confirm_verification_token" class="md-nav__link">
+    <span class="md-ellipsis">
+      confirm_verification_token
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#app.utils.email_verification.generate_verification_token" class="md-nav__link">
+    <span class="md-ellipsis">
+      generate_verification_token
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#app.utils.email_verification.send_verification_email" class="md-nav__link">
+    <span class="md-ellipsis">
+      send_verification_email
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1094,14 +1196,14 @@
 
               <details class="quote">
                 <summary>Source code in <code>app/main.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RootResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">RootResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Response model for the root endpoint</span>
 
@@ -1198,6 +1300,7 @@
       <tbody>
           <tr class="doc-section-item">
 <td><code>None</code></td>            <td>
+                  <code><span title="typing.AsyncGenerator">AsyncGenerator</span>[None, None]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1233,13 +1336,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app/main.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
 <span class="normal">37</span>
@@ -1260,8 +1357,14 @@
 <span class="normal">52</span>
 <span class="normal">53</span>
 <span class="normal">54</span>
-<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@asynccontextmanager</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">lifespan</span><span class="p">(</span><span class="n">app_context</span><span class="p">:</span> <span class="n">FastAPI</span><span class="p">):</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@asynccontextmanager</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">lifespan</span><span class="p">(</span><span class="n">app_context</span><span class="p">:</span> <span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Defines application&#39;s lifespan event handler</span>
 
@@ -1332,15 +1435,15 @@
 
             <details class="quote">
               <summary>Source code in <code>app/main.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">84</span>
-<span class="normal">85</span>
-<span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">response_model</span> <span class="o">=</span> <span class="n">RootResponse</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span>
+<span class="normal">94</span>
+<span class="normal">95</span>
+<span class="normal">96</span>
+<span class="normal">97</span>
+<span class="normal">98</span>
+<span class="normal">99</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">response_model</span> <span class="o">=</span> <span class="n">RootResponse</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">read_root</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">RootResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Root endpoint</span>
@@ -1427,6 +1530,7 @@
       <tbody>
           <tr class="doc-section-item">
 <td><code>dict</code></td>            <td>
+                  <code>dict[str, str]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1439,16 +1543,16 @@
 
             <details class="quote">
               <summary>Source code in <code>app/routes/user_routes.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">86</span>
-<span class="normal">87</span>
-<span class="normal">88</span>
-<span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">91</span>
 <span class="normal">92</span>
 <span class="normal">93</span>
-<span class="normal">94</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/admin/dashboard&quot;</span><span class="p">,</span> <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span><span class="n">Depends</span><span class="p">(</span><span class="n">role_required</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">))])</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_admin_dashboard</span><span class="p">():</span>
+<span class="normal">94</span>
+<span class="normal">95</span>
+<span class="normal">96</span>
+<span class="normal">97</span>
+<span class="normal">98</span>
+<span class="normal">99</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/admin/dashboard&quot;</span><span class="p">,</span> <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span><span class="n">Depends</span><span class="p">(</span><span class="n">role_required</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">))])</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_admin_dashboard</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Admin dashboard  endpoint (restricted access)</span>
 
@@ -1522,6 +1626,7 @@
       <tbody>
           <tr class="doc-section-item">
 <td><code>dict</code></td>            <td>
+                  <code>dict[str, str]</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1557,12 +1662,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app/routes/user_routes.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">66</span>
 <span class="normal">67</span>
 <span class="normal">68</span>
 <span class="normal">69</span>
@@ -1580,8 +1680,13 @@
 <span class="normal">81</span>
 <span class="normal">82</span>
 <span class="normal">83</span>
-<span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/token&quot;</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">form_data</span><span class="p">:</span> <span class="n">OAuth2PasswordRequestForm</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">()):</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/token&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">form_data</span><span class="p">:</span> <span class="n">OAuth2PasswordRequestForm</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Authenticate user &amp; return a JWT token</span>
 
@@ -1614,7 +1719,7 @@
 
 
 <h3 id="app.routes.user_routes.register_user" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">user_routes</span><span class="o">.</span><span class="n">register_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">user_routes</span><span class="o">.</span><span class="n">register_user</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">background_tasks</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-async"><code>async</code></small>
@@ -1670,6 +1775,7 @@
       <tbody>
           <tr class="doc-section-item">
 <td><code>UserResponse</code></td>            <td>
+                  <code><a class="autorefs autorefs-internal" title="app.models.user.UserResponse" href="#app.models.user.UserResponse">UserResponse</a></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1715,8 +1821,7 @@
 
             <details class="quote">
               <summary>Source code in <code>app/routes/user_routes.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">18</span>
-<span class="normal">19</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">19</span>
 <span class="normal">20</span>
 <span class="normal">21</span>
 <span class="normal">22</span>
@@ -1756,8 +1861,13 @@
 <span class="normal">56</span>
 <span class="normal">57</span>
 <span class="normal">58</span>
-<span class="normal">59</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/register&quot;</span><span class="p">,</span> <span class="n">response_model</span> <span class="o">=</span> <span class="n">UserResponse</span><span class="p">)</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">register_user</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="n">UserCreate</span><span class="p">):</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/register&quot;</span><span class="p">,</span> <span class="n">response_model</span> <span class="o">=</span> <span class="n">UserResponse</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">register_user</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="n">UserCreate</span><span class="p">,</span> <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UserResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Register a new user in the database</span>
 
@@ -1788,8 +1898,12 @@
     <span class="c1"># Database user insert</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">users_collection</span><span class="o">.</span><span class="n">insert_one</span><span class="p">(</span><span class="n">user_data</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span> <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to register user: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span> <span class="n">detail</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to register user: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+
+    <span class="c1"># Generate verification token &amp; schedule when verification email sends</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">generate_verification_token</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">)</span>
+    <span class="n">background_tasks</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">send_verification_email</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">UserResponse</span><span class="p">(</span>
         <span class="nb">id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">inserted_id</span><span class="p">),</span>
@@ -1798,6 +1912,153 @@
         <span class="n">is_verified</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">created_at</span> <span class="o">=</span> <span class="n">user_data</span><span class="p">[</span><span class="s2">&quot;created_at&quot;</span><span class="p">]</span>
     <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="app.routes.user_routes.verify_email" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">user_routes</span><span class="o">.</span><span class="n">verify_email</span><span class="p">(</span><span class="n">token</span><span class="p">)</span></code>
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-async"><code>async</code></small>
+  </span>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Verify a user's email address using a verification token</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>token</code>
+            </td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The email verification token passed as a query parameter</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code>dict[str, str]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>dict[str, str]: A dictionary containing a success message confirming email verification</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="fastapi.HTTPException">HTTPException</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If verification token is expired/invalid, or if user record couldn't be updated</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app/routes/user_routes.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/verify&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">verify_email</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verify a user&#39;s email address using a verification token</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        token (str): The email verification token passed as a query parameter</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict[str, str]: A dictionary containing a success message confirming email verification</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If verification token is expired/invalid, or if user record couldn&#39;t be updated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Decode &amp; verify the token to retrieve the email</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">confirm_verification_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+    <span class="c1"># Update the user&#39;s record to set is_verified to True</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">users_collection</span><span class="o">.</span><span class="n">update_one</span><span class="p">({</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">email</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;$set&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;is_verified&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}})</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">modified_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">detail</span> <span class="o">=</span> <span class="s2">&quot;User couldn&#39;t be verified.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Email verified successfully.&quot;</span><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -1907,6 +2168,7 @@
       <tbody>
           <tr class="doc-section-item">
 <td><code>dict</code></td>            <td>
+                  <code>dict</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -1932,7 +2194,7 @@
 <span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/add&quot;</span><span class="p">,</span> <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span><span class="n">Depends</span><span class="p">(</span><span class="n">role_required</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">))])</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">add_energy_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">EnergyData</span><span class="p">):</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">add_energy_data</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">EnergyData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Add new energy consumption data to the database (admin-only)</span>
 
@@ -1979,6 +2241,7 @@
       <tbody>
           <tr class="doc-section-item">
 <td><code>dict</code></td>            <td>
+                  <code>dict</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2000,7 +2263,7 @@
 <span class="normal">113</span>
 <span class="normal">114</span>
 <span class="normal">115</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/admin/dashboard&quot;</span><span class="p">,</span> <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[</span><span class="n">Depends</span><span class="p">(</span><span class="n">role_required</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">))])</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_admin_dashboard</span><span class="p">():</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_admin_dashboard</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Admin dashboard endpoint (restricted access)</span>
 
@@ -2138,6 +2401,7 @@
       <tbody>
           <tr class="doc-section-item">
 <td><code>dict</code></td>            <td>
+                  <code>dict</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2230,7 +2494,7 @@
     <span class="n">device_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Device ID filter&quot;</span><span class="p">),</span>
     <span class="n">location</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Location filter&quot;</span><span class="p">),</span>
     <span class="n">interval</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;hour&quot;</span><span class="p">,</span> <span class="s2">&quot;day&quot;</span><span class="p">,</span> <span class="s2">&quot;week&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;day&quot;</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieve aggregated energy consumption data based on time interval &amp; filters</span>
 
@@ -2437,6 +2701,7 @@
       <tbody>
           <tr class="doc-section-item">
 <td><code>FileResponse</code></td>            <td>
+                  <code><span title="fastapi.responses.FileResponse">FileResponse</span></code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -2560,7 +2825,7 @@
         <span class="nb">format</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="n">enum</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;pdf&quot;</span><span class="p">]),</span>
         <span class="n">start_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Start date (YYYY-MM-DD)&quot;</span><span class="p">),</span>
         <span class="n">end_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;End date (YYYY-MM-DD)&quot;</span><span class="p">)</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FileResponse</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate an energy consumption report in CSV or PDF format</span>
 
@@ -3960,6 +4225,7 @@ Defaults to <code>ACCESS_TOKEN_EXPIRE_MINUTES</code></p>
       <tbody>
           <tr class="doc-section-item">
 <td><code>str</code></td>            <td>
+                  <code>str</code>
             </td>
             <td>
               <div class="doc-md-description">
@@ -3987,7 +4253,7 @@ Defaults to <code>ACCESS_TOKEN_EXPIRE_MINUTES</code></p>
 <span class="normal">85</span>
 <span class="normal">86</span>
 <span class="normal">87</span>
-<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_access_token</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">expires_delta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">timedelta</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="normal">88</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create_access_token</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">expires_delta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">timedelta</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a JWT token with an expiration time</span>
 
@@ -4416,17 +4682,18 @@ Defaults to <code>ACCESS_TOKEN_EXPIRE_MINUTES</code></p>
     <table>
       <thead>
         <tr>
-<th>Name</th>          <th>Type</th>
+          <th>Type</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
-<td><code>function</code></td>            <td>
+            <td>
+                  <code><span title="typing.Callable">Callable</span>[..., dict]</code>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>A dependency function that verifies the user's role</p>
+                <p>Callable[..., dict]: A dependency function that verifies the user's role</p>
               </div>
             </td>
           </tr>
@@ -4478,7 +4745,7 @@ Defaults to <code>ACCESS_TOKEN_EXPIRE_MINUTES</code></p>
 <span class="normal">144</span>
 <span class="normal">145</span>
 <span class="normal">146</span>
-<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">role_required</span><span class="p">(</span><span class="n">required_role</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="normal">147</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">role_required</span><span class="p">(</span><span class="n">required_role</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Dependency function to check to enforce role-based access control</span>
 
@@ -4486,12 +4753,12 @@ Defaults to <code>ACCESS_TOKEN_EXPIRE_MINUTES</code></p>
 <span class="sd">        required_role (str): The required user role</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        function: A dependency function that verifies the user&#39;s role</span>
+<span class="sd">        Callable[..., dict]: A dependency function that verifies the user&#39;s role</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        HTTPException: If the user lacks the required role</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">role_checker</span><span class="p">(</span><span class="n">current_user</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">)):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">role_checker</span><span class="p">(</span><span class="n">current_user</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_user</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">current_user</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="n">required_role</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
                 <span class="n">status_code</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
@@ -4752,6 +5019,433 @@ Defaults to <code>ACCESS_TOKEN_EXPIRE_MINUTES</code></p>
         <span class="k">return</span> <span class="n">pwd_context</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">plain_password</span><span class="p">,</span> <span class="n">hashed_password</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error verifying password: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="app.utils.email_verification" class="doc doc-heading">
+            <code>app.utils.email_verification</code>
+
+
+</h2>
+
+    <div class="doc doc-contents first">
+
+        <p>This module provides email verification functionalities</p>
+<p>It handles:
+- Loading SMTP credentials from an external configuration file
+- Generating time-limited verification tokens
+- Confirming &amp; decoding verification tokens
+- Sending verification emails to users via SMTP</p>
+
+
+<details class="important" open>
+  <summary>IMPORTANT</summary>
+  <p>Ensure that the configuration file is properly set up and that sensitive credentials remain out of version control.</p>
+</details>
+
+
+
+
+
+
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="app.utils.email_verification.confirm_verification_token" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">email_verification</span><span class="o">.</span><span class="n">confirm_verification_token</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">expiration</span><span class="o">=</span><span class="mi">3600</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Confirm &amp; decode a verification token</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>token</code>
+            </td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The token to decode</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>expiration</code>
+            </td>
+            <td>
+                  <code>int</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Token expiration time in seconds (defaults to 3600 seconds)</p>
+              </div>
+            </td>
+            <td>
+                  <code>3600</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>str</code></td>            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The email address contained in the token</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="fastapi.HTTPException">HTTPException</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the token is invalid or expired</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app/utils/email_verification.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">confirm_verification_token</span><span class="p">(</span><span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">expiration</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Confirm &amp; decode a verification token</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        token (str): The token to decode</span>
+<span class="sd">        expiration (int): Token expiration time in seconds (defaults to 3600 seconds)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: The email address contained in the token</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If the token is invalid or expired</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">serializer</span> <span class="o">=</span> <span class="n">URLSafeTimedSerializer</span><span class="p">(</span><span class="n">SECRET_KEY</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">serializer</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="n">salt</span> <span class="o">=</span> <span class="n">SECURITY_PASSWORD_SALT</span><span class="p">,</span> <span class="n">max_age</span> <span class="o">=</span> <span class="n">expiration</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span> <span class="o">=</span> <span class="mi">400</span><span class="p">,</span> <span class="n">detail</span> <span class="o">=</span> <span class="s2">&quot;Verification link is invalid or expired.&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">exc</span>
+    <span class="k">return</span> <span class="n">email</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="app.utils.email_verification.generate_verification_token" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">email_verification</span><span class="o">.</span><span class="n">generate_verification_token</span><span class="p">(</span><span class="n">email</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Generate a time-limited token for verifying an email</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>email</code>
+            </td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The email address to verify</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+<th>Name</th>          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+<td><code>str</code></td>            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>A secure token</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app/utils/email_verification.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">generate_verification_token</span><span class="p">(</span><span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a time-limited token for verifying an email</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        email (str): The email address to verify</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: A secure token</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">serializer</span> <span class="o">=</span> <span class="n">URLSafeTimedSerializer</span><span class="p">(</span><span class="n">SECRET_KEY</span><span class="p">)</span>
+    <span class="n">token</span> <span class="o">=</span> <span class="n">serializer</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">salt</span> <span class="o">=</span> <span class="n">SECURITY_PASSWORD_SALT</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">token</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="app.utils.email_verification.send_verification_email" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">email_verification</span><span class="o">.</span><span class="n">send_verification_email</span><span class="p">(</span><span class="n">email</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Sends a verification email containing a link with the verification token</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>email</code>
+            </td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The recipient's email address</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>token</code>
+            </td>
+            <td>
+                  <code>str</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The verification token to include in the link</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+            <details class="quote">
+              <summary>Source code in <code>app/utils/email_verification.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span>
+<span class="normal">84</span>
+<span class="normal">85</span>
+<span class="normal">86</span>
+<span class="normal">87</span>
+<span class="normal">88</span>
+<span class="normal">89</span>
+<span class="normal">90</span>
+<span class="normal">91</span>
+<span class="normal">92</span>
+<span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">send_verification_email</span><span class="p">(</span><span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sends a verification email containing a link with the verification token</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        email (str): The recipient&#39;s email address</span>
+<span class="sd">        token (str): The verification token to include in the link</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># verification_link = f&quot;http://127.0.0.1:8000/api/v1/users/verify?token={token}&quot;</span>
+    <span class="n">verification_link</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;http://localhost:5173/login?verifyToken=</span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;Verify your email for the Sync Smart Home&quot;</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Please click the following link to verify your email:</span><span class="se">\n\n</span><span class="si">{</span><span class="n">verification_link</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">msg</span> <span class="o">=</span> <span class="n">MIMEText</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+    <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;Subject&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">subject</span>
+    <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;From&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SMTP_EMAIL</span>
+    <span class="n">msg</span><span class="p">[</span><span class="s2">&quot;To&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">email</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Example using Gmail SMPTP; update credentials as needed</span>
+        <span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP</span><span class="p">(</span><span class="s2">&quot;smtp.gmail.com&quot;</span><span class="p">,</span> <span class="mi">587</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+            <span class="n">server</span><span class="o">.</span><span class="n">starttls</span><span class="p">()</span>
+            <span class="n">server</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="n">SMTP_EMAIL</span><span class="p">,</span> <span class="n">SMTP_PASSWORD</span><span class="p">)</span>
+            <span class="n">server</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="c1"># In production, log this error appropriately</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error sending email:&quot;</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
