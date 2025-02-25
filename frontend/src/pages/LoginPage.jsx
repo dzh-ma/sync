@@ -1,12 +1,30 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../services/api";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("")
+
+  // Check for verification token in URL query parameters
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const verifyToken = params.get("verifyToken");
+    if (verifyToken) {
+      axiosInstance.get(`/users/verify?token=${verifyToken}`)
+        .then((res) => {
+          setMessage("Email verified successfully. Please log in.");
+        })
+        .catch((err) => {
+          setError("Email verification failed. Please try again.");
+          console.error(err);
+        });
+    }
+  }, [location])
 
   const handleSubmit = async (e) => {
     e.preventDefault();

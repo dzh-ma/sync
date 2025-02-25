@@ -72,7 +72,8 @@ def send_verification_email(email: str, token: str):
         email (str): The recipient's email address
         token (str): The verification token to include in the link
     """
-    verification_link = f"http://127.0.0.1:8000/api/v1/users/verify?token={token}"
+    # verification_link = f"http://127.0.0.1:8000/api/v1/users/verify?token={token}"
+    verification_link = f"http://localhost:5173/login?verifyToken={token}"
     subject = "Verify your email for the Sync Smart Home"
     body = f"Please click the following link to verify your email:\n\n{verification_link}"
 
