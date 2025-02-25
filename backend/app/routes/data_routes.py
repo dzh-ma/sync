@@ -7,8 +7,9 @@ It includes:
 - An admin dashboard route (restricted to users with an "admin" role)
 """
 from datetime import datetime
-from typing import Optional, Literal
-from fastapi import APIRouter, Query, Depends
+from typing import Optional, Literal, List
+from pymongo import ASCENDING
+from fastapi import APIRouter, Query, Depends, HTTPException
 from app.models.energy_data import EnergyData
 from app.db.database import energy_collection
 from app.core.security import role_required
@@ -26,8 +27,24 @@ async def add_energy_data(data: EnergyData) -> dict:
     Returns:
         dict: A confirmation message upon successfully insertion
     """
-    energy_collection.insert_one(data.model_dump())       # Insert into MongoDB
-    return {"message": "Energy data added successfully"}
+    timestamp = datetime.utcnow()
+
+    result = energy_collection.update_one(
+        {"device_id": data.device_id},
+        {
+            "$push": {
+                "timestamps": timestamp,
+                "energy_consumed": data.energy_consumed
+            },
+            "$setOnInsert": {"location": data.location, "created_at": timestamp}
+        },
+        upsert = True   # Create document if it doesn't exist
+    )
+    # energy_collection.insert_one(data.model_dump())       # Insert into MongoDB
+    if result.modified_count > 0 or result.upserted_id:
+        return {"message": f"Energy data added successfully for device {data.device_id}."}
+    else:
+        raise HTTPException(status_code = 500, detail = "Failed to update energy data.")
 
 @router.get("/aggregate")
 async def get_aggregated_data(
@@ -113,3 +130,24 @@ async def get_admin_dashboard() -> dict:
         dict: A welcome message confirming admin access
     """
     return {"message": "Welcome, admin!"}
+
+# NOTE: Missing docstring
+@router.get("/energy/usage")
+async def get_energy_usage(
+        device_id: Optional[str] = None,
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+) -> List[dict]:
+    query = {}
+
+    if device_id:
+        query["device_id"] = device_id
+
+    if start_date and end_date:
+        query["timestamps"] = {
+            "$gte": datetime.strptime(start_date, "%Y-%m-%d"),
+            "$lte": datetime.strptime(end_date, "%Y-%m-%d")
+        }
+
+    results = energy_collection.find(query).sort("timestamps", ASCENDING)
+    return [{"device_id": r["device_id"], "timestamps": r["timestamps"], "energy_consumed": r["energy_consumed"]} for r in results]
