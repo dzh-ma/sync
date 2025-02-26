@@ -57,8 +57,11 @@ async def generate_report(
 
     if format == "csv":
         # Convert data to a DataFrame & format timestamps
+        # df = pd.DataFrame(energy_data)
+        # df["timestamp"] = pd.to_datetime(df["timestamp"]).dt.strftime("%Y-%m-%d %H:%M:%S")  # Format timestamp
+        # df.columns = ["Device ID", "Timestamp", "Energy Consumed (kWh)", "Location"]
         df = pd.DataFrame(energy_data)
-        df["timestamp"] = pd.to_datetime(df["timestamp"]).dt.strftime("%Y-%m-%d %H:%M:%S")  # Format timestamp
+        df.drop(columns=["timestamps"], errors="ignore", inplace=True)  # Drop extra column
         df.columns = ["Device ID", "Timestamp", "Energy Consumed (kWh)", "Location"]
         df.to_csv(filename, index = False)
     elif format == "pdf":
@@ -70,10 +73,10 @@ async def generate_report(
         data = [["Device ID", "Timestamp", "Energy Cosumed (kWh)", "Location"]]
         for entry in energy_data:
             data.append([
-                entry.get("device_id", "N/A"),
-                entry.get("timestamp", "").strftime('%Y-%m-%d %H:%M:%S') if entry.get("timestamp") else "N/A",
-                entry.get("energy_consumed", "N/A"),
-                entry.get("location", "N/A")
+                str(entry.get("device_id", "N/A")),
+                str(entry.get("timestamp", "").strftime('%Y-%m-%d %H:%M:%S') if entry.get("timestamp") else "N/A"),
+                str(entry.get("energy_consumed", "N/A")),
+                str(entry.get("location", "N/A"))
             ])
 
         # Create & style table

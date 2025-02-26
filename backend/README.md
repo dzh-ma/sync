@@ -57,17 +57,33 @@ This repository contains FastAPI back-end for the Sync Smart Home project.
 - `test_data_routes.py`: Contains unit tests for **data aggregation, filtering & retrieval functionalities.**
 - `test_report_generation.py`: Contains unit tests for **report generation.**
 
+#### `utils/` (Utility Functions)
+
+- `__init__.py`: Initializes the utility module.
+- `email_verification.py`: Provides **email verification functionalities.**
+
+> [!IMPORTANT]
+> Create an `email_config.ini` file in `util/` to get email verification functionality to work.
+>> ```ini email_config.ini
+>> [smtp]
+>> email = PLACEHOLDER_EMAIL
+>> password = PLACEHOLDER_PASSWORD
+>> ```
+>>> [!CAUTION]
+>>> Verify that `email_config.ini` is present inside the root `.gitignore` before committing code.
+
 ---
 
 # Features
 
 + **User Authentication** (FastAPI & OAuth2).
++ **Email Verification** (SMTP & secure token generation).
 + **Energy Data Aggregation** (filtering by *hourly, daily & weekly intervals*).
 + **MongoDB Integration** (NoSQL database).
 + **Secure API Endpoints** (JWT authentication & access control).
 + **Comprehensive Testing** (`pytest`).
 + **Containerization** (Docker).
-+ **Report Generation** (CSV/PDF)
++ **Report Generation** (CSV/PDF).
 
 ---
 
