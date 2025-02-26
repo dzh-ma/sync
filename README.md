@@ -24,11 +24,11 @@ npm install
 
 3. **Run the front-end application**
 ```bash
-npm start
+npm run dev
 ```
 
 4. **Access the application**
-Once the front-end is running, open: `http://localhost:3000`.
+Once the front-end is running, open: `http://localhost:5173`.
 
 ## Back-end Setup
 
@@ -55,7 +55,10 @@ uvicorn main:app --reload
 ```
 
 5. **API documentation**
-    Once the back-end is running, visit: `http://127.0.0.1:8000/docs`
+    Once the back-end is running, you may view the API by visiting: `http://127.0.0.1:8000/docs`
+
+6. **Module documentation**
+    You can find the documentation in PDF format ![here](./backend/site/pdf/document.pdf)
 
 ---
 
