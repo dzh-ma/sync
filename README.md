@@ -1,112 +1,37 @@
----
-author: dzh-ma
----
+# f29pdfinal
 
-# Project Setup Guide
+Currently the app loads onto the dashboard since the backend is not connected fully to check the login and sign up add auth/login and auth/signup to url to check the login and sign up. 
 
-This repository contains the **front-end & back-end** components of the project.
 
-Follow the instructions below to set up & run both.
 
-## Front-end Setup
+Step 1: Database
 
-The front-end is built with *React.js*.
+Make sure local Mongo DB connection has the following collections <br />
+![image](https://github.com/user-attachments/assets/67f5f52c-6c03-4793-9fdd-ca9deb91a3e0) <br />
 
-1. **Navigate to the front-end directory**
-```bash
-cd frontend/
-```
 
-2. **Install front-end dependencies**
-```bash
-npm install
-```
 
-3. **Run the front-end application**
-```bash
-npm run dev
-```
+Step 2: Backend
 
-4. **Access the application**
-Once the front-end is running, open: `http://localhost:5173`.
+Open a new terminal
+>cd backend <br />
+>python -m venv myenv <br />
+> myenv/Scripts/activate <br />
+>pip install -r requirements.txt <br />
+> if pip needs to be upgraded do it otherwise the code wont work <br />
+>uvicorn main:app --reload <br />
 
-## Back-end Setup
+Step 3: Frontend
 
-The back-end is powered by *FastAPI* & *MongoDB*.
+Open a new terminal
+>npm install <br />
+>npm run build <br />
+>npm install tailwindcss <br /> (IMPORTANT)
+>npm run dev <br />
 
-1. **Navigate to the back-end directory**
-```bash
-cd backend/
-```
+things to be done --
 
-2. **Install back-end dependencies**
-```bash
-pip install -r requirements.txt
-```
+``-connect to backend ``
+``-edit the css/styles``
 
-3. **Ensure MongoDB is running**
-```bash
-sudo systemctl start mongodb
-```
 
-4. **Initialize the app using `uvicorn`**
-```bash
-uvicorn main:app --reload 
-```
-
-5. **API documentation**
-    Once the back-end is running, you may view the API by visiting: `http://127.0.0.1:8000/docs`
-
-6. **Module documentation**
-    You can find the documentation in PDF format ![here](./backend/site/pdf/document.pdf)
-
----
-
-# Running Tests
-
-To verify back-end functionality, run:
-```bash
-pytest backend/app/tests/
-```
-
----
-
-# Generating Reports
-
-## Generating CSV
-
-```bash
-# Generating access token (if using bash)
-TOKEN=$(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
-    -d "username=test_user@example.com&password=TestPassword123!" \
-    -H "Content-Type: application/x-www-form-urlencoded" | jq -r .access_token)
-
-# Generating access token (if using fish)
-set TOKEN $(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
-    -d "username=test_user@example.com&password=TestPassword123!" \
-    -H "Content-Type: application/x-www-form-urlencoded" | jq -r .access_token)
-
-# Executing command
-curl -X POST "http://127.0.0.1:8000/api/v1/reports/report?format=pdf" \
-    -H "Authorization: Bearer $TOKEN"
-```
-
-## Generating PDF
-
-```bash
-# Generating access token (if using bash)
-TOKEN=$(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
-    -d "username=test_user@example.com&password=TestPassword123!" \
-    -H "Content-Type: application/x-www-form-urlencoded" | jq -r .access_token)
-
-# Generating access token (if using fish)
-set TOKEN $(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
-    -d "username=test_user@example.com&password=TestPassword123!" \
-    -H "Content-Type: application/x-www-form-urlencoded" | jq -r .access_token)
-
-# Executing command
-curl -X POST "http://127.0.0.1:8000/api/v1/reports/report?format=csv" \
-    -H "Authorization: Bearer $TOKEN"
-```
-
----

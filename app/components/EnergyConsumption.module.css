@@ -1,0 +1,195 @@
+/*.card-container-E {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease-in-out;
+}
+
+.card-container-E:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-header-E {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.card-title-E {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333333;
+  letter-spacing: 0.5px;
+}
+
+.select-trigger-E {
+  width: 140px;
+  padding: 8px 12px;
+  background-color: #fafafa;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  color: #333;
+  transition: all 0.3s ease-in-out;
+}
+
+.select-trigger-E:hover {
+  border-color: #007bff;
+  background-color: #f0f8ff;
+}
+
+.card-content-E {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #ececec;
+  box-sizing: border-box;
+}
+
+.card-content-E .chart {
+  margin-top: 20px;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-content-E .chart .xAxisLabel,
+.card-content-E .chart .yAxisLabel {
+  color: #888;
+}
+
+.select-content-E {
+  border-radius: 6px;
+  background-color: #ffffff;
+}
+
+.select-item-E {
+  color: #333;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.select-item-E:hover {
+  background-color: #f0f8ff;
+}*/
+
+/* EnergyConsumption.module.css */
+
+/* 🌟 Container Styling */
+.card-container-E {
+  max-width: 700px;
+  width: 100%;
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.card-container-E:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+/* 🏷️ Card Header */
+.card-header-E {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.card-title-E {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #333;
+  letter-spacing: 0.5px;
+}
+
+/* 🎚️ Select Dropdown */
+.select-trigger-E {
+  width: 160px;
+  padding: 8px 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.select-trigger-E:hover,
+.select-trigger-E:focus {
+  border-color: #007bff;
+  background-color: #eef6ff;
+}
+
+.select-content-E {
+  border-radius: 6px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.select-item-E {
+  padding: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.select-item-E:hover {
+  background-color: #f0f8ff;
+}
+
+/* 📈 Chart Section */
+.card-content-E {
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border: 1px solid #ececec;
+  box-sizing: border-box;
+}
+
+.card-content-E .chart {
+  margin-top: 15px;
+  background-color: #ffffff;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 📱 Responsive Adjustments */
+@media (max-width: 768px) {
+  .card-container-E {
+    padding: 16px;
+  }
+
+  .card-title-E {
+    font-size: 1.2rem;
+  }
+
+  .select-trigger-E {
+    width: 140px;
+  }
+
+  .card-content-E {
+    padding: 12px;
+  }
+}
+
