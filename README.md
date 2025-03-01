@@ -60,6 +60,18 @@ uvicorn main:app --reload
 6. **Module documentation**
     You can find the documentation in PDF format ![here](./backend/site/pdf/document.pdf)
 
+## Node-RED Setup
+
+1. **Install Node-RED globally**
+```bash
+sudo npm install -g --unsafe-perm node-red
+```
+
+2. **Navigate to the Node-RED directory**
+```bash
+cd 
+```
+
 ---
 
 # Running Tests
