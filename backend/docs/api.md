@@ -8,9 +8,19 @@
 
 ::: app.routes.report_routes
 
-::: app.models.user
+::: app.models.device
 
 ::: app.models.energy_data
+
+::: app.models.energy_summary
+
+::: app.models.profile
+
+::: app.models.room
+
+::: app.models.schedule
+
+::: app.models.user
 
 ::: app.db.database
 

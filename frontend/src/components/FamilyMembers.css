@@ -1,0 +1,232 @@
+/*.card-container {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease-in-out;
+}
+
+.card-container:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.card-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333333;
+  letter-spacing: 0.5px;
+}
+
+.card-content {
+  padding: 16px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #ececec;
+  box-sizing: border-box;
+}
+
+.family-member {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 0;
+  border-bottom: 1px solid #ececec;
+  transition: all 0.2s ease-in-out;
+}
+
+.family-member:last-child {
+  border-bottom: none;
+}
+
+.family-member:hover {
+  background-color: #f0f8ff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.family-member-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.family-member-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333333;
+}
+
+.family-member-role {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.button-icon {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  transition: all 0.2s ease-in-out;
+}
+
+.button-icon:hover {
+  stroke: #007bff;
+  transform: scale(1.1);
+}*/
+/* General Card Styles */
+.card-containerF {
+  max-width: 100%;
+  width: 100%;
+  margin: 30px auto;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease-in-out;
+  box-sizing: border-box;
+}
+
+.card-containerF:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* Header Styling */
+.card-headerF {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.card-titleF {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  letter-spacing: 0.5px;
+}
+
+.card-contentF {
+  padding: 16px;
+  background-color: #fafafa;
+  border-radius: 8px;
+  border: 1px solid #ececec;
+  box-sizing: border-box;
+}
+
+/* Family Member Styles */
+.family-memberF {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 0;
+  border-bottom: 1px solid #ececec;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.family-memberF:last-child {
+  border-bottom: none;
+}
+
+.family-memberF:hover {
+  background-color: #f0f8ff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Avatar Styling */
+.family-member-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.family-member-nameF {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.family-member-roleF {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+/* Button Styles */
+.button-iconF {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2;
+  transition: all 0.2s ease-in-out;
+}
+
+.button-iconF:hover {
+  stroke: #007bff;
+  transform: scale(1.1);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .card-containerF {
+    padding: 15px;
+    margin: 20px;
+  }
+
+  .family-memberF {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .family-member-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .family-member-nameF {
+    font-size: 0.95rem;
+  }
+
+  .family-member-roleF {
+    font-size: 0.8rem;
+  }
+}
+
+/* Button Styles */
+.button-iconF {
+  transition: all 0.2s ease;
+}
+
+.button-iconF:hover {
+  stroke: #007bff;
+  transform: scale(1.1);
+}
+

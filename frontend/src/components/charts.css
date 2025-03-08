@@ -1,0 +1,61 @@
+/*.chart-container {
+    /* Add any styling you want for the chart container 
+    width: 100%;
+    height: 400px; /* Adjust as needed 
+  }
+  
+  .chart-line,
+  .chart-bar,
+  .chart-pie {
+    /* Add any styling specific to each chart type 
+    margin-bottom: 20px; Adds space between charts 
+  }*/
+  
+  /* charts.css */
+.chart-containerC {
+  width: 100%;
+  max-width: 800px;
+  height: auto;
+  padding: 16px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease-in-out;
+}
+
+.chart-containerC:hover {
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chart-lineC,
+.chart-barC,
+.chart-pieC {
+  width: 100%;
+  height: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .chart-containerC {
+    max-width: 90%;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .chart-containerC {
+    max-width: 100%;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-containerC {
+    max-width: 100%;
+    padding: 8px;
+    border-radius: 10px;
+  }
+}
