@@ -101,7 +101,7 @@ sudo systemctl start mongodb
 
 3. **Initialize the app using `uvicorn`**
 ```bash
-uvicorn main:app --reload 
+uvicorn app.main:app --reload 
 ```
 
 4. **API documentation**

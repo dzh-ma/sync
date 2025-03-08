@@ -6,9 +6,13 @@ It provides:
 - Functions to fetch energy consumption data with optional filtering
 """
 import os
-from pymongo import MongoClient
+import logging
 from datetime import datetime
-from typing import List, Dict
+from typing import List, Dict, Optional
+from pymongo import MongoClient
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 # Loading MongoDB URI from environment variables
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
@@ -21,6 +25,11 @@ try:
     # Collections for different functions
     users_collection = db["users"]
     energy_collection = db["energy_data"]
+    devices_collection = db["devices"]
+    profiles_collection = db["profiles"]
+    rooms_collection = db["rooms"]
+    schedules_collection = db["schedules"]
+    summary_collection = db["energy_summaries"]
 
     print(f"Connected to MongoDB database: {MONGO_URI}")
 except Exception as e:
@@ -38,19 +47,45 @@ async def init_db():
         RuntimeError: If there is an error during database initialization
     """
     try:
-        # Create uniqueness of user emails
+        # User collection indexes
         users_collection.create_index("email", unique = True)
 
-        # Optimize queries by creating indexes on frequently queried fields
+        # Energy data collection indexes
         energy_collection.create_index("device_id")
         energy_collection.create_index("timestamp")
+        energy_collection.create_index([("device_id", 1), ("timestamp", 1)])
+        energy_collection.create_index("location")
+
+        # Device collection indexes
+        devices_collection.create_index("id", unique=True)
+        devices_collection.create_index("room_id")
+        devices_collection.create_index("type")
+
+        # Profile collection indexes
+        profiles_collection.create_index("user_id")
+        profiles_collection.create_index([("user_id", 1), ("name", 1)], unique=True)
+
+        # Room collection indexes
+        rooms_collection.create_index("id", unique=True)
+        rooms_collection.create_index("created_by")
+
+        # Schedule collection indexes
+        schedules_collection.create_index("device_id")
+        schedules_collection.create_index("created_by")
+        schedules_collection.create_index("start_date")
+        schedules_collection.create_index("end_date")
+
+        # Energy summary collection indexes
+        summary_collection.create_index("user_id")
+        summary_collection.create_index([("user_id", 1), ("period", 1), ("start_date", 1)], unique=True)
+
+        logger.info("Database initialized successfully with all collections and indexes.")
 
         print("Database initialized successfully.")
     except Exception as e:
         raise RuntimeError(f"Error during database initialization: {e}") from e
 
-# FIX: Parameters marked as errors
-def get_energy_data(start_date: str = None, end_date: str = None) -> List[Dict]:
+def get_energy_data(start_date: Optional[str] = None, end_date: Optional[str] = None) -> List[Dict]:
     """
     Fetch energy data consumption from MongoDB with optional date filtering
 

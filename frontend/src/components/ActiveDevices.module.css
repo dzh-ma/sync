@@ -1,0 +1,145 @@
+/* ActiveDevices.module.css */
+
+/*.card-maximized {
+    grid-column: span 2;
+    height: 100%;
+  }
+  
+  .card-title {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 0.5rem;
+  }
+  
+  .device-icon-wrapper {
+    padding: 0.5rem;
+    border-radius: 9999px;
+  }
+  
+  .device-icon-on {
+    background-color: #00b2ff1a;
+  }
+  
+  .device-icon-off {
+    background-color: #f5f5f5;
+  }
+  
+  .device-icon {
+    height: 1.25rem;
+    width: 1.25rem;
+  }
+  
+  .device-name {
+    font-weight: 500;
+  }
+  
+  .device-room {
+    font-size: 0.875rem;
+    color: #6b7280;
+  }
+  
+  .device-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+  }
+  
+  .device-list {
+    margin-top: 0.25rem;
+  }
+  
+  .device-status-switch {
+    margin-left: auto;
+  }*/
+
+  /* ActiveDevices.module.css */
+
+.card-maximizedA {
+  grid-column: span 2;
+  height: 100%;
+}
+
+.card-titleA {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.5rem;
+}
+
+.device-listA {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.device-itemA {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.device-itemA:hover {
+  background-color: #eef2ff;
+}
+
+.device-icon-wrapperA {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  border-radius: 50%;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.device-icon-onA {
+  background-color: rgba(0, 178, 255, 0.2);
+}
+
+.device-icon-offA {
+  background-color: rgba(107, 114, 128, 0.1);
+}
+
+.device-iconA {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.device-nameA {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #374151;
+}
+
+.device-roomA {
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.device-status-switchA {
+  margin-left: auto;
+  transition: transform 0.2s ease-in-out;
+}
+
+.device-status-switchA:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .device-itemA {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .device-status-switchA {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+}
+
+  

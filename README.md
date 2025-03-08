@@ -120,5 +120,3 @@ set TOKEN $(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
 curl -X POST "http://127.0.0.1:8000/api/v1/reports/report?format=csv" \
     -H "Authorization: Bearer $TOKEN"
 ```
-
----
