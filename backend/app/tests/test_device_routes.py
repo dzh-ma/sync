@@ -9,12 +9,32 @@ Tested endpoints:
 - `/api/v1/devices/{device_id}` (Deleting a device)
 - `/api/v1/devices/{device_id}/toggle` (Toggling device status)
 """
-from fastapi.testclient import TestClient
 from app.main import app
-from app.tests.test_report_generation import get_jwt_token
+import json
 import uuid
+from bson.objectid import ObjectId
+from fastapi.testclient import TestClient
+from app.tests.test_report_generation import get_jwt_token
 
 client = TestClient(app)
+
+# Helper function to convert ObjectId in responses
+def parse_response(response):
+    """
+    Parse response and convert ObjectId instances to strings
+    """
+    if hasattr(response, 'json'):
+        data = response.json()
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if isinstance(value, dict) and '_id' in value:
+                    data[key]['_id'] = str(data[key]['_id'])
+        elif isinstance(data, list):
+            for item in data:
+                if isinstance(item, dict) and '_id' in item:
+                    item['_id'] = str(item['_id'])
+        return data
+    return response
 
 def test_create_device():
     """

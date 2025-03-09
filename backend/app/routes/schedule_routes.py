@@ -1,151 +1,162 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+"""
+This module defines API routes for managing device schedules
+"""
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
-from bson.objectid import ObjectId
-from datetime import datetime, timezone
 
 from app.models.schedule import Schedule
-from app.core.security import get_current_user, role_required
-from app.db.database import schedules_collection, devices_collection, users_collection
+from app.utils.data_operations import (
+    create_schedule,
+    get_schedule,
+    get_device_schedules,
+    get_user_schedules,
+    update_schedule,
+    delete_schedule
+)
+from app.core.security import get_current_user, profile_permission_required
 
 router = APIRouter(
     prefix="/api/v1/schedules",
-    tags=["Schedules"],
+    tags=["schedules"],
     responses={404: {"description": "Not found"}},
 )
 
-@router.post("/", dependencies=[Depends(get_current_user)])
-async def create_schedule(schedule: Schedule):
+@router.post("/")
+async def add_schedule(
+    schedule: Schedule,
+    current_user: dict = Depends(profile_permission_required("can_control_devices"))
+):
     """
-    Create a new device schedule
+    Create a new schedule for a device
     
     Args:
-        schedule (Schedule): The schedule data to create
+        schedule (Schedule): The schedule to create
         
     Returns:
-        dict: The created schedule with ID
-    
-    Raises:
-        HTTPException: If schedule creation fails
+        dict: The created schedule
     """
-    try:
-        # Check if the device exists
-        device = devices_collection.find_one({"id": schedule.device_id})
-        if not device:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Device not found"
-            )
-        
-        # Check if the user exists
-        user = users_collection.find_one({"_id": ObjectId(schedule.created_by)})
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
-            )
-        
-        # Validate schedule times
-        if schedule.start_time >= schedule.end_time:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Start time must be before end time"
-            )
-            
-        if schedule.start_date > schedule.end_date:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Start date must be before or equal to end date"
-            )
-        
-        # Prepare schedule data
-        schedule_dict = schedule.model_dump()
-        schedule_dict["created_at"] = datetime.now(timezone.utc)
-        
-        # Insert schedule
-        result = schedules_collection.insert_one(schedule_dict)
-        
-        return {
-            "message": "Schedule created successfully",
-            "schedule_id": str(result.inserted_id)
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
+    # Ensure the schedule belongs to the currently authenticated user
+    if schedule.created_by != current_user.get("sub"):
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create schedule: {str(e)}"
-        ) from e
+            status_code=403,
+            detail="Schedule must be created under your user ID"
+        )
+        
+    result = await create_schedule(schedule)
+    return {
+        "message": "Schedule created successfully",
+        "schedule_id": str(result.get("_id"))
+    }
 
-@router.get("/", response_model=List[Schedule])
+@router.get("/{schedule_id}")
+async def get_schedule_by_id(
+    schedule_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Get a schedule by its ID
+    
+    Args:
+        schedule_id (str): The ID of the schedule to retrieve
+        
+    Returns:
+        dict: The schedule data
+    """
+    schedule = await get_schedule(schedule_id)
+    
+    # Ensure users can only access their own schedules unless they're admin
+    if schedule.get("created_by") != current_user.get("sub") and current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="You can only access your own schedules"
+        )
+        
+    return schedule
+
+@router.get("/")
 async def get_schedules(
     device_id: Optional[str] = Query(None, description="Filter by device ID"),
-    created_by: Optional[str] = Query(None, description="Filter by creator user ID"),
     is_active: Optional[bool] = Query(None, description="Filter by active status"),
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Get all schedules with optional filtering
+    Get schedules for the current user, optionally filtered by device
     
     Args:
-        device_id (Optional[str]): Filter schedules by device
-        created_by (Optional[str]): Filter schedules by creator
+        device_id (Optional[str]): Filter schedules by device ID
         is_active (Optional[bool]): Filter schedules by active status
-        current_user (dict): The current authenticated user
         
     Returns:
-        List[Schedule]: List of schedules matching the filter criteria
+        list: A list of schedules
     """
-    query = {}
     if device_id:
-        query["device_id"] = device_id
-    if created_by:
-        query["created_by"] = created_by
-    if is_active is not None:
-        query["is_active"] = is_active
+        # Get schedules for a specific device
+        schedules = await get_device_schedules(device_id)
         
-    schedules = list(schedules_collection.find(query))
+        # Filter to only show user's own schedules unless they're admin
+        if current_user.get("role") != "admin":
+            schedules = [s for s in schedules if s.get("created_by") == current_user.get("sub")]
+    else:
+        # Get all schedules for the current user
+        schedules = await get_user_schedules(current_user.get("sub"))
     
-    # Convert ObjectId to string for each schedule
-    for schedule in schedules:
-        if '_id' in schedule:
-            schedule['_id'] = str(schedule['_id'])
-            
+    # Apply is_active filter if specified
+    if is_active is not None:
+        schedules = [s for s in schedules if s.get("is_active") == is_active]
+        
     return schedules
 
-@router.get("/{schedule_id}", response_model=Schedule)
-async def get_schedule(schedule_id: str, current_user: dict = Depends(get_current_user)):
+@router.put("/{schedule_id}")
+async def update_schedule_by_id(
+    schedule_id: str,
+    schedule_data: dict,
+    current_user: dict = Depends(profile_permission_required("can_control_devices"))
+):
     """
-    Get a specific schedule by ID
+    Update a schedule.
     
     Args:
-        schedule_id (str): The ID of the schedule to retrieve
-        current_user (dict): The current authenticated user
+        schedule_id (str): The ID of the schedule to update
+        schedule_data (dict): The updated schedule data
         
     Returns:
-        Schedule: The requested schedule
-        
-    Raises:
-        HTTPException: If the schedule is not found
+        dict: A success message
     """
-    try:
-        schedule = schedules_collection.find_one({"_id": ObjectId(schedule_id)})
-        if not schedule:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Schedule not found"
-            )
-        
-        # Convert ObjectId to string
-        if '_id' in schedule:
-            schedule['_id'] = str(schedule['_id'])
-            
-        return schedule
-        
-    except HTTPException:
-        raise
-    except Exception as e:
+    schedule = await get_schedule(schedule_id)
+    
+    # Ensure users can only update their own schedules
+    if schedule.get("created_by") != current_user.get("sub") and current_user.get("role") != "admin":
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create schedule: {str(e)}"
-        ) from e
+            status_code=403,
+            detail="You can only update your own schedules"
+        )
+        
+    await update_schedule(schedule_id, schedule_data)
+    return {"message": "Schedule updated successfully"}
+
+@router.delete("/{schedule_id}")
+async def delete_schedule_by_id(
+    schedule_id: str,
+    current_user: dict = Depends(profile_permission_required("can_control_devices"))
+):
+    """
+    Delete a schedule
+    
+    Args:
+        schedule_id (str): The ID of the schedule to delete
+        
+    Returns:
+        dict: A success message
+    """
+    schedule = await get_schedule(schedule_id)
+    
+    # Ensure users can only delete their own schedules
+    if schedule.get("created_by") != current_user.get("sub") and current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="You can only delete your own schedules"
+        )
+        
+    await delete_schedule(schedule_id)
+    return {"message": "Schedule deleted successfully"}

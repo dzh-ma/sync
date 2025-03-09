@@ -1,147 +1,132 @@
-from typing import List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from bson.objectid import ObjectId
-from datetime import datetime, timezone
+"""
+This module defines API routes for managing smart devices
+"""
 
-from app.core.permissions import profile_permission_required
+from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import List, Optional
+
 from app.models.device import Device
-from app.core.security import get_current_user, role_required
-from app.db.database import devices_collection, energy_collection
+from app.utils.data_operations import (
+    create_device,
+    get_device,
+    get_devices,
+    update_device,
+    delete_device,
+    get_device_energy_efficiency
+)
+from app.core.security import get_current_user, role_required, profile_permission_required
 
 router = APIRouter(
     prefix="/api/v1/devices",
-    tags=["Devices"],
+    tags=["devices"],
     responses={404: {"description": "Not found"}},
 )
 
-@router.post("/", dependencies = [Depends(role_required("admin"))])
-async def create_device(device: Device):
-    """
-    Create a new smart device (admin only)
-    
-    Args:
-        device (Device): The device data to create
-        
-    Returns:
-        dict: The created device with ID
-    
-    Raises:
-        HTTPException: If device creation fails
-    """
-    try:
-        # Check if device with same ID already exists
-        if devices_collection.find_one({"id": device.id}):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Device with this ID already exists"
-            )
-
-        result = devices_collection.insert_one(device.model_dump())
-
-        return {
-            "message": "Device created successfully",
-            "id": str(result.inserted_id)
-        }
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create device: {str(e)}"
-        ) from e
-
-@router.get("/", response_model=List[Device])
-async def get_all_devices(
-    room_id: Optional[str] = Query(None, description="Filter by room ID"),
-    type: Optional[str] = Query(None, description="Filter by device type"),
-    current_user: dict = Depends(get_current_user)
+@router.post("/")
+async def add_device(
+    device: Device,
+    current_user: dict = Depends(role_required("admin"))
 ):
     """
-    Get all devices with optional filtering
+    Add a new device to the system (admin only)
     
     Args:
-        room_id (Optional[str]): Filter devices by room ID
-        type (Optional[str]): Filter devices by type
-        current_user (dict): The current authenticated user
+        device (Device): The device to add
         
     Returns:
-        List[Device]: List of devices matching the filter criteria
+        dict: The created device
     """
-    query = {}
-    if room_id:
-        query["room_id"] = room_id
-    if type:
-        query["type"] = type
+    result = await create_device(device)
+    return {"message": "Device created successfully", "device_id": device.id}
 
-    devices = list(devices_collection.find(query))
-
-    # Convert ObjectId to string for each device
-    for device in devices:
-        if '_id' in device:
-            device['_id'] = str(device['_id'])
-
-    return devices
-
-@router.get("/{device_id}", response_model=Device)
-async def get_device(device_id: str, current_user: dict = Depends(get_current_user)):
+@router.get("/{device_id}")
+async def get_device_by_id(
+    device_id: str,
+    _ = Depends(profile_permission_required("can_control_devices"))
+):
     """
-    Get a specific device by ID
+    Get a device by its ID
     
     Args:
         device_id (str): The ID of the device to retrieve
-        current_user (dict): The current authenticated user
         
     Returns:
-        Device: The requested device
+        dict: The device data
+    """
+    return await get_device(device_id)
+
+@router.get("/")
+async def get_all_devices(
+    room_id: Optional[str] = Query(None, description="Filter devices by room"),
+    type: Optional[str] = Query(None, description="Filter devices by type"),
+    _ = Depends(profile_permission_required("can_control_devices"))
+):
+    """
+    Get all devices, optionally filtered by room or type
+    
+    Args:
+        room_id (Optional[str]): The room ID to filter by
+        type (Optional[str]): The device type to filter by
         
-    Raises:
-        HTTPException: If the device is not found
+    Returns:
+        list: A list of devices
     """
-    device = devices_collection.find_one({"id": device_id})
-    if not device:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Device not found"
-        )
+    devices = await get_devices(room_id)
+    
+    # Apply type filter if provided
+    if type:
+        devices = [d for d in devices if d.get("type") == type]
+        
+    return devices
 
-    if '_id' in device:
-        device['_id'] = str(device['_id'])
-
-    return device
-
-@router.put("/{device_id}", dependencies=[Depends(role_required("admin"))])
-async def update_device(device_id: str, device_update: Device):
+@router.put("/{device_id}")
+async def update_device_by_id(
+    device_id: str,
+    device_data: dict,
+    current_user: dict = Depends(role_required("admin"))
+):
     """
-    Update an existing device (admin only)
+    Update a device (admin only)
     
     Args:
         device_id (str): The ID of the device to update
-        device_update (Device): The updated device data
+        device_data (dict): The updated device data
         
     Returns:
-        dict: Confirmation of update
-        
-    Raises:
-        HTTPException: If the device is not found or update fails
+        dict: The updated device
     """
-    existing_device = devices_collection.find_one({"id": device_id})
-    if not existing_device:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Device not found"
-        )
+    updated = await update_device(device_id, device_data)
+    return {"message": "Device updated successfully", "device": updated}
 
-    update_data = device_update.model_dump()
-    result = devices_collection.update_one(
-        {"id": device_id},
-        {"$set": update_data}
-    )
+@router.post("/{device_id}/toggle")
+async def toggle_device(
+    device_id: str,
+    _ = Depends(profile_permission_required("can_control_devices"))
+):
+    """
+    Toggle a device's status between 'on' and 'off'
+    
+    Args:
+        device_id (str): The ID of the device to toggle
+        
+    Returns:
+        dict: The updated device with new status
+    """
+    device = await get_device(device_id)
+    
+    # Toggle the status
+    new_status = "off" if device.get("status") == "on" else "on"
+    
+    # Update the device with the new status
+    updated = await update_device(device_id, {"status": new_status})
+    
+    return {"status": new_status, "device_id": device_id}
 
-    if result.modified_count:
-        return {"message": "Device updated successfully"}
-    else:
-        return {"message": "No changes applied to the device"}
-
-@router.delete("/{device_id}", dependencies=[Depends(role_required("admin"))])
-async def delete_device(device_id: str):
+@router.delete("/{device_id}")
+async def delete_device_by_id(
+    device_id: str,
+    current_user: dict = Depends(role_required("admin"))
+):
     """
     Delete a device (admin only)
     
@@ -149,105 +134,25 @@ async def delete_device(device_id: str):
         device_id (str): The ID of the device to delete
         
     Returns:
-        dict: Confirmation of deletion
-        
-    Raises:
-        HTTPException: If the device is not found or deletion fails
+        dict: A success message
     """
-    device = devices_collection.find_one({"id": device_id})
-    if not device:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Device not found"
-        )
+    await delete_device(device_id)
+    return {"message": "Device and related data deleted successfully"}
 
-    # Delete the device
-    result = devices_collection.delete_one({"id": device_id})
-
-    if result.deleted_count:
-        # Also delete related energy data
-        energy_collection.delete_many({"device_id": device_id})
-        return {"message": "Device and related data deleted successfully"}
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to delete device"
-        )
-
-@router.post("/{device_id}/toggle", dependencies=[Depends(get_current_user)])
-async def toggle_device(device_id: str):
-    """
-    Toggle a device's status between "on" and "off"
-    
-    Args:
-        device_id (str): The ID of the device to toggle
-        
-    Returns:
-        dict: The updated device status
-        
-    Raises:
-        HTTPException: If the device is not found or update fails
-    """
-    device = devices_collection.find_one({"id": device_id})
-    if not device:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Device not found"
-        )
-
-    # Toggle status
-    new_status = "off" if device["status"] == "on" else "on"
-
-    result = devices_collection.update_one(
-        {"id": device_id},
-        {"$set": {"status": new_status}}
-    )
-
-    if result.modified_count:
-        return {
-            "device_id": device_id,
-            "status": new_status,
-            "message": f"Device {new_status}"
-        }
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to toggle device status"
-        )
-
-@router.post("/{device_id}/control")
-async def control_device(
+@router.get("/{device_id}/efficiency")
+async def get_device_efficiency(
     device_id: str,
-    command: dict,
-    _ = Depends(profile_permission_required("can_control_devices"))
+    days: int = Query(30, description="Number of days to analyze"),
+    _ = Depends(profile_permission_required("can_access_energy_data"))
 ):
     """
-    Control a device (requires `can_control_devices` permission)
-
+    Get energy efficiency metrics for a device
+    
     Args:
-        device_id (str): ID of the device to control
-        command (dict): Command to send to the device (e.g., {"action": "turn_on"})
-
+        device_id (str): The ID of the device to analyze
+        days (int): Number of days to analyze
+        
     Returns:
-        dict: Command result
+        dict: Energy efficiency metrics
     """
-    # Get device
-    device = devices_collection.find_one({"id": device_id})
-
-    if not device:
-        raise HTTPException(status_code = 404, detail = "Device not found")
-
-    # Update device status based on command
-    action = command.get("action")
-
-    if action in ["turn_on", "turn_off"]:
-        new_status = "on" if action == "turn_off" else "off"
-
-        devices_collection.update_one(
-            {"id": device_id},
-            {"set": {"status": new_status}}
-        )
-
-        return {"message": f"Device {device_id} {action} successful"}
-    else:
-        raise HTTPException(status_code = 400, detail = "Unsupported action")
+    return await get_device_energy_efficiency(device_id, days)

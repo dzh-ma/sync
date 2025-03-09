@@ -12,6 +12,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
 from jose import jwt, JWTError
+
+from app.db.database import profiles_collection
  
 # Password hashing context
 pwd_context = CryptContext(schemes = ["bcrypt"], deprecated = "auto")
@@ -145,3 +147,44 @@ def role_required(required_role: str):
             )
         return current_user
     return role_checker
+
+def profile_permission_required(permission: str):
+    """
+    Dependency function to check if the current user's active profile has a specific permission.
+    
+    Args:
+        permission (str): The permission to check for (e.g., "can_control_devices")
+        
+    Returns:
+        function: A dependency function that verifies if the profile has the permission
+        
+    Raises:
+        HTTPException: If the user has no active profile or the profile lacks the required permission
+    """
+    async def permission_checker(current_user: dict = Depends(get_current_user)):
+        # Admin users always have all permissions
+        if current_user.get("role") == "admin":
+            return current_user
+            
+        # Get the active profile for this user
+        active_profile = profiles_collection.find_one({
+            "user_id": current_user.get("sub"),
+            "is_active": True
+        })
+        
+        if not active_profile:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="No active profile found. Please set an active profile."
+            )
+            
+        # Check if the profile has the required permission
+        if not active_profile.get(permission, False):
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Your current profile does not have permission to perform this action."
+            )
+            
+        return current_user
+        
+    return permission_checker

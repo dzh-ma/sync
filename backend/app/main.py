@@ -6,21 +6,18 @@ It acts as a middleware between the front-end & database, handling:
 - CORS middleware for front-end communication
 - Database initialization & application life-cycle management
 """
-import os
 import logging
+import json
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from typing import Any
+from bson import ObjectId
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-from app.routes.user_routes import router as user_router
-from app.routes.data_routes import router as data_router
-from app.routes.report_routes import router as report_router
-from app.routes.device_routes import router as device_router
-from app.routes.profile_routes import router as profile_router
-from app.routes.room_routes import router as room_router
-from app.routes.summary_routes import router as summary_router
-from app.routes.schedule_routes import router as schedule_router
+from app.routes import register_routes
 from app.db.database import init_db
 
 # Configure logging
@@ -28,7 +25,6 @@ logging.basicConfig(level = logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Environment variables
-ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 origins = [
     "http://localhost:5173",
     "mongodb://localhost:27017/",
@@ -63,33 +59,54 @@ async def lifespan(app_context: FastAPI):
     finally:
         logger.info("Application is shutting down.")
 
+class MongoJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return super().default(obj)
+
+class MongoJSONResponse(JSONResponse):
+    def render(self, content: Any) -> bytes:
+        return json.dumps(
+            content,
+            ensure_ascii=False,
+            allow_nan=False,
+            indent=None,
+            separators=(",", ":"),
+            cls=MongoJSONEncoder,
+        ).encode("utf-8")
+
 # Initialize FastAPI application
-app = FastAPI(lifespan = lifespan)
+app = FastAPI(
+    title = "Sync Smart Home API",
+    description = "API for the Sync Smart Home project",
+    version = "1.0.0",
+    default_response_class = MongoJSONResponse,
+    lifespan = lifespan
+)
 
 # Enable CORS for front-end communication
 app.add_middleware(
     CORSMiddleware,
-    # allow_origins = ALLOWED_ORIGINS,      # Change `"*"` to specific origins/domain in production
-    allow_origins = origins,      # Change `"*"` to specific origins/domain in production
+    allow_origins = origins,    # ["*"] is fine for development but not in production if used
     allow_credentials = True,
     allow_methods = ["*"],
     allow_headers = ["*"],
 )
 
-# Include API routers
-app.include_router(user_router, prefix = "/api/v1/users", tags = ["Users"])
-app.include_router(data_router, prefix = "/api/v1/data", tags = ["Data"])
-app.include_router(report_router, prefix = "/api/v1/reports", tags = ["Reports"])
-# app.include_router(device_router, prefix = "/api/v1/devices", tags = ["Devices"])
-# app.include_router(profile_router, prefix = "/api/v1/profiles", tags = ["Profiles"])
-# app.include_router(room_router, prefix = "/api/v1/rooms", tags = ["Rooms"])
-# app.include_router(schedule_router, prefix = "/api/v1/schedules", tags = ["Schedule"])
-# app.include_router(summary_router, prefix = "/api/v1/summaries", tags = ["Summary"])
-app.include_router(device_router)
-app.include_router(profile_router)
-app.include_router(room_router)
-app.include_router(schedule_router)
-app.include_router(summary_router)
+# Middleware to handle ObjectId in responses
+@app.middleware("http")
+async def handle_mongodb_objects(request, call_next):
+   response = await call_next(request)
+   if isinstance(response, Response):
+       response.body = json.dumps(
+           json.loads(response.body.decode()),
+           cls=MongoJSONEncoder
+       ).encode()
+   return response
+
+# Register all routes
+register_routes(app)
 
 # Root response model
 class RootResponse(BaseModel):

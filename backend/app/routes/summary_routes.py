@@ -1,228 +1,168 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from typing import List, Optional
-from datetime import datetime, timezone, timedelta
-from bson.objectid import ObjectId
-import pandas as pd
+"""
+This module defines API routes for energy consumption summaries
+"""
 
-from app.models.energy_summary import EnergySummary
-from app.core.security import get_current_user, role_required
-from app.db.database import energy_collection, summary_collection, users_collection
+from fastapi import APIRouter, Depends, HTTPException, Query
+from typing import List, Optional
+from datetime import datetime, timedelta
+
+from app.utils.data_operations import (
+    generate_energy_summary,
+    get_user_energy_summaries
+)
+from app.core.security import get_current_user, role_required, profile_permission_required
+from app.db.database import summary_collection
+from bson import ObjectId
 
 router = APIRouter(
     prefix="/api/v1/summaries",
-    tags=["Energy Summaries"],
+    tags=["summaries"],
     responses={404: {"description": "Not found"}},
 )
 
-@router.post("/generate", dependencies=[Depends(get_current_user)])
-async def generate_energy_summary(
-    user_id: str, 
-    period: str = Query(..., enum=["daily", "weekly", "monthly"]),
-    start_date: Optional[str] = None,
-    end_date: Optional[str] = None
+@router.post("/generate")
+async def generate_summary(
+    user_id: str = Query(..., description="User ID to generate summary for"),
+    period: str = Query("daily", description="Period type (daily, weekly, monthly)"),
+    start_date: Optional[str] = Query(None, description="Start date (YYYY-MM-DD)"),
+    current_user: dict = Depends(profile_permission_required("can_access_energy_data"))
 ):
     """
-    Generate an energy consumption summary for the specified period
+    Generate an energy consumption summary
     
     Args:
-        user_id (str): The user ID to generate the summary for
-        period (str): The period type (daily, weekly, monthly)
-        start_date (Optional[str]): Start date for the summary period (YYYY-MM-DD)
-        end_date (Optional[str]): End date for the summary period (YYYY-MM-DD)
+        user_id (str): User ID to generate summary for
+        period (str): Period type (daily, weekly, monthly)
+        start_date (Optional[str]): Start date (YYYY-MM-DD)
         
     Returns:
-        dict: The generated energy summary
-    
-    Raises:
-        HTTPException: If generation fails or parameters are invalid
+        dict: The generated summary with ID
     """
-    try:
-        # Validate user exists
-        user = users_collection.find_one({"_id": ObjectId(user_id)})
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
-            )
-        
-        # Set default dates if not provided
-        now = datetime.now(timezone.utc)
-        if not end_date:
-            end_date = now.date().isoformat()
-        
-        if not start_date:
-            if period == "daily":
-                start_date = now.date().isoformat()
-            elif period == "weekly":
-                start_date = (now - timedelta(days=7)).date().isoformat()
-            elif period == "monthly":
-                start_date = (now - timedelta(days=30)).date().isoformat()
-        
-        # Parse dates
-        start_datetime = datetime.fromisoformat(start_date)
-        end_datetime = datetime.fromisoformat(end_date)
-        
-        if start_datetime > end_datetime:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Start date must be before end date"
-            )
-        
-        # Query energy data for the period
-        query = {
-            "timestamp": {
-                "$gte": start_datetime,
-                "$lte": end_datetime
-            }
-        }
-        
-        energy_data = list(energy_collection.find(query))
-        
-        if not energy_data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No energy data available for the selected period"
-            )
-        
-        # Calculate total consumption
-        total_consumption = sum(item.get("energy_consumed", 0) for item in energy_data)
-        
-        # Calculate cost estimate (example rate: $0.15 per kWh)
-        cost_estimate = total_consumption * 0.15
-        
-        # Calculate comparison to previous period
-        previous_start = start_datetime - (end_datetime - start_datetime)
-        previous_end = start_datetime - timedelta(days=1)
-        
-        previous_query = {
-            "timestamp": {
-                "$gte": previous_start,
-                "$lte": previous_end
-            }
-        }
-        
-        previous_data = list(energy_collection.find(previous_query))
-        previous_consumption = sum(item.get("energy_consumed", 0) for item in previous_data) if previous_data else 0
-        
-        comparison = None
-        if previous_consumption > 0:
-            comparison = ((total_consumption - previous_consumption) / previous_consumption) * 100
-        
-        # Create summary object
-        summary = EnergySummary(
-            user_id=user_id,
-            period=period,
-            start_date=start_datetime,
-            end_date=end_datetime,
-            total_consumption=total_consumption,
-            cost_estimate=cost_estimate,
-            comparison_to_previous=comparison
-        )
-        
-        # Check if summary already exists
-        existing_summary = summary_collection.find_one({
-            "user_id": user_id,
-            "period": period,
-            "start_date": start_datetime,
-        })
-        
-        if existing_summary:
-            # Update existing summary
-            summary_collection.update_one(
-                {"_id": existing_summary["_id"]},
-                {"$set": summary.model_dump()}
-            )
-            summary_id = str(existing_summary["_id"])
-        else:
-            # Insert new summary
-            result = summary_collection.insert_one(summary.model_dump())
-            summary_id = str(result.inserted_id)
-        
-        return {
-            "message": "Energy summary generated successfully",
-            "summary_id": summary_id,
-            "summary": summary.model_dump()
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
+    # Only allow generating summaries for your own user_id unless admin
+    if user_id != current_user.get("sub") and current_user.get("role") != "admin":
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate energy summary: {str(e)}"
+            status_code=403,
+            detail="You can only generate summaries for your own account"
         )
+    
+    # Parse start_date if provided, otherwise use current date
+    if start_date:
+        try:
+            start_date_obj = datetime.strptime(start_date, "%Y-%m-%d")
+        except ValueError:
+            raise HTTPException(
+                status_code=400, 
+                detail="Invalid date format. Use YYYY-MM-DD."
+            )
+    else:
+        start_date_obj = datetime.now()
+    
+    # Calculate end_date based on period
+    if period == "daily":
+        end_date_obj = start_date_obj + timedelta(days=1)
+    elif period == "weekly":
+        end_date_obj = start_date_obj + timedelta(days=7)
+    elif period == "monthly":
+        # Approximate a month as 30 days
+        end_date_obj = start_date_obj + timedelta(days=30)
+    else:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid period. Use 'daily', 'weekly', or 'monthly'."
+        )
+    
+    # Generate the summary
+    summary = await generate_energy_summary(
+        user_id=user_id,
+        period=period,
+        start_date=start_date_obj,
+        end_date=end_date_obj
+    )
+    
+    # Insert into database to match test expectations
+    result = summary_collection.insert_one(summary)
+    summary_id = str(result.inserted_id)
+    
+    return {
+        "message": "Energy summary generated successfully",
+        "summary_id": summary_id,
+        "summary": summary
+    }
 
-@router.get("/", response_model=List[EnergySummary])
-async def get_energy_summaries(
+@router.get("/")
+async def get_summaries(
+    period: Optional[str] = Query(None, description="Filter by period (daily, weekly, monthly)"),
     user_id: Optional[str] = Query(None, description="Filter by user ID"),
-    period: Optional[str] = Query(None, description="Filter by period type", enum=["daily", "weekly", "monthly"]),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict = Depends(profile_permission_required("can_access_energy_data"))
 ):
     """
-    Get all energy summaries with optional filtering
+    Get energy summaries, optionally filtered by period or user
     
     Args:
-        user_id (Optional[str]): Filter summaries by user ID
-        period (Optional[str]): Filter summaries by period type
-        current_user (dict): The current authenticated user
+        period (Optional[str]): Filter by period type
+        user_id (Optional[str]): Filter by user ID
         
     Returns:
-        List[EnergySummary]: List of energy summaries matching the filter criteria
+        list: A list of energy summaries
     """
-    query = {}
-    if user_id:
-        query["user_id"] = user_id
-    if period:
-        query["period"] = period
-        
-    summaries = list(summary_collection.find(query))
+    # If user_id is provided, only allow access to your own summaries unless admin
+    if user_id and user_id != current_user.get("sub") and current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="You can only access your own summaries"
+        )
     
-    # Convert ObjectId to string
-    for summary in summaries:
-        if '_id' in summary:
-            summary['_id'] = str(summary['_id'])
-            
-    return summaries
+    # Default to the current user's ID if no user_id is provided
+    actual_user_id = user_id if user_id else current_user.get("sub")
+    
+    # Get summaries
+    return await get_user_energy_summaries(actual_user_id, period)
 
-@router.get("/{summary_id}", response_model=EnergySummary)
-async def get_energy_summary(summary_id: str, current_user: dict = Depends(get_current_user)):
+@router.get("/{summary_id}")
+async def get_summary_by_id(
+    summary_id: str,
+    current_user: dict = Depends(profile_permission_required("can_access_energy_data"))
+):
     """
     Get a specific energy summary by ID
     
     Args:
         summary_id (str): The ID of the summary to retrieve
-        current_user (dict): The current authenticated user
         
     Returns:
-        EnergySummary: The requested energy summary
-        
-    Raises:
-        HTTPException: If the summary is not found
+        dict: The summary data
     """
     try:
         summary = summary_collection.find_one({"_id": ObjectId(summary_id)})
+        
         if not summary:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Energy summary not found"
+                status_code=404,
+                detail=f"Summary with ID {summary_id} not found"
+            )
+        
+        # Ensure users can only access their own summaries unless they're admin
+        if summary.get("user_id") != current_user.get("sub") and current_user.get("role") != "admin":
+            raise HTTPException(
+                status_code=403,
+                detail="You can only access your own summaries"
             )
         
         # Convert ObjectId to string
-        if '_id' in summary:
-            summary['_id'] = str(summary['_id'])
-            
+        summary["_id"] = str(summary["_id"])
         return summary
         
-    except HTTPException:
-        raise
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error retrieving energy summary: {str(e)}"
+            status_code=500,
+            detail=f"Error retrieving summary: {str(e)}"
         )
 
-@router.delete("/{summary_id}", dependencies=[Depends(role_required("admin"))])
-async def delete_energy_summary(summary_id: str):
+@router.delete("/{summary_id}")
+async def delete_summary(
+    summary_id: str,
+    current_user: dict = Depends(role_required("admin"))
+):
     """
     Delete an energy summary (admin only)
     
@@ -230,35 +170,30 @@ async def delete_energy_summary(summary_id: str):
         summary_id (str): The ID of the summary to delete
         
     Returns:
-        dict: Confirmation of deletion
-        
-    Raises:
-        HTTPException: If the summary is not found or deletion fails
+        dict: A success message
     """
     try:
-        # Check if summary exists
         summary = summary_collection.find_one({"_id": ObjectId(summary_id)})
+        
         if not summary:
             raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Energy summary not found"
+                status_code=404,
+                detail=f"Summary with ID {summary_id} not found"
             )
         
         # Delete the summary
         result = summary_collection.delete_one({"_id": ObjectId(summary_id)})
         
-        if result.deleted_count:
-            return {"message": "Energy summary deleted successfully"}
-        else:
+        if result.deleted_count == 0:
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to delete energy summary"
+                status_code=500,
+                detail=f"Failed to delete summary with ID {summary_id}"
             )
-            
-    except HTTPException:
-        raise
+        
+        return {"message": "Energy summary deleted successfully"}
+        
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error deleting energy summary: {str(e)}"
+            status_code=500,
+            detail=f"Error deleting summary: {str(e)}"
         )

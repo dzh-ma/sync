@@ -1,15 +1,5 @@
 """
-This module defines permission-based access control for the Sync Smart Home API
-
-It provides middleware functions to:
-- Enforce profile-specific permission checks for various system features
-- Gate access to APIs based on user profile capabilities
-- Support the fine-grained permission system required by FR 3-1 through FR 3-4
-
-The permission system works alongside the role-based access control in security.py,
-but focuses on profile-level permissions rather than user roles. This enables more
-granular control, allowing administrators to customize what actions specific profiles
-can perform (controlling devices, accessing energy data, etc.).
+This module provides functionality for profile-based permission checks
 
 Usage:
     from app.core.permissions import profile_permission_required
@@ -20,13 +10,30 @@ Usage:
     ):
         # Only profiles with can_access_energy_data=True can access this
 """
+from typing import Optional
 from fastapi import Depends, HTTPException, status
-from typing import Callable
 
-from app.core.security import get_current_user
+from app.core.security import get_current_user, oauth2_scheme
 from app.db.database import profiles_collection
 
-def profile_permission_required(permission_field: str):
+async def get_user_active_profile(current_user: dict) -> Optional[dict]:
+    """
+    Get the active profile for the current user
+    
+    Args:
+        current_user (dict): The current authenticated user
+        
+    Returns:
+        Optional[dict]: The active profile if one exists, otherwise None
+    """
+    active_profile = profiles_collection.find_one({
+        "user_id": current_user.get("sub"),
+        "is_active": True
+    })
+    
+    return active_profile
+
+def profile_permission_required(permission: str):
     """
     Dependency function to enforce profile-specific permissions
 
@@ -39,16 +46,28 @@ def profile_permission_required(permission_field: str):
     Raises:
         HTTPException: If the user lacks the required permissions
     """
-    def permission_checker(current_user: dict = Depends(get_current_user)):
-        user_email = current_user.get("sub")
-        user_profile = profiles_collection.find_one({"user_id": user_email})
+    async def permission_checker(current_user: dict = Depends(get_current_user)):
+        # Admin users always have all permissions
+        if current_user.get("role") == "admin":
+            return current_user
 
-        if not user_profile or not user_profile.get(permission_field, False):
+        # Get the active profile for this user
+        active_profile = await get_user_active_profile(current_user)
+
+        if not active_profile:
             raise HTTPException(
                 status_code = status.HTTP_403_FORBIDDEN,
-                detail = f"Permission denied: {permission_field} required"
+                detail = "No active profile found. Please set an active profile."
+            )
+            
+        # Check if the profile has the required permission
+        if not active_profile.get(permission, False):
+            raise HTTPException(
+                status_code = status.HTTP_403_FORBIDDEN,
+                detail = "Your current profile does not have permission to perform this action."
             )
 
         return current_user
 
     return permission_checker
+

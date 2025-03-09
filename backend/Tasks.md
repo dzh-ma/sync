@@ -25,8 +25,8 @@ date: 2025-03-08
 
 4. **Implement Authentication for New Routes**
     > Adds security by ensuring only authorized users can access specific functionality
-    - [ ] Apply role-based access control to device management
-    - [ ] Set profile-specific permissions for data access
+    - [X] Apply role-based access control to device management
+    - [X] Set profile-specific permissions for data access
 
 5. **Create Data Operations**
     > Implements business logic for manipulating data

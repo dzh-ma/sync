@@ -1,11 +1,22 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+"""
+This module defines API routes for managing rooms within the smart home
+"""
+
+from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import List, Optional
-from bson.objectid import ObjectId
-from datetime import datetime, timezone
 
 from app.models.room import Room
-from app.core.security import get_current_user, role_required
-from app.db.database import rooms_collection, devices_collection, users_collection
+from app.utils.data_operations import (
+    create_room,
+    get_room,
+    get_user_rooms,
+    update_room,
+    delete_room,
+    aggregate_energy_data_by_room,
+    get_devices
+)
+from app.core.security import get_current_user, role_required, profile_permission_required
+from datetime import datetime, timedelta
 
 router = APIRouter(
     prefix="/api/v1/rooms",
@@ -13,157 +24,112 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-@router.post("/", dependencies=[Depends(get_current_user)])
-async def create_room(room: Room):
+@router.post("/")
+async def add_room(
+    room: Room,
+    current_user: dict = Depends(get_current_user)
+):
     """
     Create a new room
     
     Args:
-        room (Room): The room data to create
+        room (Room): The room to create
         
     Returns:
-        dict: The created room with ID
-    
-    Raises:
-        HTTPException: If room creation fails
+        dict: A success message with the room ID
     """
-    try:
-        # Check if the user exists
-        user_id = room.created_by
-        user = users_collection.find_one({"_id": ObjectId(user_id)})
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="User not found"
-            )
+    # Ensure the room belongs to the currently authenticated user
+    # The test is passing the MongoDB ObjectId as created_by
+    user_id = current_user.get("sub")
+    
+    # Update the room's created_by if needed
+    if room.created_by != user_id:
+        # FIX: "None" is not assignable to "str"
+        room.created_by = user_id
         
-        # Check if room with same name already exists for this user
-        existing_room = rooms_collection.find_one({
-            "name": room.name,
-            "created_by": room.created_by
-        })
-        
-        if existing_room:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Room with this name already exists"
-            )
-        
-        # Prepare room data
-        room_dict = room.model_dump()
-        room_dict["created_at"] = datetime.now(timezone.utc)
-        
-        # Insert room
-        result = rooms_collection.insert_one(room_dict)
-        
-        return {
-            "message": "Room created successfully",
-            "room_id": room.id
-        }
-        
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create room: {str(e)}"
-        )
+    result = await create_room(room)
+    return {
+        "message": "Room created successfully", 
+        "room_id": room.id
+    }
 
-@router.get("/", response_model=List[Room])
-async def get_rooms(
-    created_by: Optional[str] = Query(None, description="Filter by creator user ID"),
+@router.get("/{room_id}")
+async def get_room_by_id(
+    room_id: str,
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Get all rooms with optional filtering
-    
-    Args:
-        created_by (Optional[str]): Filter rooms by creator
-        current_user (dict): The current authenticated user
-        
-    Returns:
-        List[Room]: List of rooms matching the filter criteria
-    """
-    query = {}
-    if created_by:
-        query["created_by"] = created_by
-        
-    rooms = list(rooms_collection.find(query))
-    
-    # Convert ObjectId to string
-    for room in rooms:
-        if '_id' in room:
-            room['_id'] = str(room['_id'])
-            
-    return rooms
-
-@router.get("/{room_id}", response_model=Room)
-async def get_room(room_id: str, current_user: dict = Depends(get_current_user)):
-    """
-    Get a specific room by ID
+    Get a room by its ID
     
     Args:
         room_id (str): The ID of the room to retrieve
-        current_user (dict): The current authenticated user
         
     Returns:
-        Room: The requested room
-        
-    Raises:
-        HTTPException: If the room is not found
+        dict: The room data
     """
-    room = rooms_collection.find_one({"id": room_id})
-    if not room:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Room not found"
-        )
+    room = await get_room(room_id)
     
-    # Convert ObjectId to string
-    if '_id' in room:
-        room['_id'] = str(room['_id'])
+    # Ensure users can only access their own rooms unless they're admin
+    if room.get("created_by") != current_user.get("sub") and current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="You can only access your own rooms"
+        )
         
     return room
 
-@router.put("/{room_id}", dependencies=[Depends(get_current_user)])
-async def update_room(room_id: str, room_update: Room):
+@router.get("/")
+async def get_rooms(
+    created_by: Optional[str] = Query(None, description="Filter by creator"),
+    current_user: dict = Depends(get_current_user)
+):
     """
-    Update an existing room
+    Get all rooms for the current user, optionally filtered by creator
     
     Args:
-        room_id (str): The ID of the room to update
-        room_update (Room): The updated room data
+        created_by (Optional[str]): Filter by the user who created the room
         
     Returns:
-        dict: Confirmation of update
-        
-    Raises:
-        HTTPException: If the room is not found or update fails
+        list: A list of rooms
     """
-    existing_room = rooms_collection.find_one({"id": room_id})
-    if not existing_room:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Room not found"
-        )
-    
-    # Prepare update data
-    update_data = room_update.model_dump()
-    update_data["updated_at"] = datetime.now(timezone.utc)
-    
-    # Update room
-    result = rooms_collection.update_one(
-        {"id": room_id},
-        {"$set": update_data}
-    )
-    
-    if result.modified_count:
-        return {"message": "Room updated successfully"}
-    else:
-        return {"message": "No changes applied to the room"}
+    if created_by:
+        return await get_user_rooms(created_by)
+    # FIX: "None" is not assignable to "str"
+    return await get_user_rooms(current_user.get("sub"))
 
-@router.delete("/{room_id}", dependencies=[Depends(get_current_user)])
-async def delete_room(room_id: str):
+@router.put("/{room_id}")
+async def update_room_by_id(
+    room_id: str,
+    room_data: dict,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Update a room
+
+    Args:
+        room_id (str): The ID of the room to update
+        room_data (dict): The updated room data
+        
+    Returns:
+        dict: A success message
+    """
+    room = await get_room(room_id)
+    
+    # Ensure users can only update their own rooms unless they're admin
+    if room.get("created_by") != current_user.get("sub") and current_user.get("role") != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="You can only update your own rooms"
+        )
+        
+    await update_room(room_id, room_data)
+    return {"message": "Room updated successfully"}
+
+@router.delete("/{room_id}")
+async def delete_room_by_id(
+    room_id: str,
+    current_user: dict = Depends(get_current_user)
+):
     """
     Delete a room
     
@@ -171,66 +137,62 @@ async def delete_room(room_id: str):
         room_id (str): The ID of the room to delete
         
     Returns:
-        dict: Confirmation of deletion
-        
-    Raises:
-        HTTPException: If the room is not found or deletion fails
+        dict: A success message
     """
-    # Check if room exists
-    room = rooms_collection.find_one({"id": room_id})
-    if not room:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Room not found"
-        )
+    room = await get_room(room_id)
     
-    # Check if there are devices in this room
-    devices_in_room = devices_collection.find_one({"room_id": room_id})
-    if devices_in_room:
+    # Ensure users can only delete their own rooms unless they're admin
+    if room.get("created_by") != current_user.get("sub") and current_user.get("role") != "admin":
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Cannot delete room with active devices. Please remove or reassign devices first."
+            status_code=403,
+            detail="You can only delete your own rooms"
         )
-    
-    # Delete the room
-    result = rooms_collection.delete_one({"id": room_id})
-    
-    if result.deleted_count:
-        return {"message": "Room deleted successfully"}
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to delete room"
-        )
+        
+    await delete_room(room_id)
+    return {"message": "Room deleted successfully"}
 
-@router.get("/{room_id}/devices", dependencies=[Depends(get_current_user)])
-async def get_devices_in_room(room_id: str):
+@router.get("/{room_id}/devices")
+async def get_devices_in_room(
+    room_id: str,
+    current_user: dict = Depends(get_current_user)
+):
     """
     Get all devices in a specific room
     
     Args:
-        room_id (str): The ID of the room
+        room_id (str): The ID of the room to get devices for
         
     Returns:
-        list: List of devices in the room
-        
-    Raises:
-        HTTPException: If the room is not found
+        list: A list of devices in the room
     """
-    # Check if room exists
-    room = rooms_collection.find_one({"id": room_id})
-    if not room:
+    # First check if the room exists and the user has access to it
+    room = await get_room(room_id)
+    
+    # Ensure users can only access their own rooms unless they're admin
+    if room.get("created_by") != current_user.get("sub") and current_user.get("role") != "admin":
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Room not found"
+            status_code=403,
+            detail="You can only access your own rooms"
         )
     
     # Get devices in the room
-    devices = list(devices_collection.find({"room_id": room_id}))
+    return await get_devices(room_id)
+
+@router.get("/energy/consumption")
+async def get_energy_by_room(
+    days: int = 30,
+    _ = Depends(profile_permission_required("can_access_energy_data"))
+):
+    """
+    Get energy consumption aggregated by room
     
-    # Convert ObjectId to string
-    for device in devices:
-        if '_id' in device:
-            device['_id'] = str(device['_id'])
+    Args:
+        days (int): Number of days to analyze
+        
+    Returns:
+        list: Energy consumption by room
+    """
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
     
-    return devices
+    return await aggregate_energy_data_by_room(start_date, end_date)
