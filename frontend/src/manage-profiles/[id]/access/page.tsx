@@ -1,12 +1,11 @@
-"use client"
-
+import React from "react"
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
+import { useParams, useNavigate } from "react-router-dom"
+import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
+import { Button } from "../../../../components/ui/button"
+import { Switch } from "../../../../components/ui/switch"
 import { motion } from "framer-motion"
 import { ArrowLeft, Bell, Zap, Clock, BarChart2, Database, History, Smartphone } from "lucide-react"
-import { useRouter } from "next/navigation"
 
 interface FamilyMember {
   id: string
@@ -24,8 +23,9 @@ interface FamilyMember {
   }
 }
 
-export default function ManageProfileAccessPage({ params }: { params: { id: string } }) {
-  const router = useRouter()
+export default function ManageProfileAccessPage() {
+  const { id } = useParams()
+  const navigate = useNavigate()
   const [member, setMember] = useState<FamilyMember | null>(null)
   const [permissions, setPermissions] = useState({
     notifications: true,
@@ -39,19 +39,19 @@ export default function ManageProfileAccessPage({ params }: { params: { id: stri
 
   useEffect(() => {
     const storedMembers = JSON.parse(localStorage.getItem("familyMembers") || "[]")
-    const member = storedMembers.find((m: FamilyMember) => m.id === params.id)
+    const member = storedMembers.find((m: FamilyMember) => m.id === id)
     if (member) {
       setMember(member)
       if (member.permissions) {
         setPermissions(member.permissions)
       }
     }
-  }, [params.id])
+  }, [id])
 
   const handleSaveChanges = () => {
     const storedMembers = JSON.parse(localStorage.getItem("familyMembers") || "[]")
     const updatedMembers = storedMembers.map((m: FamilyMember) => {
-      if (m.id === params.id) {
+      if (m.id === id) {
         return {
           ...m,
           permissions,
@@ -60,7 +60,7 @@ export default function ManageProfileAccessPage({ params }: { params: { id: stri
       return m
     })
     localStorage.setItem("familyMembers", JSON.stringify(updatedMembers))
-    router.push("/manage-profiles")
+    navigate("/manage-profiles")
   }
 
   if (!member) return null
@@ -70,7 +70,7 @@ export default function ManageProfileAccessPage({ params }: { params: { id: stri
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <header className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-6 w-6" />
             </Button>
             <div>
@@ -207,4 +207,3 @@ export default function ManageProfileAccessPage({ params }: { params: { id: stri
     </div>
   )
 }
-

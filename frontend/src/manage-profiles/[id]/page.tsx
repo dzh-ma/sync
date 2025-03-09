@@ -1,13 +1,12 @@
-"use client"
-
+import React from "react"
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Input } from "@/components/ui/input"
+import { Card, CardContent, CardHeader, CardTitle } from "../../../components/ui/card"
+import { Button } from "../../../components/ui/button"
+import { Switch } from "../../../components/ui/switch"
+import { Input } from "../../../components/ui/input"
 import { motion } from "framer-motion"
 import { ArrowLeft, Bell, Zap, Clock, BarChart2, Database, History, Smartphone, Trash2, Key } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useNavigate, useParams } from "react-router-dom"
 import {
   Dialog,
   DialogContent,
@@ -16,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "../../../components/ui/dialog"
 
 interface FamilyMember {
   id: string
@@ -35,8 +34,9 @@ interface FamilyMember {
   pin?: string
 }
 
-export default function ManageProfilePage({ params }: { params: { id: string } }) {
-  const router = useRouter()
+export default function ManageProfilePage() {
+  const navigate = useNavigate()
+  const params = useParams()
   const [member, setMember] = useState<FamilyMember | null>(null)
   const [permissions, setPermissions] = useState({
     notifications: true,
@@ -85,7 +85,7 @@ export default function ManageProfilePage({ params }: { params: { id: string } }
       return m
     })
     localStorage.setItem("familyMembers", JSON.stringify(updatedMembers))
-    router.push("/manage-profiles")
+    navigate("/manage-profiles")
   }
 
   const handleSavePin = () => {
@@ -111,7 +111,7 @@ export default function ManageProfilePage({ params }: { params: { id: string } }
     const storedMembers = JSON.parse(localStorage.getItem("familyMembers") || "[]")
     const updatedMembers = storedMembers.filter((m: FamilyMember) => m.id !== params.id)
     localStorage.setItem("familyMembers", JSON.stringify(updatedMembers))
-    router.push("/manage-profiles")
+    navigate("/manage-profiles")
   }
 
   if (!member) return null
@@ -121,7 +121,7 @@ export default function ManageProfilePage({ params }: { params: { id: string } }
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <header className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-6 w-6" />
             </Button>
             <div>
@@ -313,4 +313,3 @@ export default function ManageProfilePage({ params }: { params: { id: string } }
     </div>
   )
 }
-

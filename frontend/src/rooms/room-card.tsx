@@ -1,6 +1,7 @@
+import React from "react"
 import Image from "next/image"
-import { Card } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card } from "../../components/ui/card"
+import { Button } from "../../components/ui/button"
 import { MoreVertical } from "lucide-react"
 
 interface RoomCardProps {

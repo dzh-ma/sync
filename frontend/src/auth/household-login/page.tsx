@@ -1,38 +1,33 @@
-"use client"
-
-import type React from "react"
-import Image from "next/image"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
-import { Mail } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Mail } from "lucide-react";
+import { toast } from "../../../components/ui/use-toast";
 
 export default function HouseholdLoginPage() {
-  const router = useRouter()
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: "",
     pin: ["", "", "", ""],
-  })
+  });
 
   const handlePinChange = (index: number, value: string) => {
-    if (value.length > 1) return
-    const newPin = [...formData.pin]
-    newPin[index] = value
-    setFormData({ ...formData, pin: newPin })
+    if (value.length > 1) return;
+    const newPin = [...formData.pin];
+    newPin[index] = value;
+    setFormData({ ...formData, pin: newPin });
 
     if (value && index < 3) {
-      const nextInput = document.getElementById(`pin-${index + 1}`)
-      nextInput?.focus()
+      const nextInput = document.getElementById(`pin-${index + 1}`);
+      nextInput?.focus();
     }
-  }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const familyMembers = JSON.parse(localStorage.getItem("familyMembers") || "[]")
-    const member = familyMembers.find((m: any) => m.email === formData.email && m.pin === formData.pin.join(""))
+    e.preventDefault();
+    const familyMembers = JSON.parse(localStorage.getItem("familyMembers") || "[]");
+    const member = familyMembers.find((m: any) => m.email === formData.email && m.pin === formData.pin.join(""));
 
     if (member) {
       localStorage.setItem(
@@ -44,26 +39,25 @@ export default function HouseholdLoginPage() {
           name: member.name,
           role: member.role,
           permissions: member.permissions,
-        }),
-      )
-      router.push("/")
+        })
+      );
+      navigate("/");
     } else {
       toast({
         title: "Login Failed",
         description: "Invalid email or PIN. Please try again.",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex">
       <div className="hidden lg:flex lg:flex-1 relative">
-        <Image
+        <img
           src="https://media.istockphoto.com/id/1219569858/photo/woman-cooking-on-the-modern-kitchen-at-home.jpg?s=612x612&w=0&k=20&c=oUTIUAb0_cALWZ2GCTI3ZUmZCH31cf0UmBMPf1tMsck="
           alt="Smart Home"
-          fill
-          className="object-cover"
+          className="object-cover absolute inset-0 w-full h-full"
         />
         <div className="absolute inset-0 bg-black/20" />
         <div className="absolute bottom-20 left-10 text-white">
@@ -132,7 +126,7 @@ export default function HouseholdLoginPage() {
             </Button>
 
             <div className="text-center">
-              <Link href="/auth/login" className="text-[#00B2FF] hover:underline text-sm">
+              <Link to="/auth/login" className="text-[#00B2FF] hover:underline text-sm">
                 ← Back to Admin Login
               </Link>
             </div>
@@ -140,6 +134,5 @@ export default function HouseholdLoginPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

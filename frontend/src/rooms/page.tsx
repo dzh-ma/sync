@@ -1,12 +1,13 @@
 "use client"
 
+import React from "react"
 import { NavigationSidebar } from "../components/navigation-sidebar"
-import { Button } from "@/components/ui/button"
+import { Button } from "../../components/ui/button"
 import { Plus, User, Home } from "lucide-react"
 import { useState } from "react"
 import { RoomCard } from "./room-card"
 import { AddRoomDialog } from "./add-room-dialog"
-import { Card } from "@/components/ui/card"
+import { Card } from "../../components/ui/card"
 import Link from "next/link"
 
 const initialRooms = [

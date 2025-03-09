@@ -1,21 +1,21 @@
-"use client";
-
+import React from "react";
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { LineChart, BarChart, PieChart } from "@/components/charts";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+import { LineChart, BarChart, PieChart } from "../../components/charts";
 import { Download, User, BarChart2, PieChartIcon, TrendingUp, Lock } from "lucide-react";
 import { PDFDocument, rgb } from "pdf-lib";
 import { toPng } from "html-to-image";
-import { Inter } from "next/font/google";
+// Remove next/font import as it's not supported in Vite/React Router
+// You can use Google Fonts via CSS import in your main CSS file instead
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
-import { NavigationSidebar } from "@/app/components/navigation-sidebar"; // Import the navbar
+import { useToast } from "../../components/ui/use-toast";
+import { NavigationSidebar } from "../../components/navigation-sidebar"; // Import the navbar
 
-const inter = Inter({ subsets: ["latin"] });
+// Inter font is now imported via CSS instead of the Next.js way
 
 interface Device {
   id: string;
@@ -31,6 +31,11 @@ interface Device {
 interface Room {
   id: string;
   name: string;
+}
+
+interface ChartDataPoint {
+  name: string;
+  usage: number;
 }
 
 const generatePDF = async (devices: Device[], rooms: Room[]) => {
@@ -133,27 +138,38 @@ const generatePDF = async (devices: Device[], rooms: Room[]) => {
   link.click();
 };
 
+interface UserPermissions {
+  statisticalData?: boolean;
+  [key: string]: boolean | undefined;
+}
+
+interface User {
+  id: string;
+  type: string;
+  permissions?: UserPermissions;
+}
+
 export default function StatisticsPage() {
-  const router = useRouter();
+  const navigate = useNavigate(); // Replace router with navigate
   const [devices, setDevices] = useState<Device[]>([]);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [timeRange, setTimeRange] = useState("day");
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+    const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}") as User;
     if (!currentUser.id || !currentUser.permissions?.statisticalData) {
-      router.push("/");
+      navigate("/"); // Replace router.push with navigate
       return;
     }
     setUser(currentUser);
 
-    const storedDevices = JSON.parse(localStorage.getItem("devices") || "[]");
-    const storedRooms = JSON.parse(localStorage.getItem("rooms") || "[]");
+    const storedDevices = JSON.parse(localStorage.getItem("devices") || "[]") as Device[];
+    const storedRooms = JSON.parse(localStorage.getItem("rooms") || "[]") as Room[];
     setDevices(storedDevices);
     setRooms(storedRooms);
-  }, [router]);
+  }, [navigate]); // Update dependency
 
   const handleRequestAccess = () => {
     toast({
@@ -162,7 +178,7 @@ export default function StatisticsPage() {
     });
   };
 
-  const filterDataByTimeRange = (data: any[]) => {
+  const filterDataByTimeRange = (data: Device[]): Device[] => {
     if (data.length === 0) return [];
 
     const now = new Date();
@@ -182,7 +198,7 @@ export default function StatisticsPage() {
         startDate.setDate(now.getDate() - 1);
     }
 
-    return data.filter((item: any) => new Date(item.lastStatusChange) >= startDate);
+    return data.filter((item) => new Date(item.lastStatusChange) >= startDate);
   };
 
   const calculateRoomUsage = (roomName: string): number => {
@@ -191,7 +207,7 @@ export default function StatisticsPage() {
       .reduce((total, device) => total + device.totalEnergyConsumed, 0);
   };
 
-  const deviceData =
+  const deviceData: ChartDataPoint[] =
     devices.length > 0
       ? filterDataByTimeRange(devices).map((device) => ({
         name: device.name,
@@ -199,21 +215,21 @@ export default function StatisticsPage() {
       }))
       : [];
 
-  const roomData = rooms
+  const roomData: ChartDataPoint[] = rooms
     .map((room) => ({
       name: room.name,
       usage: Number.parseFloat(calculateRoomUsage(room.name).toFixed(2)),
     }))
     .filter((room) => room.usage > 0);
 
-  const deviceTypeData =
+  const deviceTypeData: Record<string, number> =
     devices.length > 0
       ? filterDataByTimeRange(devices).reduce(
-        (acc, device) => {
+        (acc: Record<string, number>, device) => {
           acc[device.type] = (acc[device.type] || 0) + device.totalEnergyConsumed;
           return acc;
         },
-        {} as Record<string, number>
+        {}
       )
       : {};
 

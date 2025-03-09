@@ -1,17 +1,18 @@
 "use client"
 
+import React from "react"
 import { useState, useEffect } from "react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
+import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card"
+import { Button } from "../../components/ui/button"
+import { Switch } from "../../components/ui/switch"
+import { Slider } from "../../components/ui/slider"
 import { Lightbulb, Thermometer, Fan, Tv, Lock, Plus, Smartphone, Edit, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { NavigationSidebar } from "@/app/components/navigation-sidebar"; // Import the navbar
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "../../components/ui/dialog"
+import { Label } from "../../components/ui/label"
+import { Input } from "../../components/ui/input"
+import { NavigationSidebar } from "../../components/navigation-sidebar"; // Import the navbar
 
 
 

@@ -1,9 +1,10 @@
 "use client"
 
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Slider } from "@/components/ui/slider"
-import { Label } from "@/components/ui/label"
+import React from "react"
+import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card"
+import { Switch } from "../../components/ui/switch"
+import { Slider } from "../../components/ui/slider"
+import { Label } from "../../components/ui/label"
 import { Lightbulb, Thermometer, Wind } from "lucide-react"
 import './DeviceControl.module.css'; // Import the CSS file
 
