@@ -9,11 +9,47 @@ It includes:
 from datetime import datetime
 from typing import Optional, Literal
 from fastapi import APIRouter, Query, Depends
+
 from app.models.energy_data import EnergyData
 from app.db.database import energy_collection
 from app.core.security import role_required
+from app.core.permissions import profile_permission_required
 
 router = APIRouter()
+
+@router.get("/user/energy-data")
+async def get_user_energy_data(
+    start_date: Optional[str] = Query(None, description = "Start date (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(None, description = "End date (YYYY-MM-DD)"),
+    device_id: Optional[str] = Query(None, description = "Device ID filter"),
+    _ = Depends(profile_permission_required("can_access_energy_data"))
+):
+    """
+    Retrieve energy data for profiles with energy data access permission
+
+    Args:
+        start_date (Optional[str]): Start date for filtering
+        end_date (Optional[str]): End date for filtering
+        device_id (Optional[str]): Device ID filter
+
+    Returns:
+        dict: Energy consumption data
+    """
+    #  Similar to existing get_aggregated_data but with profile permission check
+    query = {}
+
+    if start_date and end_date:
+        query["timestamp"] = {
+            "$gte": datetime.strptime(start_date, "%Y-%m-%d"),
+            "$lte": datetime.strptime(end_date, "%Y-%m-%d")
+        }
+
+    if device_id:
+        query["device_id"] = device_id
+
+    energy_data = list(energy_collection.find(query, {"_id": 0}))
+
+    return {"data": energy_data}
 
 @router.post("/add", dependencies = [Depends(role_required("admin"))])
 async def add_energy_data(data: EnergyData):
