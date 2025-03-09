@@ -16,6 +16,11 @@ from pydantic import BaseModel
 from app.routes.user_routes import router as user_router
 from app.routes.data_routes import router as data_router
 from app.routes.report_routes import router as report_router
+from app.routes.device_routes import router as device_router
+from app.routes.profile_routes import router as profile_router
+from app.routes.room_routes import router as room_router
+from app.routes.summary_routes import router as summary_router
+from app.routes.schedule_routes import router as schedule_router
 from app.db.database import init_db
 
 # Configure logging
@@ -75,6 +80,16 @@ app.add_middleware(
 app.include_router(user_router, prefix = "/api/v1/users", tags = ["Users"])
 app.include_router(data_router, prefix = "/api/v1/data", tags = ["Data"])
 app.include_router(report_router, prefix = "/api/v1/reports", tags = ["Reports"])
+# app.include_router(device_router, prefix = "/api/v1/devices", tags = ["Devices"])
+# app.include_router(profile_router, prefix = "/api/v1/profiles", tags = ["Profiles"])
+# app.include_router(room_router, prefix = "/api/v1/rooms", tags = ["Rooms"])
+# app.include_router(schedule_router, prefix = "/api/v1/schedules", tags = ["Schedule"])
+# app.include_router(summary_router, prefix = "/api/v1/summaries", tags = ["Summary"])
+app.include_router(device_router)
+app.include_router(profile_router)
+app.include_router(room_router)
+app.include_router(schedule_router)
+app.include_router(summary_router)
 
 # Root response model
 class RootResponse(BaseModel):
