@@ -249,5 +249,5 @@ async def control_device(
         )
 
         return {"message": f"Device {device_id} {action} successful"}
-    else
+    else:
         raise HTTPException(status_code = 400, detail = "Unsupported action")

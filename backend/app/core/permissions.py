@@ -1,3 +1,25 @@
+"""
+This module defines permission-based access control for the Sync Smart Home API
+
+It provides middleware functions to:
+- Enforce profile-specific permission checks for various system features
+- Gate access to APIs based on user profile capabilities
+- Support the fine-grained permission system required by FR 3-1 through FR 3-4
+
+The permission system works alongside the role-based access control in security.py,
+but focuses on profile-level permissions rather than user roles. This enables more
+granular control, allowing administrators to customize what actions specific profiles
+can perform (controlling devices, accessing energy data, etc.).
+
+Usage:
+    from app.core.permissions import profile_permission_required
+    
+    @router.get("/route")
+    async def protected_route(
+        _ = Depends(profile_permission_required("can_access_energy_data"))
+    ):
+        # Only profiles with can_access_energy_data=True can access this
+"""
 from fastapi import Depends, HTTPException, status
 from typing import Callable
 
