@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from bson.objectid import ObjectId
 from datetime import datetime, timezone
 
+from app.core.permissions import profile_permission_required
 from app.models.device import Device
 from app.core.security import get_current_user, role_required
 from app.db.database import devices_collection, energy_collection
@@ -13,10 +14,10 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-@router.post("/", dependencies = [Depends(get_current_user)])
+@router.post("/", dependencies = [Depends(role_required("admin"))])
 async def create_device(device: Device):
     """
-    Create a new smart device
+    Create a new smart device (admin only)
     
     Args:
         device (Device): The device data to create
@@ -35,12 +36,11 @@ async def create_device(device: Device):
                 detail="Device with this ID already exists"
             )
 
-        device_dict = device.model_dump()
-        result = devices_collection.insert_one(device_dict)
+        result = devices_collection.insert_one(device.model_dump())
 
         return {
             "message": "Device created successfully",
-            "device_id": device.id
+            "id": str(result.inserted_id)
         }
     except Exception as e:
         raise HTTPException(
@@ -58,7 +58,7 @@ async def get_all_devices(
     Get all devices with optional filtering
     
     Args:
-        room_id (Optional[str]): Filter devices by room
+        room_id (Optional[str]): Filter devices by room ID
         type (Optional[str]): Filter devices by type
         current_user (dict): The current authenticated user
         
@@ -107,10 +107,10 @@ async def get_device(device_id: str, current_user: dict = Depends(get_current_us
 
     return device
 
-@router.put("/{device_id}", dependencies=[Depends(get_current_user)])
+@router.put("/{device_id}", dependencies=[Depends(role_required("admin"))])
 async def update_device(device_id: str, device_update: Device):
     """
-    Update an existing device
+    Update an existing device (admin only)
     
     Args:
         device_id (str): The ID of the device to update
@@ -214,3 +214,40 @@ async def toggle_device(device_id: str):
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to toggle device status"
         )
+
+@router.post("/{device_id}/control")
+async def control_device(
+    device_id: str,
+    command: dict,
+    _ = Depends(profile_permission_required("can_control_devices"))
+):
+    """
+    Control a device (requires `can_control_devices` permission)
+
+    Args:
+        device_id (str): ID of the device to control
+        command (dict): Command to send to the device (e.g., {"action": "turn_on"})
+
+    Returns:
+        dict: Command result
+    """
+    # Get device
+    device = devices_collection.find_one({"id": device_id})
+
+    if not device:
+        raise HTTPException(status_code = 404, detail = "Device not found")
+
+    # Update device status based on command
+    action = command.get("action")
+
+    if action in ["turn_on", "turn_off"]:
+        new_status = "on" if action == "turn_off" else "off"
+
+        devices_collection.update_one(
+            {"id": device_id},
+            {"set": {"status": new_status}}
+        )
+
+        return {"message": f"Device {device_id} {action} successful"}
+    else
+        raise HTTPException(status_code = 400, detail = "Unsupported action")
