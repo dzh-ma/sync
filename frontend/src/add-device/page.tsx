@@ -1,14 +1,13 @@
 "use client"
 
-import type React from "react"
+import React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { Button } from "../../components/ui/button"
+import { Input } from "../../components/ui/input"
+import { Label } from "../../components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import {
   Lightbulb,
   Thermometer,
@@ -24,6 +23,7 @@ import {
   ArrowLeft,
 } from "lucide-react"
 import { motion } from "framer-motion"
+import { useNavigate } from "react-router-dom"
 
 const deviceTypes = [
   { value: "light", label: "Light", icon: Lightbulb },
@@ -39,7 +39,7 @@ const deviceTypes = [
 ]
 
 export default function AddDevicePage() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [deviceName, setDeviceName] = useState("")
   const [deviceType, setDeviceType] = useState("")
   const [room, setRoom] = useState("")
@@ -62,7 +62,7 @@ export default function AddDevicePage() {
     const updatedDevices = [...existingDevices, newDevice]
     localStorage.setItem("devices", JSON.stringify(updatedDevices))
 
-    router.push("/devices")
+    navigate("/devices")
   }
 
   const getDevicePowerConsumption = (deviceType: string): number => {
@@ -82,7 +82,7 @@ export default function AddDevicePage() {
     <div className="p-6 bg-gray-50 min-h-screen">
       <header className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-6 w-6" />
           </Button>
           <div>
@@ -142,7 +142,7 @@ export default function AddDevicePage() {
               </Select>
             </div>
             <div className="flex gap-4">
-              <Button type="button" variant="outline" className="flex-1" onClick={() => router.back()}>
+              <Button type="button" variant="outline" className="flex-1" onClick={() => navigate(-1)}>
                 Cancel
               </Button>
               <Button type="submit" className="flex-1 bg-[#00B2FF] hover:bg-[#00B2FF]/90">

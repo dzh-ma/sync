@@ -1,11 +1,10 @@
-"use client";
-
+import React from "react";
 import { useState, useEffect } from "react";
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from "@dnd-kit/sortable";
 import { Edit2, Download, Bell, Command, HelpCircle, Sun, Moon, Lock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { ActiveDevices } from "../components/active-devices";
 import { EnergyConsumption } from "../components/energy-consumption";
 import { FamilyMembers } from "../components/family-members";
@@ -15,24 +14,32 @@ import { AutomationWidget } from "../components/automation-widget";
 import { RoomEnergyConsumption } from "../components/room-energy-consumption";
 import { TimeDateWidget } from "../components/time-date-widget";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
-import { toast } from "@/components/ui/use-toast";
+// Replace Next.js router with browser navigation
+import { useNavigate } from "react-router-dom";
+import { toast } from "../../components/ui/use-toast";
 import axios from "axios";
-import { NavigationSidebar } from "@/app/components/navigation-sidebar"; // Import the navbar
+import { NavigationSidebar } from "../../components/navigation-sidebar"; // Import the navbar
 
+// Fix 1: Add TypeScript interface for widget props
+interface WidgetProps {
+  userId: string;
+  householdId: string;
+}
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// Fix 2: Fix the import.meta.env type
+const API_URL = (import.meta as any).env.VITE_API_URL || 'http://localhost:8000';
 
+// Fix 3: Update the initialWidgets type
 const initialWidgets = [
-  { id: "time-date", component: TimeDateWidget },
-  { id: "devices", component: ActiveDevices },
-  { id: "weather", component: WeatherWidget },
-  { id: "energy", component: EnergyConsumption },
-  { id: "automation", component: AutomationWidget },
-]
+  { id: "time-date", component: TimeDateWidget as React.ComponentType<WidgetProps> },
+  { id: "devices", component: ActiveDevices as React.ComponentType<WidgetProps> },
+  { id: "weather", component: WeatherWidget as React.ComponentType<WidgetProps> },
+  { id: "energy", component: EnergyConsumption as React.ComponentType<WidgetProps> },
+  { id: "automation", component: AutomationWidget as React.ComponentType<WidgetProps> },
+];
 
 export default function Page() {
-  const router = useRouter()
+  const navigate = useNavigate();
   const [rooms, setRooms] = useState([
     { id: "1", name: "Living Room", consumption: 45 },
     { id: "2", name: "Bedroom", consumption: 18 },
@@ -48,7 +55,7 @@ export default function Page() {
   useEffect(() => {
     const storedUser = localStorage.getItem("currentUser");
     if (!storedUser) {
-      router.push("/auth/login");
+      navigate("/auth/login");
       return;
     }
 
@@ -73,12 +80,12 @@ export default function Page() {
           description: "Failed to load user data. Please try again.",
           variant: "destructive",
         });
-        router.push("/auth/login");
+        navigate("/auth/login");
       }
     };
 
     fetchUserData();
-  }, [router]);
+  }, [navigate]);
 
   useEffect(() => {
     if (user) {
@@ -211,8 +218,11 @@ export default function Page() {
                     <SortableWidget key={widget.id} id={widget.id} isEditing={isEditing}>
                       <Card className={`h-full ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
                         <CardContent className="p-4">
-                          {/* Pass user_id or household_id to components needing user-specific data */}
-                          <widget.component userId={user.id} householdId={user.household_id} />
+                          {/* Fix 4: Component rendering with proper typing */}
+                          {React.createElement(widget.component, {
+                            userId: user.id,
+                            householdId: user.household_id
+                          })}
                         </CardContent>
                       </Card>
                     </SortableWidget>

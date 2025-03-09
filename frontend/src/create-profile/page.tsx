@@ -1,31 +1,31 @@
-// create-profile/page.tsx
 "use client";
 
+import React from "react";
 import { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-} from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
+} from "../../components/ui/select";
+import { Switch } from "../../components/ui/switch";
 import { ArrowLeft, Upload, Users } from "lucide-react";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group";
 import { motion } from "framer-motion";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "../../components/ui/use-toast";
 import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export default function CreateProfilePage() {
-    const router = useRouter();
+    const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [formData, setFormData] = useState({
         profileType: "",
@@ -84,7 +84,7 @@ export default function CreateProfilePage() {
                 description:
                     "The new household member profile has been successfully created.",
             });
-            router.push("/manage-profiles");
+            navigate("/manage-profiles");
         } catch (error) {
             console.error("Error creating profile:", error);
             toast({
@@ -104,7 +104,7 @@ export default function CreateProfilePage() {
             >
                 <header className="flex justify-between items-center mb-8">
                     <div className="flex items-center gap-4">
-                        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
                             <ArrowLeft className="h-6 w-6" />
                         </Button>
                         <div className="flex items-center gap-4">

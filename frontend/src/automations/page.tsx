@@ -3,10 +3,10 @@
 import React from "react"
 
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { Button } from "../../components/ui/button"
+import { Switch } from "../../components/ui/switch"
+import { Badge } from "../../components/ui/badge"
 import { Clock, Sun, Moon, Home, Plus, Zap, Droplet, Thermometer, Trash2, Edit, Repeat } from "lucide-react"
 import { motion } from "framer-motion"
 import {
@@ -16,13 +16,13 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { toast } from "@/components/ui/use-toast"
-import { NavigationSidebar } from "@/app/components/navigation-sidebar"; // Import the navbar
+} from "../../components/ui/dialog"
+import { Input } from "../../components/ui/input"
+import { Label } from "../../components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
+import { Checkbox } from "../../components/ui/checkbox"
+import { toast } from "../../components/ui/use-toast"
+import { NavigationSidebar } from "../../components/navigation-sidebar"; // Import the navbar
 
 
 interface Automation {

@@ -1,12 +1,9 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import React, { useState, useEffect } from "react"
+import { Card, CardContent } from "../../components/ui/card"
+import { Button } from "../../components/ui/button"
 import { motion } from "framer-motion"
 import { ArrowLeft, Users, Settings, Shield } from "lucide-react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
+import { useNavigate, useParams } from "react-router-dom"
 
 interface FamilyMember {
   id: string
@@ -17,7 +14,7 @@ interface FamilyMember {
 }
 
 export default function ManageProfilesPage() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([])
 
   useEffect(() => {
@@ -30,7 +27,7 @@ export default function ManageProfilesPage() {
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <header className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-6 w-6" />
             </Button>
             <div className="flex items-center gap-4">
@@ -64,11 +61,10 @@ export default function ManageProfilesPage() {
                 <div className="flex flex-col items-center text-center">
                   <div className="relative w-24 h-24 mb-4">
                     {member.avatar ? (
-                      <Image
+                      <img
                         src={member.avatar || "/placeholder.svg"}
                         alt={member.name}
-                        fill
-                        className="rounded-full object-cover"
+                        className="rounded-full object-cover w-full h-full"
                       />
                     ) : (
                       <div className="w-full h-full bg-gray-100 rounded-full flex items-center justify-center">
@@ -85,14 +81,14 @@ export default function ManageProfilesPage() {
                     <Button
                       variant="outline"
                       className="w-full text-[#00B2FF] border-[#00B2FF] hover:bg-[#00B2FF]/10"
-                      onClick={() => router.push(`/manage-profiles/${member.id}/details`)}
+                      onClick={() => navigate(`/manage-profiles/${member.id}/details`)}
                     >
                       <Settings className="w-4 h-4 mr-2" />
                       Manage Details
                     </Button>
                     <Button
                       className="w-full bg-[#00B2FF] hover:bg-[#00B2FF]/90"
-                      onClick={() => router.push(`/manage-profiles/${member.id}/access`)}
+                      onClick={() => navigate(`/manage-profiles/${member.id}/access`)}
                     >
                       <Shield className="w-4 h-4 mr-2" />
                       Manage Access
@@ -107,4 +103,3 @@ export default function ManageProfilesPage() {
     </div>
   )
 }
-

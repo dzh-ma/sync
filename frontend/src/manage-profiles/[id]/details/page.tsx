@@ -1,13 +1,12 @@
-"use client"
-
+import React from "react"
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { useParams, useNavigate } from "react-router-dom"
+import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card"
+import { Button } from "../../../../components/ui/button"
+import { Input } from "../../../../components/ui/input"
+import { Label } from "../../../../components/ui/label"
 import { motion } from "framer-motion"
 import { ArrowLeft, User, Key, Trash2, Mail } from "lucide-react"
-import { useRouter } from "next/navigation"
 import {
   Dialog,
   DialogContent,
@@ -16,8 +15,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "../../../../components/ui/dialog"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../../../components/ui/select"
 
 interface FamilyMember {
   id: string
@@ -27,8 +26,9 @@ interface FamilyMember {
   pin?: string
 }
 
-export default function ManageProfileDetailsPage({ params }: { params: { id: string } }) {
-  const router = useRouter()
+export default function ManageProfileDetailsPage() {
+  const { id } = useParams()
+  const navigate = useNavigate()
   const [member, setMember] = useState<FamilyMember | null>(null)
   const [isChangePinOpen, setIsChangePinOpen] = useState(false)
   const [newPin, setNewPin] = useState(["", "", "", ""])
@@ -40,7 +40,7 @@ export default function ManageProfileDetailsPage({ params }: { params: { id: str
 
   useEffect(() => {
     const storedMembers = JSON.parse(localStorage.getItem("familyMembers") || "[]")
-    const member = storedMembers.find((m: FamilyMember) => m.id === params.id)
+    const member = storedMembers.find((m: FamilyMember) => m.id === id)
     if (member) {
       setMember(member)
       setFormData({
@@ -49,7 +49,7 @@ export default function ManageProfileDetailsPage({ params }: { params: { id: str
         role: member.role,
       })
     }
-  }, [params.id])
+  }, [id])
 
   const handlePinChange = (index: number, value: string) => {
     if (value.length > 1) return
@@ -66,7 +66,7 @@ export default function ManageProfileDetailsPage({ params }: { params: { id: str
   const handleSaveChanges = () => {
     const storedMembers = JSON.parse(localStorage.getItem("familyMembers") || "[]")
     const updatedMembers = storedMembers.map((m: FamilyMember) => {
-      if (m.id === params.id) {
+      if (m.id === id) {
         return {
           ...m,
           ...formData,
@@ -75,7 +75,7 @@ export default function ManageProfileDetailsPage({ params }: { params: { id: str
       return m
     })
     localStorage.setItem("familyMembers", JSON.stringify(updatedMembers))
-    router.push("/manage-profiles")
+    navigate("/manage-profiles")
   }
 
   const handleSavePin = () => {
@@ -83,7 +83,7 @@ export default function ManageProfileDetailsPage({ params }: { params: { id: str
     if (pin.length === 4) {
       const storedMembers = JSON.parse(localStorage.getItem("familyMembers") || "[]")
       const updatedMembers = storedMembers.map((m: FamilyMember) => {
-        if (m.id === params.id) {
+        if (m.id === id) {
           return {
             ...m,
             pin,
@@ -99,9 +99,9 @@ export default function ManageProfileDetailsPage({ params }: { params: { id: str
 
   const handleDeleteProfile = () => {
     const storedMembers = JSON.parse(localStorage.getItem("familyMembers") || "[]")
-    const updatedMembers = storedMembers.filter((m: FamilyMember) => m.id !== params.id)
+    const updatedMembers = storedMembers.filter((m: FamilyMember) => m.id !== id)
     localStorage.setItem("familyMembers", JSON.stringify(updatedMembers))
-    router.push("/manage-profiles")
+    navigate("/manage-profiles")
   }
 
   if (!member) return null
@@ -111,7 +111,7 @@ export default function ManageProfileDetailsPage({ params }: { params: { id: str
       <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <header className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
               <ArrowLeft className="h-6 w-6" />
             </Button>
             <div>
@@ -238,4 +238,3 @@ export default function ManageProfileDetailsPage({ params }: { params: { id: str
     </div>
   )
 }
-

@@ -1,18 +1,19 @@
 "use client"
 
-import type React from "react"
+// FIX: Errors
+import React from "react"
 
 import { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { toast } from "@/components/ui/use-toast"
+import { useNavigate } from "react-router-dom"
+import { Button } from "../../../components/ui/button"
+import { Input } from "../../../components/ui/input"
+import { toast } from "../../../components/ui/use-toast"
 import { ArrowLeft, Mail, Lock } from "lucide-react"
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../../components/ui/card"
 
 export default function ForgotPasswordPage() {
-  const router = useRouter()
+  const navigate = useNavigate()
   const [step, setStep] = useState(1)
   const [email, setEmail] = useState("")
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
@@ -60,7 +61,7 @@ export default function ForgotPasswordPage() {
       title: "Password Reset Successful",
       description: "Your password has been reset. Please log in with your new password.",
     })
-    router.push("/auth/login")
+    navigate("/auth/login")
   }
 
   const handleOtpChange = (index: number, value: string) => {

@@ -1,12 +1,12 @@
 "use client";
 
-import type React from "react";
+import React from "react";
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -14,15 +14,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useLogout } from "@/app/components/logout";
+} from "../../components/ui/dialog";
+import { useLogout } from "../../components/logout";
 import { motion } from "framer-motion";
 import { User, Settings, BarChart2, Users, LogOut, Plus, Lock } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useNavigate } from "react-router-dom";
 import Link from "next/link";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "../../components/ui/use-toast";
 import Image from "next/image";
-import { NavigationSidebar } from "@/app/components/navigation-sidebar"; // Import the navbar
+import { NavigationSidebar } from "../../components/navigation-sidebar"; // Import the navbar
 
 interface FamilyMember {
   id: string;
@@ -39,12 +39,12 @@ export default function ProfilePage() {
   });
   const [user, setUser] = useState<any>(null);
   const logout = useLogout();
-  const router = useRouter();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
     if (!currentUser.id) {
-      router.push("/auth/login");
+      navigate("/auth/login");
       return;
     }
     setUser(currentUser);
@@ -52,7 +52,7 @@ export default function ProfilePage() {
       name: currentUser.name,
       email: currentUser.email,
     });
-  }, [router]);
+  }, [navigate]);
 
   const handleEditProfile = () => {
     // In a real application, this would update the user's information in the backend
@@ -152,7 +152,7 @@ export default function ProfilePage() {
                       <Button
                         variant="outline"
                         className="w-full h-12 text-[#00B2FF] border-[#00B2FF] hover:bg-[#00B2FF]/10"
-                        onClick={() => router.push("/statistics")}
+                        onClick={() => navigate("/statistics")}
                       >
                         <BarChart2 className="w-4 h-4 mr-2" />
                         View Analytics
@@ -161,7 +161,7 @@ export default function ProfilePage() {
                       <Button
                         variant="outline"
                         className="w-full h-12 text-[#00B2FF] border-[#00B2FF] hover:bg-[#00B2FF]/10"
-                        onClick={() => router.push("/settings")}
+                        onClick={() => navigate("/settings")}
                       >
                         <Settings className="w-4 h-4 mr-2" />
                         Account Settings
@@ -192,7 +192,7 @@ export default function ProfilePage() {
                       <Button
                         variant="outline"
                         className="w-full h-12 text-[#00B2FF] border-[#00B2FF] hover:bg-[#00B2FF]/10"
-                        onClick={() => router.push("/settings")}
+                        onClick={() => navigate("/settings")}
                       >
                         <Settings className="w-4 h-4 mr-2" />
                         Account Settings

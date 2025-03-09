@@ -1,12 +1,13 @@
 "use client"
 
+import React from "react"
 import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
+import { Button } from "../../components/ui/button"
+import { Badge } from "../../components/ui/badge"
 import { Download, User, Lightbulb, ThermometerSun, Timer, Fan, ArrowRight, Zap } from "lucide-react"
 import { motion } from "framer-motion"
-import { NavigationSidebar } from "@/app/components/navigation-sidebar";
+import { NavigationSidebar } from "../../components/navigation-sidebar";
 
 const adminSuggestions = [
   {

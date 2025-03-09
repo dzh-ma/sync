@@ -1,9 +1,10 @@
 "use client"
 
+import React from "react"
 import { useEffect, useState } from "react"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent } from "../../components/ui/card"
+import { Avatar, AvatarFallback } from "../../components/ui/avatar"
+import { Button } from "../../components/ui/button"
 import Link from "next/link"
 import './FamilyMembers.css' // Import the CSS file
 
