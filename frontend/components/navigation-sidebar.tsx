@@ -1,5 +1,5 @@
 import { Home, Lightbulb, Clock, BarChart2, MapPin, Plus, User, Settings } from "lucide-react"
-import { cn } from "../lib/utils"
+import { cn } from "@/lib/utils"
 
 export function NavigationSidebar() {
   return (

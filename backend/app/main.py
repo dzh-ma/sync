@@ -32,6 +32,7 @@ ALLOWED_ORIGINS = os.getenv("ALLOWED_ORIGINS", "*").split(",")
 origins = [
     "http://localhost:5173",
     "mongodb://localhost:27017/",
+    "http://localhost:3000"
 ]
 
 @asynccontextmanager

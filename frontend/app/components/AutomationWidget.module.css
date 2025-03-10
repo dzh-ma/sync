@@ -1,0 +1,231 @@
+/* AutomationWidget.module.css */
+/*.card {
+    height: 100%;
+  }
+  
+  .cardHeader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-bottom: 8px;
+  }
+  
+  .cardTitle {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  
+  .dialogContent {
+    max-width: 425px;
+  }
+  
+  .gridContainer {
+    display: grid;
+    gap: 16px;
+    padding-top: 16px;
+  }
+  
+  .gridItem {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 16px;
+  }
+  
+  .cardContent {
+    padding: 16px;
+  }
+  
+  .automationItem {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+  }
+  
+  .iconWrapper {
+    padding: 8px;
+    border-radius: 50%;
+  }
+  
+  .activeIcon {
+    background-color: #d1fae5;
+  }
+  
+  .inactiveIcon {
+    background-color: #e5e7eb;
+  }
+  
+  .icon {
+    height: 20px;
+    width: 20px;
+  }
+  
+  .detailsWrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .detailsText {
+    font-weight: 500;
+  }
+  
+  .scheduleText {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+  
+  .badgeWrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }*/
+  /* AutomationWidget.module.css */
+.cardAuto {
+  height: 100%;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+}
+
+.cardHeaderAuto {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+}
+
+.cardTitleAuto {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.dialogContentAuto {
+  max-width: 400px;
+  padding: 20px;
+}
+
+.gridContainerAuto {
+  display: grid;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+.gridItemAuto {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cardContentAuto {
+  padding: 16px;
+}
+
+.automationItemAuto {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+.automationItemAuto:hover {
+  background-color: #f1f5f9;
+}
+
+.iconWrapperAuto {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 40px;
+  width: 40px;
+  border-radius: 50%;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.activeIconAuto {
+  background-color: #bbf7d0;
+}
+
+.inactiveIconAuto {
+  background-color: #e5e7eb;
+}
+
+.iconAuto {
+  height: 22px;
+  width: 22px;
+  color: #4b5563;
+}
+
+.detailsWrapperAuto {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.detailsTextAuto {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #111827;
+}
+
+.scheduleTextAuto {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.badgeWrapperAuto {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .automationItemAuto {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+  }
+
+  .detailsWrapperAuto {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .badgeWrapperAuto {
+    justify-content: flex-end;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardAuto {
+    padding: 12px;
+  }
+
+  .cardTitleAuto {
+    font-size: 1.1rem;
+  }
+
+  .automationItemAuto {
+    padding: 8px;
+  }
+
+  .iconWrapperAuto {
+    height: 35px;
+    width: 35px;
+  }
+
+  .detailsTextAuto {
+    font-size: 0.95rem;
+  }
+
+  .scheduleTextAuto {
+    font-size: 0.75rem;
+  }
+}

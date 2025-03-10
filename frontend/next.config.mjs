@@ -15,7 +15,6 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-    domains: ['media.istockphoto.com'], // Add this line
   },
   experimental: {
     webpackBuildWorker: true,
@@ -24,7 +23,6 @@ const nextConfig = {
   },
 }
 
-// Fix the mergeConfig function to return nextConfig
 mergeConfig(nextConfig, userConfig)
 
 function mergeConfig(nextConfig, userConfig) {
