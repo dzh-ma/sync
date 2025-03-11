@@ -6,8 +6,12 @@ export function useLogout() {
   const router = useRouter()
 
   return () => {
-    // Instead of removing the user, we'll just redirect to the dashboard
+    // Clear localStorage items
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('token_type');
+    
+    // Use the correct path
     router.push("/auth/login")
   }
 }
-

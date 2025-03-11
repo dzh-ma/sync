@@ -1,1 +1,3 @@
 backend/app/utils/email_config.ini
+frontend/node_modules/
+frontend-bak/node_modules

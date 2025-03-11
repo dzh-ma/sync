@@ -1,3 +1,4 @@
+// add-device/pages.tsx
 "use client"
 
 import type React from "react"
@@ -47,22 +48,26 @@ export default function AddDevicePage() {
   const handleAddDevice = (e: React.FormEvent) => {
     e.preventDefault()
 
-    const newDevice = {
-      id: Date.now().toString(),
-      name: deviceName,
-      type: deviceType,
-      room: room,
-      status: "off",
-      powerConsumption: getDevicePowerConsumption(deviceType),
-      lastStatusChange: Date.now(),
-      totalEnergyConsumed: 0,
+    try{
+      const newDevice = {
+        id: Date.now().toString(),
+        name: deviceName,
+        type: deviceType,
+        room: room,
+        status: "off",
+        powerConsumption: getDevicePowerConsumption(deviceType),
+        lastStatusChange: Date.now(),
+        totalEnergyConsumed: 0,
+      }
+
+      const existingDevices = JSON.parse(localStorage.getItem("devices") || "[]")
+      const updatedDevices = [...existingDevices, newDevice]
+      localStorage.setItem("devices", JSON.stringify(updatedDevices))
+
+      router.push("/devices")
+    } catch (error) {
+      console.error("Failed to add device:", error)
     }
-
-    const existingDevices = JSON.parse(localStorage.getItem("devices") || "[]")
-    const updatedDevices = [...existingDevices, newDevice]
-    localStorage.setItem("devices", JSON.stringify(updatedDevices))
-
-    router.push("/devices")
   }
 
   const getDevicePowerConsumption = (deviceType: string): number => {

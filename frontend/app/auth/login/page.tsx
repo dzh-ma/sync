@@ -10,12 +10,14 @@ import Link from "next/link";
 import { Eye, EyeOff, Mail } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import axios from 'axios';
+import { useUser } from "@/contexts/UserContext"; // Import the user context
 
-// API base URL with fallback to localhost
+// API base URL with fallback
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login } = useUser(); // Use the login function from context
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [isLoading, setIsLoading] = useState(false);
@@ -57,33 +59,25 @@ export default function LoginPage() {
       // Extract token and store it
       const { access_token, token_type } = response.data;
       
-      // Get user details using the token
-      const userResponse = await axios.get(`${API_URL}/users/me`, {
-        headers: {
-          'Authorization': `${token_type} ${access_token}`
-        }
+      // Use the login function from context to update global state
+      login({
+        email: formData.email,
+        isAuthenticated: true,
+        token: access_token
       });
 
-      // Store auth token and user information
-      localStorage.setItem('access_token', access_token);
-      localStorage.setItem('token_type', token_type);
-      localStorage.setItem('currentUser', JSON.stringify({
-        email: formData.email,
-        role: userResponse.data.role || 'user',
-        id: userResponse.data.id,
-        is_verified: userResponse.data.is_verified
-      }));
-
-      // Redirect to dashboard
       toast({
         title: "Login Successful",
         description: "Welcome back!",
         variant: "default",
       });
       
+      // Redirect to dashboard
       router.push("/dashboard");
     } catch (error) {
       // Handle common error scenarios
+      console.error("Login error:", error);
+      
       const errorMessage =
         (error as any).response?.data?.detail ||
         (error as any).message ||
@@ -116,14 +110,14 @@ export default function LoginPage() {
       // Store the email for the verification step
       setVerificationEmail(formData.email);
       
-      // Using the documented password reset flow
+      // Request password reset
       await axios.post(`${API_URL}/users/request-password-reset`, { 
         email: formData.email 
       });
       
       toast({
-        title: "Verification Code Sent",
-        description: "Please check your email for the verification code",
+        title: "Verification Email Sent",
+        description: "A confirmation link has been sent to your email",
         variant: "default",
       });
       
@@ -152,6 +146,17 @@ export default function LoginPage() {
       toast({
         title: "Missing Information",
         description: "Please enter both the verification code and new password",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate password
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{}|;':",.<>?/])[A-Za-z\d!@#$%^&*()_+\-=\[\]{}|;':",.<>?/]{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+      toast({
+        title: "Invalid Password",
+        description: "Password must be at least 8 characters with uppercase, lowercase, numbers, and special characters.",
         variant: "destructive",
       });
       return;
@@ -326,9 +331,12 @@ export default function LoginPage() {
                   type="text"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter the verification code from your email"
+                  placeholder="Enter the verification code"
                   required
                 />
+                <p className="text-xs text-gray-500">
+                  Enter the code sent to your email
+                </p>
               </div>
 
               <div className="space-y-2">

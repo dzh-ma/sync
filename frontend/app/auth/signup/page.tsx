@@ -177,7 +177,7 @@ export default function SignupPage() {
       
       toast({
         title: "Registration Initiated",
-        description: "A verification code has been sent to your email.",
+        description: "A confirmation link has been sent to your email.",
       })
       
       setStep(2)
@@ -237,20 +237,17 @@ export default function SignupPage() {
     setIsLoading(true)
     
     try {
-      // Request a new verification code from the backend
+      // Request a new verification email from the backend
       await axios.post(`${API_URL}/users/resend-verification`, {
         email: formData.email
       })
       
       toast({
-        title: "Verification Code Resent",
-        description: "A new verification code has been sent to your email.",
+        title: "Verification Email Resent",
+        description: "A new confirmation link has been sent to your email.",
       })
-      
-      // Reset the verification code inputs
-      setVerificationCode(["", "", "", "", "", ""])
     } catch (error) {
-      const errorMessage = error.response?.data?.detail || "Failed to resend verification code. Please try again."
+      const errorMessage = error.response?.data?.detail || "Failed to resend verification email. Please try again."
       toast({
         title: "Request Failed",
         description: errorMessage,
@@ -477,40 +474,46 @@ export default function SignupPage() {
         return (
           <div className="space-y-6">
             <h3 className="text-lg font-semibold">Verify Your Email</h3>
-            <p className="text-sm text-gray-500">We've sent a 6-digit verification code to {formData.email}</p>
-
-            <div className="flex justify-between gap-2">
-              {verificationCode.map((digit, index) => (
-                <Input
-                  key={index}
-                  id={`code-${index}`}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleVerificationCodeChange(index, e.target.value)}
-                  className="w-10 h-12 text-center text-xl"
-                />
-              ))}
+            <p className="text-sm text-gray-500">We've sent a confirmation link to {formData.email}</p>
+            
+            <div className="bg-blue-50 p-4 rounded-md border border-blue-200">
+              <p className="text-sm text-blue-800">
+                Please check your inbox and click the verification link to confirm your email address. 
+                This step is required to activate your account.
+              </p>
+            </div>
+            
+            <div className="bg-gray-50 p-4 rounded-md">
+              <h4 className="text-sm font-medium mb-2">Can't find the email?</h4>
+              <ul className="text-xs text-gray-600 space-y-1">
+                <li>• Check your spam or junk folder</li>
+                <li>• Make sure you entered the correct email address</li>
+                <li>• Allow a few minutes for the email to arrive</li>
+              </ul>
             </div>
 
             <p className="text-sm text-center">
-              Didn't receive the code?{" "}
+              Didn't receive the email?{" "}
               <button
                 className="text-[#00B2FF] hover:underline"
                 onClick={handleResendOtp}
                 disabled={isLoading}
               >
-                Resend verification code
+                Resend verification email
               </button>
             </p>
 
             <Button 
-              className="w-full bg-[#FF9500] hover:bg-[#FF9500]/90 py-6 text-lg" 
-              onClick={handleVerifyOtp}
-              disabled={isLoading}
+              className="w-full bg-[#FF9500] hover:bg-[#FF9500]/90 py-6 text-lg"
+              onClick={() => {
+                toast({
+                  title: "Please Verify Your Email",
+                  description: "You need to click the link in your email before continuing.",
+                  variant: "destructive"
+                });
+              }}
             >
-              {isLoading ? "Verifying..." : "Verify & Continue"}
+              I've Verified My Email
             </Button>
           </div>
         )

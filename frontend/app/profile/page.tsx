@@ -1,3 +1,4 @@
+// profile/page.tsx
 "use client";
 
 import type React from "react";
@@ -43,7 +44,7 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-    if (!currentUser.id) {
+    if (!currentUser.email || !currentUser.isAuthenticated) {
       router.push("/auth/login");
       return;
     }

@@ -1,0 +1,64 @@
+// dashboard/page.tsx
+// NOTE: This is a working copy
+"use client"
+
+import { useState, useEffect } from 'react';
+import { useUser } from '@/contexts/UserContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import { Button } from '@/components/ui/button';
+
+export default function Dashboard() {
+  const { user, logout } = useUser();
+  const [greeting, setGreeting] = useState('');
+
+  useEffect(() => {
+    const hours = new Date().getHours();
+    if (hours < 12) {
+      setGreeting('Good morning');
+    } else if (hours < 18) {
+      setGreeting('Good afternoon');
+    } else {
+      setGreeting('Good evening');
+    }
+  }, []);
+
+  return (
+    <ProtectedRoute>
+      <div className="container mx-auto p-6">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold">Dashboard</h1>
+          <Button 
+            variant="outline" 
+            onClick={logout}
+            className="px-4 py-2"
+          >
+            Logout
+          </Button>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">{greeting}, {user?.email}</h2>
+          <p className="text-gray-600">Welcome to your Smart Home Dashboard.</p>
+        </div>
+
+        {/* Sample dashboard content */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="font-semibold mb-2">Energy Usage</h3>
+            <p className="text-gray-600">View your energy consumption statistics</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="font-semibold mb-2">Device Management</h3>
+            <p className="text-gray-600">Control your connected devices</p>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h3 className="font-semibold mb-2">Profiles</h3>
+            <p className="text-gray-600">Manage family member profiles</p>
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
+}

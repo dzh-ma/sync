@@ -1,3 +1,4 @@
+// rooms/page.tsx
 "use client"
 
 import { NavigationSidebar } from "../components/navigation-sidebar"
