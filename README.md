@@ -8,69 +8,47 @@ This repository contains the **front-end & back-end** components of the project.
 
 Follow the instructions below to set up & run both.
 
-## Front-end Setup
+## Frontend Setup
 
 The front-end is built with *React.js*.
 
-1. **Navigate to the front-end directory**
-```bash
-cd frontend/
-```
-
-2. **Install front-end dependencies**
+1. **Install front-end dependencies**
 ```bash
 npm install
 ```
 
-3. **Run the front-end application**
+2. **Run the front-end application**
 ```bash
 npm run dev
 ```
 
-4. **Access the application**
-Once the front-end is running, open: `http://localhost:5173`.
+3. **Access the application**
+Once the front-end is running, open: `http://localhost:3000`.
 
-## Back-end Setup
+## Backend Setup
 
 The back-end is powered by *FastAPI* & *MongoDB*.
 
-1. **Navigate to the back-end directory**
+1. **Install back-end dependencies**
 ```bash
-cd backend/
+pip install -r backend/requirements.txt
 ```
 
-2. **Install back-end dependencies**
-```bash
-pip install -r requirements.txt
-```
-
-3. **Ensure MongoDB is running**
+2. **Ensure MongoDB is running**
 ```bash
 sudo systemctl start mongodb
 ```
 
-4. **Initialize the app using `uvicorn`**
+3. **Initialize the app using `uvicorn`**
 ```bash
-uvicorn main:app --reload 
+uvicorn backend.main:app --reload 
 ```
 
-5. **API documentation**
+4. **API documentation**
     Once the back-end is running, you may view the API by visiting: `http://127.0.0.1:8000/docs`
 
-6. **Module documentation**
-    You can find the documentation in PDF format ![here](./backend/site/pdf/document.pdf)
-
-## Node-RED Setup
-
-1. **Install Node-RED globally**
-```bash
-sudo npm install -g --unsafe-perm node-red
-```
-
-2. **Navigate to the Node-RED directory**
-```bash
-cd 
-```
+5. **Module documentation**
+    You can find the documentation in PDF format ![here](./site/pdf/document.pdf)
 
 ---
 
@@ -120,3 +98,5 @@ set TOKEN $(curl -s -X POST "http://127.0.0.1:8000/api/v1/users/token" \
 curl -X POST "http://127.0.0.1:8000/api/v1/reports/report?format=csv" \
     -H "Authorization: Bearer $TOKEN"
 ```
+
+---

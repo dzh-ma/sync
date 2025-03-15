@@ -1,8 +1,0 @@
-{
-  "/devices/page": "app/devices/page.js",
-  "/dashboard/page": "app/dashboard/page.js",
-  "/auth/signup/page": "app/auth/signup/page.js",
-  "/suggestions/page": "app/suggestions/page.js",
-  "/add-device/page": "app/add-device/page.js",
-  "/page": "app/page.js"
-}
