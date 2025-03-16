@@ -36,7 +36,6 @@ def init_db():
     u_c.create_index("id", unique=True)     # Unique identification
     u_c.create_index("email", unique=True)  # Unique email address
     u_c.create_index("username")            # General username
-    u_c.create_index("verified")            # Verification status
 
     # Profile collection
     p_c.create_index("id", unique=True)         # Unique identification
