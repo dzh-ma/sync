@@ -1,0 +1,3 @@
+"""
+Initializes FastAPI application.
+"""
