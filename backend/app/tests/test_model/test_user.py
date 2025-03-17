@@ -4,7 +4,7 @@ Test suite for user validation models.
 import pytest
 from datetime import datetime, timedelta
 from pydantic import ValidationError
-from ..models.user import CreateUser, UserDB, UserResponse, UserUpdate
+from app.models.user import CreateUser, UserDB, UserResponse, UserUpdate
 
 class TestCreateUser:
     """Tests for the CreateUser model validation."""

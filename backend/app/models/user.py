@@ -148,9 +148,10 @@ class UserUpdate(BaseModel):
         Raises:
             ValueError: Validation encountered a missing requirement.
         """
-        if len(u) < 3:
-            raise ValueError("Username must be at least 3 characters long.")
-        if len(u) > 30:
-            raise ValueError("Username must be less than 30 characters long.")
+        if isinstance(u, str):
+            if len(u) < 3:
+                raise ValueError("Username must be at least 3 characters long.")
+            if len(u) > 30:
+                raise ValueError("Username must be less than 30 characters long.")
 
         return u
