@@ -1,0 +1,38 @@
+"""
+Main application entry point for the smart home API.
+"""
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+# Import database initialization
+from app.db.data import init_db
+
+# Import routers
+from app.routes import user_router, profile_router
+
+# Create FastAPI app
+app = FastAPI(
+    title="Smart Home System",
+    description="Smart Home System API",
+    version="1.0.0",
+    openapi_url="/api/v1/openapi.json"
+)
+
+# Configure CORS
+origins = ["http://localhost", "http://localhost:8080"]  # Add your origins
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Include routers with appropriate prefixes
+app.include_router(user_router, prefix="/api/v1")
+app.include_router(profile_router, prefix="/api/v1")
+
+@app.get("/")
+async def root():
+    """Root endpoint for API health check."""
+    return {"message": "Smart Home System API is running"}

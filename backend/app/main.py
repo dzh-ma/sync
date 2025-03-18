@@ -9,6 +9,7 @@ from app.db.data import init_db
 
 # Import routers
 from app.routes.user_routes import router as user_router
+from app.routes.profile_routes import router as profile_router
 # Import other routers here
 
 # Create FastAPI application
@@ -35,6 +36,8 @@ def startup_event():
 
 # Include routers
 app.include_router(user_router, prefix="/api/v1")
+app.include_router(profile_router, prefix="/api/v1")
+
 
 # Add a root endpoint for API health check
 @app.get("/")

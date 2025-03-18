@@ -14,7 +14,7 @@ from app.core.password import hash_password, verify_role
 from app.core.auth import get_current_user
 
 # Print statement for debugging
-print("DEBUG: user_routes.py loaded, u_c object:", u_c)
+# print("DEBUG: user_routes.py loaded, u_c object:", u_c)
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -30,7 +30,7 @@ async def get_all_users(
     Get all users (admin only).
     """
     # Debug print
-    print(f"DEBUG: get_all_users called with u_c={u_c}, id(u_c)={id(u_c)}")
+    # print(f"DEBUG: get_all_users called with u_c={u_c}, id(u_c)={id(u_c)}")
     
     # Check if user is admin
     if current_user.role != "admin":
@@ -47,14 +47,14 @@ async def get_all_users(
         query["active"] = active
     
     # Debug print
-    print(f"DEBUG: Executing find with query={query}")
+    # print(f"DEBUG: Executing find with query={query}")
     
     # Convert cursor to list explicitly
     cursor = u_c.find(query).skip(skip).limit(limit)
-    print(f"DEBUG: type(cursor)={type(cursor)}, cursor={cursor}")
+    # print(f"DEBUG: type(cursor)={type(cursor)}, cursor={cursor}")
     
     users = list(cursor)
-    print(f"DEBUG: users={users}, len(users)={len(users)}")
+    # print(f"DEBUG: users={users}, len(users)={len(users)}")
     
     # Convert to UserResponse models
     return [UserResponse.model_validate(user) for user in users]
@@ -69,7 +69,7 @@ async def get_user(
     Users can only access their own data, while admins can access any user's data.
     """    
     # Debug print
-    print(f"DEBUG: get_user called with user_id={user_id}, u_c={u_c}")
+    # print(f"DEBUG: get_user called with user_id={user_id}, u_c={u_c}")
     
     # Check if the requesting user is the user being requested or an admin
     if current_user.role != "admin" and current_user.id != user_id:
@@ -79,7 +79,7 @@ async def get_user(
         )
     
     user = u_c.find_one({"id": user_id})
-    print(f"DEBUG: find_one result={user}")
+    # print(f"DEBUG: find_one result={user}")
     
     if not user:
         raise HTTPException(
@@ -99,14 +99,14 @@ async def create_user(
     Only admin users can create new users.
     """
     # Debug print
-    print(f"DEBUG: create_user called with username={user_create.username}, u_c={u_c}")
+    # print(f"DEBUG: create_user called with username={user_create.username}, u_c={u_c}")
     
     # Verify admin role
     verify_role(current_user.role, "admin")
     
     # Check if username or email already exists
     username_exists = u_c.find_one({"username": user_create.username})
-    print(f"DEBUG: username_exists={username_exists}")
+    # print(f"DEBUG: username_exists={username_exists}")
     
     if username_exists:
         raise HTTPException(
@@ -115,7 +115,7 @@ async def create_user(
         )
     
     email_exists = u_c.find_one({"email": user_create.email})
-    print(f"DEBUG: email_exists={email_exists}")
+    # print(f"DEBUG: email_exists={email_exists}")
     
     if email_exists:
         raise HTTPException(
