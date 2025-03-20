@@ -2342,6 +2342,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#app.routes.report_routes.run_in_executor" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_in_executor
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -5115,6 +5124,15 @@
   
 </li>
         
+          <li class="md-nav__item">
+  <a href="#app.routes.report_routes.run_in_executor" class="md-nav__link">
+    <span class="md-ellipsis">
+      run_in_executor
+    </span>
+  </a>
+  
+</li>
+        
       </ul>
     </nav>
   
@@ -6625,7 +6643,9 @@
 
             <details class="quote">
               <summary>Source code in <code>app/db/data.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">33</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
 <span class="normal">34</span>
 <span class="normal">35</span>
 <span class="normal">36</span>
@@ -6685,9 +6705,7 @@
 <span class="normal">90</span>
 <span class="normal">91</span>
 <span class="normal">92</span>
-<span class="normal">93</span>
-<span class="normal">94</span>
-<span class="normal">95</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">init_db</span><span class="p">():</span>
+<span class="normal">93</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">init_db</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize MongoDB database &amp; creates indexes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -32463,65 +32481,69 @@ Users can only update their own profile, while admins can update any profile.</p
 
             <details class="quote">
               <summary>Source code in <code>app/routes/report_routes.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
-<span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span>
-<span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
-<span class="normal">49</span>
-<span class="normal">50</span>
-<span class="normal">51</span>
-<span class="normal">52</span>
-<span class="normal">53</span>
-<span class="normal">54</span>
-<span class="normal">55</span>
-<span class="normal">56</span>
-<span class="normal">57</span>
-<span class="normal">58</span>
-<span class="normal">59</span>
-<span class="normal">60</span>
-<span class="normal">61</span>
-<span class="normal">62</span>
-<span class="normal">63</span>
-<span class="normal">64</span>
-<span class="normal">65</span>
-<span class="normal">66</span>
-<span class="normal">67</span>
-<span class="normal">68</span>
-<span class="normal">69</span>
-<span class="normal">70</span>
-<span class="normal">71</span>
-<span class="normal">72</span>
-<span class="normal">73</span>
-<span class="normal">74</span>
-<span class="normal">75</span>
-<span class="normal">76</span>
-<span class="normal">77</span>
-<span class="normal">78</span>
-<span class="normal">79</span>
-<span class="normal">80</span>
-<span class="normal">81</span>
-<span class="normal">82</span>
-<span class="normal">83</span>
-<span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_202_ACCEPTED</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">ReportResponse</span><span class="p">)</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 42</span>
+<span class="normal"> 43</span>
+<span class="normal"> 44</span>
+<span class="normal"> 45</span>
+<span class="normal"> 46</span>
+<span class="normal"> 47</span>
+<span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_202_ACCEPTED</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">ReportResponse</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_report</span><span class="p">(</span>
     <span class="n">request</span><span class="p">:</span> <span class="n">CreateReportRequest</span><span class="p">,</span>
     <span class="n">background_tasks</span><span class="p">:</span> <span class="n">BackgroundTasks</span>
@@ -32549,14 +32571,18 @@ Users can only update their own profile, while admins can update any profile.</p
         <span class="n">report_type</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">report_type</span>
     <span class="p">)</span>
 
-    <span class="c1"># Save to database</span>
-    <span class="n">report_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">create_report</span><span class="p">(</span><span class="n">report_db</span><span class="p">)</span>
+    <span class="c1"># Save to database - run in executor to make it non-blocking</span>
+    <span class="n">report_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">run_in_executor</span><span class="p">(</span><span class="n">ReportService</span><span class="o">.</span><span class="n">create_report</span><span class="p">)(</span><span class="n">report_db</span><span class="p">)</span>
 
-    <span class="c1"># Start background task to generate report</span>
-    <span class="n">background_tasks</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">ReportService</span><span class="o">.</span><span class="n">generate_report</span><span class="p">,</span> <span class="n">report_id</span><span class="p">)</span>
+    <span class="c1"># Start background task to generate report - will run in thread pool</span>
+    <span class="nd">@run_in_executor</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_report_wrapper</span><span class="p">(</span><span class="n">report_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">generate_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span>
 
-    <span class="c1"># Get the created report</span>
-    <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span>
+    <span class="n">background_tasks</span><span class="o">.</span><span class="n">add_task</span><span class="p">(</span><span class="n">generate_report_wrapper</span><span class="p">,</span> <span class="n">report_id</span><span class="p">)</span>
+
+    <span class="c1"># Get the created report - run in executor to make it non-blocking</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">run_in_executor</span><span class="p">(</span><span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">)(</span><span class="n">report_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">report</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
@@ -32605,27 +32631,7 @@ Users can only update their own profile, while admins can update any profile.</p
 
             <details class="quote">
               <summary>Source code in <code>app/routes/report_routes.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">197</span>
-<span class="normal">198</span>
-<span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
-<span class="normal">214</span>
-<span class="normal">215</span>
-<span class="normal">216</span>
-<span class="normal">217</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">217</span>
 <span class="normal">218</span>
 <span class="normal">219</span>
 <span class="normal">220</span>
@@ -32636,14 +32642,34 @@ Users can only update their own profile, while admins can update any profile.</p
 <span class="normal">225</span>
 <span class="normal">226</span>
 <span class="normal">227</span>
-<span class="normal">228</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;/</span><span class="si">{report_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_204_NO_CONTENT</span><span class="p">)</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;/</span><span class="si">{report_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_204_NO_CONTENT</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_report</span><span class="p">(</span>
     <span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ID of the report to delete&quot;</span><span class="p">)</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Delete a report and its associated file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">run_in_executor</span><span class="p">(</span><span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">)(</span><span class="n">report_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">report</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
@@ -32660,7 +32686,7 @@ Users can only update their own profile, while admins can update any profile.</p
             <span class="k">pass</span>
 
     <span class="c1"># Delete from database</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">delete_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">run_in_executor</span><span class="p">(</span><span class="n">ReportService</span><span class="o">.</span><span class="n">delete_report</span><span class="p">)(</span><span class="n">report_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
@@ -32693,27 +32719,7 @@ Users can only update their own profile, while admins can update any profile.</p
 
             <details class="quote">
               <summary>Source code in <code>app/routes/report_routes.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
-<span class="normal">171</span>
-<span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
-<span class="normal">175</span>
-<span class="normal">176</span>
-<span class="normal">177</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">177</span>
 <span class="normal">178</span>
 <span class="normal">179</span>
 <span class="normal">180</span>
@@ -32730,14 +32736,34 @@ Users can only update their own profile, while admins can update any profile.</p
 <span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
-<span class="normal">194</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/</span><span class="si">{report_id}</span><span class="s2">/download&quot;</span><span class="p">)</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/</span><span class="si">{report_id}</span><span class="s2">/download&quot;</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">download_report</span><span class="p">(</span>
     <span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ID of the report to download&quot;</span><span class="p">)</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Download a generated report file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">run_in_executor</span><span class="p">(</span><span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">)(</span><span class="n">report_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">report</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
@@ -32793,27 +32819,7 @@ Users can only update their own profile, while admins can update any profile.</p
 
             <details class="quote">
               <summary>Source code in <code>app/routes/report_routes.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 87</span>
-<span class="normal"> 88</span>
-<span class="normal"> 89</span>
-<span class="normal"> 90</span>
-<span class="normal"> 91</span>
-<span class="normal"> 92</span>
-<span class="normal"> 93</span>
-<span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">107</span>
 <span class="normal">108</span>
 <span class="normal">109</span>
 <span class="normal">110</span>
@@ -32823,14 +32829,34 @@ Users can only update their own profile, while admins can update any profile.</p
 <span class="normal">114</span>
 <span class="normal">115</span>
 <span class="normal">116</span>
-<span class="normal">117</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/</span><span class="si">{report_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">ReportResponse</span><span class="p">)</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/</span><span class="si">{report_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">ReportResponse</span><span class="p">)</span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_report</span><span class="p">(</span>
     <span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ID of the report to retrieve&quot;</span><span class="p">)</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get the status and details of a specific report.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">run_in_executor</span><span class="p">(</span><span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">)(</span><span class="n">report_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">report</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
             <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
@@ -32879,27 +32905,7 @@ Users can only update their own profile, while admins can update any profile.</p
 
             <details class="quote">
               <summary>Source code in <code>app/routes/report_routes.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
-<span class="normal">132</span>
-<span class="normal">133</span>
-<span class="normal">134</span>
-<span class="normal">135</span>
-<span class="normal">136</span>
-<span class="normal">137</span>
-<span class="normal">138</span>
-<span class="normal">139</span>
-<span class="normal">140</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">140</span>
 <span class="normal">141</span>
 <span class="normal">142</span>
 <span class="normal">143</span>
@@ -32913,7 +32919,27 @@ Users can only update their own profile, while admins can update any profile.</p
 <span class="normal">151</span>
 <span class="normal">152</span>
 <span class="normal">153</span>
-<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/user/</span><span class="si">{user_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">List</span><span class="p">[</span><span class="n">ReportResponse</span><span class="p">])</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/user/</span><span class="si">{user_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">List</span><span class="p">[</span><span class="n">ReportResponse</span><span class="p">])</span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user_reports</span><span class="p">(</span>
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ID of the user&quot;</span><span class="p">),</span>
     <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum number of reports to return&quot;</span><span class="p">),</span>
@@ -32922,7 +32948,7 @@ Users can only update their own profile, while admins can update any profile.</p
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Get all reports for a specific user.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">reports</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">get_user_reports</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+    <span class="n">reports</span> <span class="o">=</span> <span class="k">await</span> <span class="n">run_in_executor</span><span class="p">(</span><span class="n">ReportService</span><span class="o">.</span><span class="n">get_user_reports</span><span class="p">)(</span><span class="n">user_id</span><span class="p">)</span>
 
     <span class="c1"># Apply pagination</span>
     <span class="n">paginated_reports</span> <span class="o">=</span> <span class="n">reports</span><span class="p">[</span><span class="n">offset</span><span class="p">:</span><span class="n">offset</span><span class="o">+</span><span class="n">limit</span><span class="p">]</span>
@@ -32948,6 +32974,49 @@ Users can only update their own profile, while admins can update any profile.</p
         <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">responses</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="app.routes.report_routes.run_in_executor" class="doc doc-heading">
+            <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">routes</span><span class="o">.</span><span class="n">report_routes</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span><span class="n">func</span><span class="p">)</span></code>
+
+</h3>
+
+
+    <div class="doc doc-contents ">
+
+        <p>Decorator to run synchronous functions in a thread pool executor.
+Makes them non-blocking for FastAPI's async framework.</p>
+
+            <details class="quote">
+              <summary>Source code in <code>app/routes/report_routes.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">run_in_executor</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Decorator to run synchronous functions in a thread pool executor.</span>
+<span class="sd">    Makes them non-blocking for FastAPI&#39;s async framework.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span><span class="o">.</span><span class="n">run_in_executor</span><span class="p">(</span>
+            <span class="n">executor</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">wrapper</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -36716,13 +36785,15 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="normal">288</span>
 <span class="normal">289</span>
 <span class="normal">290</span>
-<span class="normal">291</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ReportService</span><span class="p">:</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ReportService</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Service for managing energy report generation and storage.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_report</span><span class="p">(</span><span class="n">report_data</span><span class="p">:</span> <span class="n">ReportDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_report</span><span class="p">(</span><span class="n">report_data</span><span class="p">:</span> <span class="n">ReportDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a report record in the database.</span>
 
@@ -36733,11 +36804,11 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">            str: ID of the created report</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">report_dict</span> <span class="o">=</span> <span class="n">report_data</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">r_c</span><span class="o">.</span><span class="n">insert_one</span><span class="p">(</span><span class="n">report_dict</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">r_c</span><span class="o">.</span><span class="n">insert_one</span><span class="p">(</span><span class="n">report_dict</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">inserted_id</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve a report by ID.</span>
 
@@ -36747,11 +36818,11 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">        Returns:</span>
 <span class="sd">            Optional[Dict]: Report data if found, None otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">r_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">report_id</span><span class="p">})</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="n">r_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">report_id</span><span class="p">})</span>
         <span class="k">return</span> <span class="n">report</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user_reports</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_user_reports</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Retrieve all reports for a user.</span>
 
@@ -36762,11 +36833,11 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">            List[Dict]: List of report data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">cursor</span> <span class="o">=</span> <span class="n">r_c</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">})</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;created&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">reports</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>  <span class="c1"># Limit to 100 reports</span>
+        <span class="n">reports</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>  <span class="c1"># Convert cursor to list</span>
         <span class="k">return</span> <span class="n">reports</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_report_status</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">ReportStatus</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_report_status</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">ReportStatus</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Update the status of a report.</span>
 
@@ -36781,7 +36852,7 @@ Users can only update their own data, while admins can update any user's data.</
         <span class="n">update_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span> <span class="s2">&quot;updated&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()}</span>
         <span class="n">update_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
 
-        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">r_c</span><span class="o">.</span><span class="n">update_one</span><span class="p">(</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">r_c</span><span class="o">.</span><span class="n">update_one</span><span class="p">(</span>
             <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">report_id</span><span class="p">},</span>
             <span class="p">{</span><span class="s2">&quot;$set&quot;</span><span class="p">:</span> <span class="n">update_data</span><span class="p">}</span>
         <span class="p">)</span>
@@ -36789,7 +36860,7 @@ Users can only update their own data, while admins can update any user's data.</
         <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">modified_count</span> <span class="o">&gt;</span> <span class="mi">0</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fetch_energy_data</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fetch_energy_data</span><span class="p">(</span>
         <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">start_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">end_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -36827,8 +36898,10 @@ Users can only update their own data, while admins can update any user's data.</
             <span class="n">query</span><span class="p">[</span><span class="s2">&quot;device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="p">:</span> <span class="n">device_ids</span><span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># If no specific devices are requested, get all devices for the user</span>
-            <span class="n">user_devices_cursor</span> <span class="o">=</span> <span class="n">d_c</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">})</span>
-            <span class="n">user_devices</span> <span class="o">=</span> <span class="k">await</span> <span class="n">user_devices_cursor</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+            <span class="n">user_devices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">d_c</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">}))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">user_devices</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># User has no devices, return empty list</span>
+
             <span class="n">user_device_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">device</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">user_devices</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">user_device_ids</span><span class="p">:</span>
@@ -36852,19 +36925,19 @@ Users can only update their own data, while admins can update any user's data.</
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">cursor</span> <span class="o">=</span> <span class="n">us_c</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cursor type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">usage_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>  <span class="c1"># Limit to 10,000 records</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Usage data type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">usage_data</span><span class="p">),</span><span class="w"> </span><span class="n">length</span><span class="si">:</span><span class="s2"> </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">usage_data</span><span class="p">)</span><span class="si">}}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">usage_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>  <span class="c1"># Convert cursor to list</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Usage data type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">usage_data</span><span class="p">)</span><span class="si">}</span><span class="s2">, length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">usage_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Enhance usage data with device information</span>
         <span class="n">enhanced_data</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">usage_data</span><span class="p">:</span>
             <span class="c1"># Get device info</span>
             <span class="n">device_id</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;device_id&quot;</span><span class="p">)</span>
-            <span class="n">device</span> <span class="o">=</span> <span class="k">await</span> <span class="n">d_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">})</span>
+            <span class="n">device</span> <span class="o">=</span> <span class="n">d_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">})</span>
 
             <span class="c1"># Create enhanced record with location</span>
             <span class="n">enhanced_record</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">),</span> <span class="n">datetime</span><span class="p">)</span> <span class="k">else</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">),</span>
                 <span class="s2">&quot;device_id&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">,</span>
                 <span class="s2">&quot;energy_consumed&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;energy_consumed&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                 <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">device</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;room_id&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">device</span> <span class="k">else</span> <span class="s2">&quot;Unknown&quot;</span>
@@ -36875,7 +36948,7 @@ Users can only update their own data, while admins can update any user's data.</
         <span class="k">return</span> <span class="n">enhanced_data</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fetch_user_data</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fetch_user_data</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Fetch user data for report personalization.</span>
 
@@ -36885,7 +36958,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict: User data</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">u_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">})</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">u_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">})</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">{}</span>
@@ -36896,7 +36969,7 @@ Users can only update their own data, while admins can update any user's data.</
         <span class="p">}</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generate_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a report based on its ID.</span>
 
@@ -36910,19 +36983,19 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">                - Error message if failed</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Get report data</span>
-        <span class="n">report_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span>
+        <span class="n">report_data</span> <span class="o">=</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">report_data</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Report not found&quot;</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># Update status to generating</span>
-            <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
+            <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
                 <span class="n">report_id</span><span class="p">,</span> 
                 <span class="n">ReportStatus</span><span class="o">.</span><span class="n">GENERATING</span>
             <span class="p">)</span>
 
             <span class="c1"># Fetch energy data</span>
-            <span class="n">energy_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">fetch_energy_data</span><span class="p">(</span>
+            <span class="n">energy_data</span> <span class="o">=</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">fetch_energy_data</span><span class="p">(</span>
                 <span class="n">user_id</span><span class="o">=</span><span class="n">report_data</span><span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">],</span>
                 <span class="n">start_date</span><span class="o">=</span><span class="n">report_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start_date&quot;</span><span class="p">),</span>
                 <span class="n">end_date</span><span class="o">=</span><span class="n">report_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;end_date&quot;</span><span class="p">),</span>
@@ -36931,7 +37004,7 @@ Users can only update their own data, while admins can update any user's data.</
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">energy_data</span><span class="p">:</span>
                 <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;No energy data found for the specified criteria&quot;</span>
-                <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
+                <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
                     <span class="n">report_id</span><span class="p">,</span> 
                     <span class="n">ReportStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span>
                     <span class="n">error_message</span><span class="o">=</span><span class="n">error_msg</span>
@@ -36939,7 +37012,7 @@ Users can only update their own data, while admins can update any user's data.</
                 <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">error_msg</span>
 
             <span class="c1"># Fetch user data for personalization</span>
-            <span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">fetch_user_data</span><span class="p">(</span><span class="n">report_data</span><span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">])</span>
+            <span class="n">user_data</span> <span class="o">=</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">fetch_user_data</span><span class="p">(</span><span class="n">report_data</span><span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">])</span>
 
             <span class="c1"># Generate the report</span>
             <span class="n">report_path</span> <span class="o">=</span> <span class="n">generate_energy_report</span><span class="p">(</span>
@@ -36955,7 +37028,7 @@ Users can only update their own data, while admins can update any user's data.</
             <span class="n">device_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;device_id&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">energy_data</span><span class="p">))</span>
 
             <span class="c1"># Update the report record with success status</span>
-            <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
+            <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
                 <span class="n">report_id</span><span class="p">,</span>
                 <span class="n">ReportStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
                 <span class="n">file_path</span><span class="o">=</span><span class="n">report_path</span><span class="p">,</span>
@@ -36973,7 +37046,7 @@ Users can only update their own data, while admins can update any user's data.</
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># Update the report record with failure status</span>
             <span class="n">error_message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
+            <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
                 <span class="n">report_id</span><span class="p">,</span>
                 <span class="n">ReportStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span>
                 <span class="n">error_message</span><span class="o">=</span><span class="n">error_message</span>
@@ -36982,7 +37055,7 @@ Users can only update their own data, while admins can update any user's data.</
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">error_message</span>
 
     <span class="nd">@staticmethod</span>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Delete a report record from the database.</span>
 
@@ -36992,7 +37065,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">        Returns:</span>
 <span class="sd">            bool: True if deletion was successful, False otherwise</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">r_c</span><span class="o">.</span><span class="n">delete_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">report_id</span><span class="p">})</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">r_c</span><span class="o">.</span><span class="n">delete_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">report_id</span><span class="p">})</span>
         <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">deleted_count</span> <span class="o">&gt;</span> <span class="mi">0</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -37016,7 +37089,6 @@ Users can only update their own data, while admins can update any user's data.</
             <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">report_service</span><span class="o">.</span><span class="n">ReportService</span><span class="o">.</span><span class="n">create_report</span><span class="p">(</span><span class="n">report_data</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
   </span>
 
@@ -37097,7 +37169,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="normal">30</span>
 <span class="normal">31</span>
 <span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_report</span><span class="p">(</span><span class="n">report_data</span><span class="p">:</span> <span class="n">ReportDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_report</span><span class="p">(</span><span class="n">report_data</span><span class="p">:</span> <span class="n">ReportDB</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a report record in the database.</span>
 
@@ -37108,7 +37180,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">        str: ID of the created report</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">report_dict</span> <span class="o">=</span> <span class="n">report_data</span><span class="o">.</span><span class="n">model_dump</span><span class="p">()</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">r_c</span><span class="o">.</span><span class="n">insert_one</span><span class="p">(</span><span class="n">report_dict</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">r_c</span><span class="o">.</span><span class="n">insert_one</span><span class="p">(</span><span class="n">report_dict</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">inserted_id</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -37123,7 +37195,6 @@ Users can only update their own data, while admins can update any user's data.</
             <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">report_service</span><span class="o">.</span><span class="n">ReportService</span><span class="o">.</span><span class="n">delete_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
   </span>
 
@@ -37190,9 +37261,7 @@ Users can only update their own data, while admins can update any user's data.</
 
             <details class="quote">
               <summary>Source code in <code>app/services/report_service.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">279</span>
-<span class="normal">280</span>
-<span class="normal">281</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">281</span>
 <span class="normal">282</span>
 <span class="normal">283</span>
 <span class="normal">284</span>
@@ -37202,8 +37271,10 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="normal">288</span>
 <span class="normal">289</span>
 <span class="normal">290</span>
-<span class="normal">291</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">delete_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Delete a report record from the database.</span>
 
@@ -37213,7 +37284,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: True if deletion was successful, False otherwise</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">r_c</span><span class="o">.</span><span class="n">delete_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">report_id</span><span class="p">})</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">r_c</span><span class="o">.</span><span class="n">delete_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">report_id</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">deleted_count</span> <span class="o">&gt;</span> <span class="mi">0</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -37228,7 +37299,6 @@ Users can only update their own data, while admins can update any user's data.</
             <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">report_service</span><span class="o">.</span><span class="n">ReportService</span><span class="o">.</span><span class="n">fetch_energy_data</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">start_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device_ids</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
   </span>
 
@@ -37427,8 +37497,10 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="normal">167</span>
 <span class="normal">168</span>
 <span class="normal">169</span>
-<span class="normal">170</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fetch_energy_data</span><span class="p">(</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_energy_data</span><span class="p">(</span>
     <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">start_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">end_date</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -37466,8 +37538,10 @@ Users can only update their own data, while admins can update any user's data.</
         <span class="n">query</span><span class="p">[</span><span class="s2">&quot;device_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;$in&quot;</span><span class="p">:</span> <span class="n">device_ids</span><span class="p">}</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># If no specific devices are requested, get all devices for the user</span>
-        <span class="n">user_devices_cursor</span> <span class="o">=</span> <span class="n">d_c</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">})</span>
-        <span class="n">user_devices</span> <span class="o">=</span> <span class="k">await</span> <span class="n">user_devices_cursor</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="n">user_devices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">d_c</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">}))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user_devices</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>  <span class="c1"># User has no devices, return empty list</span>
+
         <span class="n">user_device_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">device</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="n">user_devices</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="n">user_device_ids</span><span class="p">:</span>
@@ -37491,19 +37565,19 @@ Users can only update their own data, while admins can update any user's data.</
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Query: </span><span class="si">{</span><span class="n">query</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">cursor</span> <span class="o">=</span> <span class="n">us_c</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cursor type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">usage_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>  <span class="c1"># Limit to 10,000 records</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Usage data type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">usage_data</span><span class="p">),</span><span class="w"> </span><span class="n">length</span><span class="si">:</span><span class="s2"> </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">usage_data</span><span class="p">)</span><span class="si">}}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">usage_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>  <span class="c1"># Convert cursor to list</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Usage data type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">usage_data</span><span class="p">)</span><span class="si">}</span><span class="s2">, length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">usage_data</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Enhance usage data with device information</span>
     <span class="n">enhanced_data</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">usage_data</span><span class="p">:</span>
         <span class="c1"># Get device info</span>
         <span class="n">device_id</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;device_id&quot;</span><span class="p">)</span>
-        <span class="n">device</span> <span class="o">=</span> <span class="k">await</span> <span class="n">d_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">})</span>
+        <span class="n">device</span> <span class="o">=</span> <span class="n">d_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">})</span>
 
         <span class="c1"># Create enhanced record with location</span>
         <span class="n">enhanced_record</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">),</span> <span class="n">datetime</span><span class="p">)</span> <span class="k">else</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">),</span>
             <span class="s2">&quot;device_id&quot;</span><span class="p">:</span> <span class="n">device_id</span><span class="p">,</span>
             <span class="s2">&quot;energy_consumed&quot;</span><span class="p">:</span> <span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;energy_consumed&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
             <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="n">device</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;room_id&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">device</span> <span class="k">else</span> <span class="s2">&quot;Unknown&quot;</span>
@@ -37525,7 +37599,6 @@ Users can only update their own data, while admins can update any user's data.</
             <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">report_service</span><span class="o">.</span><span class="n">ReportService</span><span class="o">.</span><span class="n">fetch_user_data</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
   </span>
 
@@ -37592,9 +37665,7 @@ Users can only update their own data, while admins can update any user's data.</
 
             <details class="quote">
               <summary>Source code in <code>app/services/report_service.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">172</span>
-<span class="normal">173</span>
-<span class="normal">174</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
 <span class="normal">175</span>
 <span class="normal">176</span>
 <span class="normal">177</span>
@@ -37611,8 +37682,10 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="normal">188</span>
 <span class="normal">189</span>
 <span class="normal">190</span>
-<span class="normal">191</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fetch_user_data</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fetch_user_data</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fetch user data for report personalization.</span>
 
@@ -37622,7 +37695,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict: User data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">user</span> <span class="o">=</span> <span class="k">await</span> <span class="n">u_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">})</span>
+    <span class="n">user</span> <span class="o">=</span> <span class="n">u_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">})</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{}</span>
@@ -37644,7 +37717,6 @@ Users can only update their own data, while admins can update any user's data.</
             <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">report_service</span><span class="o">.</span><span class="n">ReportService</span><span class="o">.</span><span class="n">generate_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
   </span>
 
@@ -37714,9 +37786,7 @@ Users can only update their own data, while admins can update any user's data.</
 
             <details class="quote">
               <summary>Source code in <code>app/services/report_service.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">193</span>
-<span class="normal">194</span>
-<span class="normal">195</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">195</span>
 <span class="normal">196</span>
 <span class="normal">197</span>
 <span class="normal">198</span>
@@ -37798,8 +37868,10 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="normal">274</span>
 <span class="normal">275</span>
 <span class="normal">276</span>
-<span class="normal">277</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generate_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate a report based on its ID.</span>
 
@@ -37813,19 +37885,19 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">            - Error message if failed</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Get report data</span>
-    <span class="n">report_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span>
+    <span class="n">report_data</span> <span class="o">=</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">report_data</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Report not found&quot;</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># Update status to generating</span>
-        <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
+        <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
             <span class="n">report_id</span><span class="p">,</span> 
             <span class="n">ReportStatus</span><span class="o">.</span><span class="n">GENERATING</span>
         <span class="p">)</span>
 
         <span class="c1"># Fetch energy data</span>
-        <span class="n">energy_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">fetch_energy_data</span><span class="p">(</span>
+        <span class="n">energy_data</span> <span class="o">=</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">fetch_energy_data</span><span class="p">(</span>
             <span class="n">user_id</span><span class="o">=</span><span class="n">report_data</span><span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">],</span>
             <span class="n">start_date</span><span class="o">=</span><span class="n">report_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;start_date&quot;</span><span class="p">),</span>
             <span class="n">end_date</span><span class="o">=</span><span class="n">report_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;end_date&quot;</span><span class="p">),</span>
@@ -37834,7 +37906,7 @@ Users can only update their own data, while admins can update any user's data.</
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">energy_data</span><span class="p">:</span>
             <span class="n">error_msg</span> <span class="o">=</span> <span class="s2">&quot;No energy data found for the specified criteria&quot;</span>
-            <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
+            <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
                 <span class="n">report_id</span><span class="p">,</span> 
                 <span class="n">ReportStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span>
                 <span class="n">error_message</span><span class="o">=</span><span class="n">error_msg</span>
@@ -37842,7 +37914,7 @@ Users can only update their own data, while admins can update any user's data.</
             <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">error_msg</span>
 
         <span class="c1"># Fetch user data for personalization</span>
-        <span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">fetch_user_data</span><span class="p">(</span><span class="n">report_data</span><span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">])</span>
+        <span class="n">user_data</span> <span class="o">=</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">fetch_user_data</span><span class="p">(</span><span class="n">report_data</span><span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">])</span>
 
         <span class="c1"># Generate the report</span>
         <span class="n">report_path</span> <span class="o">=</span> <span class="n">generate_energy_report</span><span class="p">(</span>
@@ -37858,7 +37930,7 @@ Users can only update their own data, while admins can update any user's data.</
         <span class="n">device_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;device_id&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">energy_data</span><span class="p">))</span>
 
         <span class="c1"># Update the report record with success status</span>
-        <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
+        <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
             <span class="n">report_id</span><span class="p">,</span>
             <span class="n">ReportStatus</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
             <span class="n">file_path</span><span class="o">=</span><span class="n">report_path</span><span class="p">,</span>
@@ -37876,7 +37948,7 @@ Users can only update their own data, while admins can update any user's data.</
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="c1"># Update the report record with failure status</span>
         <span class="n">error_message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-        <span class="k">await</span> <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
+        <span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span>
             <span class="n">report_id</span><span class="p">,</span>
             <span class="n">ReportStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span>
             <span class="n">error_message</span><span class="o">=</span><span class="n">error_message</span>
@@ -37896,7 +37968,6 @@ Users can only update their own data, while admins can update any user's data.</
             <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">report_service</span><span class="o">.</span><span class="n">ReportService</span><span class="o">.</span><span class="n">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
   </span>
 
@@ -37976,7 +38047,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_report</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieve a report by ID.</span>
 
@@ -37986,7 +38057,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">    Returns:</span>
 <span class="sd">        Optional[Dict]: Report data if found, None otherwise</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">report</span> <span class="o">=</span> <span class="k">await</span> <span class="n">r_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">report_id</span><span class="p">})</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="n">r_c</span><span class="o">.</span><span class="n">find_one</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">report_id</span><span class="p">})</span>
     <span class="k">return</span> <span class="n">report</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -38001,7 +38072,6 @@ Users can only update their own data, while admins can update any user's data.</
             <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">report_service</span><span class="o">.</span><span class="n">ReportService</span><span class="o">.</span><span class="n">get_user_reports</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
   </span>
 
@@ -38082,7 +38152,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="normal">59</span>
 <span class="normal">60</span>
 <span class="normal">61</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user_reports</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_user_reports</span><span class="p">(</span><span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Retrieve all reports for a user.</span>
 
@@ -38093,7 +38163,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="sd">        List[Dict]: List of report data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cursor</span> <span class="o">=</span> <span class="n">r_c</span><span class="o">.</span><span class="n">find</span><span class="p">({</span><span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">})</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;created&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">reports</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cursor</span><span class="o">.</span><span class="n">to_list</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>  <span class="c1"># Limit to 100 reports</span>
+    <span class="n">reports</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>  <span class="c1"># Convert cursor to list</span>
     <span class="k">return</span> <span class="n">reports</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -38108,7 +38178,6 @@ Users can only update their own data, while admins can update any user's data.</
             <code class="highlight language-python"><span class="n">app</span><span class="o">.</span><span class="n">services</span><span class="o">.</span><span class="n">report_service</span><span class="o">.</span><span class="n">ReportService</span><span class="o">.</span><span class="n">update_report_status</span><span class="p">(</span><span class="n">report_id</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
-      <small class="doc doc-label doc-label-async"><code>async</code></small>
       <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
   </span>
 
@@ -38228,7 +38297,7 @@ Users can only update their own data, while admins can update any user's data.</
 <span class="normal">82</span>
 <span class="normal">83</span>
 <span class="normal">84</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@staticmethod</span>
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_report_status</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">ReportStatus</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">update_report_status</span><span class="p">(</span><span class="n">report_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">ReportStatus</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Update the status of a report.</span>
 
@@ -38243,7 +38312,7 @@ Users can only update their own data, while admins can update any user's data.</
     <span class="n">update_data</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">status</span><span class="p">,</span> <span class="s2">&quot;updated&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()}</span>
     <span class="n">update_data</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">r_c</span><span class="o">.</span><span class="n">update_one</span><span class="p">(</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">r_c</span><span class="o">.</span><span class="n">update_one</span><span class="p">(</span>
         <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">report_id</span><span class="p">},</span>
         <span class="p">{</span><span class="s2">&quot;$set&quot;</span><span class="p">:</span> <span class="n">update_data</span><span class="p">}</span>
     <span class="p">)</span>

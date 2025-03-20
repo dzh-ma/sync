@@ -1,0 +1,142 @@
+
+/*.card-container {
+     Optional styling for the Card component 
+    max-width: 400px;
+    margin: 20px;
+  }
+  
+  .card-header {
+     Optional styling for Card Header 
+    padding: 12px;
+  }
+  
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  
+  .card-content {
+     Styling for Card Content 
+    padding: 16px;
+  }
+  
+  .device-control-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .device-control-item .icon {
+    height: 20px;
+    width: 20px;
+  }
+  
+  .device-control-item .label {
+    margin-left: 8px;
+  }
+  
+  .temperature-slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .temperature-slider-container .slider {
+    width: 60%;
+  }*/
+  /* General Card Styling */
+.card-containerD {
+  max-width: 400px;
+  width: 100%;
+  margin: 20px auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.card-containerD:hover {
+  transform: scale(1.02);
+}
+
+/* Card Header */
+.card-headerD {
+  padding: 16px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.card-titleD {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Card Content */
+.card-contentD {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Device Control Items */
+.device-control-itemD {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: #f8f8f8;
+  border-radius: 8px;
+  transition: background 0.3s ease;
+}
+
+.device-control-itemD:hover {
+  background: #e6f7ff;
+}
+
+.device-control-itemD .iconD {
+  height: 24px;
+  width: 24px;
+  color: #007bff;
+}
+
+.device-control-itemD .labelD {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #444;
+}
+
+/* Temperature Slider */
+.temperature-slider-containerD {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px;
+  background: #f8f8f8;
+  border-radius: 8px;
+}
+
+.temperature-slider-containerD .sliderD {
+  width: 65%;
+  accent-color: #007bff;
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+  .card-containerD {
+      max-width: 100%;
+      margin: 10px;
+      padding: 10px;
+  }
+
+  .device-control-itemD,
+  .temperature-slider-containerD {
+      flex-direction: column;
+      align-items: flex-start;
+  }
+
+  .sliderD {
+      width: 100%;
+  }
+}
