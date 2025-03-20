@@ -16,7 +16,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app.core.auth import get_current_user
 from app.models.user import UserDB
 
-# Mock MongoDB connection before importing the application
 @pytest.fixture(scope="session", autouse=True)
 def mock_mongodb_connection():
     """
@@ -28,7 +27,7 @@ def mock_mongodb_connection():
     mongo_patcher.start()
     
     # Mock init_db function to avoid creating real indexes
-    db_patcher = patch('db.data.init_db', MagicMock())
+    db_patcher = patch('app.db.data.init_db', MagicMock())
     db_patcher.start()
     
     yield
@@ -37,14 +36,28 @@ def mock_mongodb_connection():
     mongo_patcher.stop()
     db_patcher.stop()
 
-# Clear dependency overrides after tests
-@pytest.fixture(scope="session", autouse=True)
-def cleanup_dependency_overrides():
+# Mock the auth dependency for tests
+@pytest.fixture(autouse=True)
+def mock_auth_dependency():
     """
-    Ensure that any FastAPI dependency overrides are cleaned up after tests.
+    Mock the authentication dependency for all tests.
     """
+    # Create a test user
+    mock_user = UserDB(
+        id="test-user-id",
+        username="test-user",
+        email="test@example.com",
+        hashed_password="hashed_password",
+        role="admin"
+    )
+    
+    # Import the application
+    from app.main import app
+    
+    # Set up the dependency override
+    app.dependency_overrides[get_current_user] = lambda: mock_user
+    
     yield
     
-    # Import the application (only after the test session is done)
-    from app.main import app
+    # Clear dependency overrides after tests
     app.dependency_overrides = {}

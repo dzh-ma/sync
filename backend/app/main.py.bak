@@ -19,7 +19,6 @@ from app.routes.access_management_routes import router as access_management_rout
 from app.routes.goal_routes import router as goal_router
 from app.routes.analytics_routes import router as analytics_router
 from app.routes.suggestion_routes import router as suggestion_router
-from app.routes.report_routes import router as report_router  # NEW: Import report router
 
 # Create FastAPI application
 app = FastAPI(
@@ -42,11 +41,6 @@ app.add_middleware(
 def startup_event():
     """Initialize database on startup."""
     init_db()
-    
-    # Create reports directory if it doesn't exist
-    import os
-    from app.utils.report.report_generator import REPORTS_DIR
-    os.makedirs(REPORTS_DIR, exist_ok=True)
 
 # Include routers
 app.include_router(user_router, prefix="/api/v1")
@@ -60,7 +54,6 @@ app.include_router(access_management_router, prefix="/api/v1")
 app.include_router(goal_router, prefix="/api/v1")
 app.include_router(analytics_router, prefix="/api/v1")
 app.include_router(suggestion_router, prefix="/api/v1")
-app.include_router(report_router, prefix="/api/v1")  # NEW: Include report router
 
 # Add a root endpoint for API health check
 @app.get("/")

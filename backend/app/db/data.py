@@ -8,7 +8,7 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
 
 # Initializing client
 try:
-    c = MongoClient("mongodb://localhost:27017/")
+    c = MongoClient(MONGO_URI)
     d = c.sync
 
     u_c = d["user"]                 # User collection

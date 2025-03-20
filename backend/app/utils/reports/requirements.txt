@@ -1,5 +1,3 @@
-pydantic
-pymongo
 pandas
 numpy
 matplotlib
