@@ -123,10 +123,7 @@ async def create_device(
             detail="Device with this ID already exists"
         )
     
-    # Fetch the newly created device from the database
-    device = d_c.find_one({"id": device_id})
-    
-    return DeviceResponse.model_validate(device)
+    return DeviceResponse.model_validate(device_db)
 
 @router.patch("/{device_id}", response_model=DeviceResponse)
 async def update_device(
