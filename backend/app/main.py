@@ -12,6 +12,7 @@ from app.routes.user_routes import router as user_router
 from app.routes.profile_routes import router as profile_router
 from app.routes.device_routes import router as device_router
 from app.routes.room_routes import router as room_router
+from app.routes.usage_routes import router as usage_router
 # Import other routers here
 
 # Create FastAPI application
@@ -41,6 +42,7 @@ app.include_router(user_router, prefix="/api/v1")
 app.include_router(profile_router, prefix="/api/v1")
 app.include_router(device_router, prefix="/api/v1")
 app.include_router(room_router, prefix="/api/v1")
+app.include_router(usage_router, prefix="/api/v1")
 
 # Add a root endpoint for API health check
 @app.get("/")
