@@ -146,6 +146,7 @@ class AccessManagementResponse(BaseModel):
     created: datetime
     expires_at: Optional[datetime] = None
     active: bool
+    note: Optional[str] = None
 
     model_config = ConfigDict(from_attributes=True)
 

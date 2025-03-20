@@ -15,6 +15,7 @@ from app.routes.room_routes import router as room_router
 from app.routes.usage_routes import router as usage_router
 from app.routes.automation_routes import router as automation_router
 from app.routes.notification_routes import router as notification_router
+from app.routes.access_management_routes import router as access_management_router
 
 # Create FastAPI application
 app = FastAPI(
@@ -46,6 +47,7 @@ app.include_router(room_router, prefix="/api/v1")
 app.include_router(usage_router, prefix="/api/v1")
 app.include_router(automation_router, prefix="/api/v1")
 app.include_router(notification_router, prefix="/api/v1")
+app.include_router(access_management_router, prefix="/api/v1")
 
 # Add a root endpoint for API health check
 @app.get("/")
