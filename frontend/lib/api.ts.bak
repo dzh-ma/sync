@@ -1,0 +1,134 @@
+// lib/api.ts
+import axios from 'axios';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+
+// Create an axios instance with default config
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add a request interceptor to add the auth token to requests
+api.interceptors.request.use(
+  (config) => {
+    // Get the token from localStorage
+    const token = localStorage.getItem('access_token');
+    const tokenType = localStorage.getItem('token_type') || 'bearer';
+    
+    // If token exists, add it to the headers
+    if (token) {
+      config.headers['Authorization'] = `${tokenType} ${token}`;
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add a response interceptor to handle common errors
+api.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    // Handle 401 Unauthorized errors (expired token, etc.)
+    if (error.response && error.response.status === 401) {
+      // Clear stored tokens and redirect to login
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('token_type');
+      localStorage.removeItem('currentUser');
+      
+      // In a client component, you'd use router.push
+      // Since this is a service file, we'll use window.location
+      window.location.href = '/login';
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+export const deviceApi = {
+  // Get all devices
+  getDevices: async () => {
+    const response = await fetch(`${API_URL}/devices/`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    if (!response.ok) throw new Error('Failed to fetch devices');
+    return response.json();
+  },
+  
+  // Create a new device
+  createDevice: async (device: Omit<Device, 'id'>) => {
+    const response = await fetch(`${API_URL}/devices/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(device)
+    });
+    if (!response.ok) throw new Error('Failed to create device');
+    return response.json();
+  },
+  
+  // Update device
+  updateDevice: async (deviceId: string, updates: Partial<Device>) => {
+    const response = await fetch(`${API_URL}/devices/${deviceId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(updates)
+    });
+    if (!response.ok) throw new Error('Failed to update device');
+    return response.json();
+  },
+  
+  // Toggle device on/off
+  toggleDevice: async (deviceId: string) => {
+    const response = await fetch(`${API_URL}/devices/${deviceId}/toggle`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    if (!response.ok) throw new Error('Failed to toggle device');
+    return response.json();
+  },
+  
+  // Control device parameters (brightness, temperature, etc.)
+  controlDevice: async (deviceId: string, parameters: any) => {
+    const response = await fetch(`${API_URL}/devices/${deviceId}/control`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify(parameters)
+    });
+    if (!response.ok) throw new Error('Failed to control device');
+    return response.json();
+  },
+  
+  // Delete device
+  deleteDevice: async (deviceId: string) => {
+    const response = await fetch(`${API_URL}/devices/${deviceId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+    if (!response.ok) throw new Error('Failed to delete device');
+    return response.json();
+  }
+};
+
+export default api;
