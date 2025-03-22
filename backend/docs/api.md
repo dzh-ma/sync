@@ -2,6 +2,14 @@
 
 ::: app.main
 
+::: app.generate_report
+
+::: app.data_util
+
+::: app.inspect_data
+
+::: app.patched_report_generator
+
 ::: app.core.auth
 
 ::: app.core.password
@@ -55,6 +63,8 @@
 ::: app.routes.usage_routes
 
 ::: app.routes.user_routes
+
+::: app.seeds.seed_database
 
 ::: app.services.report_service
 

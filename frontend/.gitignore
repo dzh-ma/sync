@@ -1,3 +1,5 @@
 backend/utils/email_config.ini
 node_modules/
 .next/
+
+*storybook.log
