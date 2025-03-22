@@ -25,8 +25,8 @@ from reportlab.lib.units import inch
 DEFAULT_ENERGY_COST = 0.23  # AED per kWh
 
 # Ensure the reports directory exists
-# REPORTS_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "generated_reports")
-REPORTS_DIR = os.path.join(os.path.dirname(__file__), "generated_reports")
+# REPORTS_DIR = os.path.join(os.path.dirname(__file__), "generated_reports")
+REPORTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "generated_reports")
 os.makedirs(REPORTS_DIR, exist_ok=True)
 
 def calculate_tiered_cost(energy_consumption: float) -> float:

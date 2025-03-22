@@ -21,7 +21,8 @@ from statsmodels.tsa.arima.model import ARIMA
 from io import BytesIO
 
 # Ensure that the reports directory exists
-REPORTS_DIR = os.path.join(os.path.dirname(__file__), "generated_reports")
+# REPORTS_DIR = os.path.join(os.path.dirname(__file__), "generated_reports")
+REPORTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "generated_reports")
 os.makedirs(REPORTS_DIR, exist_ok = True)
 
 # Average electricity cost per kWh
