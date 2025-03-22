@@ -1,299 +1,229 @@
-// app/dashboard/page.tsx
+// dashboard/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, ZapOff, Activity } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { Card } from "@/components/ui/card";
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core";
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, rectSortingStrategy } from "@dnd-kit/sortable";
+import { Edit2, Download, Bell, Command, HelpCircle, Sun, Moon, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ActiveDevices } from "../components/active-devices";
+import { EnergyConsumption } from "../components/energy-consumption";
+import { FamilyMembers } from "../components/family-members";
+import { WeatherWidget } from "../components/weather-widget";
+import { SortableWidget } from "../components/sortable-widget";
+import { AutomationWidget } from "../components/automation-widget";
+import { RoomEnergyConsumption } from "../components/room-energy-consumption";
+import { TimeDateWidget } from "../components/time-date-widget";
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { toast } from "@/components/ui/use-toast";
+import { useUser } from "@/contexts/UserContext"; // Import the user context
+import { NavigationSidebar } from "@/app/components/navigation-sidebar"; 
+import ProtectedRoute from "@/components/ProtectedRoute"; // Import the protected route component
 
-interface UsageData {
-  device_id?: string;
-  timestamp: string;
-  energy_consumed: number;
-}
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
 
-interface ProcessedData {
-  name: string;
-  value: number;
-}
+const initialWidgets = [
+  { id: "time-date", component: TimeDateWidget },
+  { id: "devices", component: ActiveDevices },
+  { id: "weather", component: WeatherWidget },
+  { id: "energy", component: EnergyConsumption },
+  { id: "automation", component: AutomationWidget },
+]
 
-interface EnergyConsumptionProps {
-  userId?: string;
-  token?: string;
-  apiUrl?: string;
-}
-
-export function EnergyConsumption({ userId, token, apiUrl = 'http://localhost:8000/api/v1' }: EnergyConsumptionProps) {
-  const [timeFrame, setTimeFrame] = useState("week");
-  const [usageData, setUsageData] = useState<ProcessedData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [totalConsumption, setTotalConsumption] = useState(0);
-
-  useEffect(() => {
-    const fetchUsageData = async () => {
-      if (!userId || !token) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-        setError(null);
-        
-        // Calculate date range based on selected timeframe
-        const endDate = new Date();
-        const startDate = new Date();
-        
-        switch (timeFrame) {
-          case "day":
-            startDate.setHours(0, 0, 0, 0);
-            break;
-          case "week":
-            startDate.setDate(startDate.getDate() - 7);
-            break;
-          case "month":
-            startDate.setMonth(startDate.getMonth() - 1);
-            break;
-          case "year":
-            startDate.setFullYear(startDate.getFullYear() - 1);
-            break;
-        }
-        
-        // Format dates for API request
-        const startDateStr = startDate.toISOString();
-        const endDateStr = endDate.toISOString();
-        
-        // Fetch energy usage data
-        const response = await fetch(`${apiUrl}/usage?start_time=${startDateStr}&end_time=${endDateStr}`, {
-          headers: {
-            'Authorization': `Basic ${token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`Error fetching usage data: ${response.status}`);
-        }
-
-        const data: UsageData[] = await response.json();
-        
-        // Process the data for chart display
-        const processedData = processUsageData(data, timeFrame);
-        setUsageData(processedData);
-        
-        // Calculate total consumption
-        const total = data.reduce((sum, item) => sum + (item.energy_consumed || 0), 0);
-        setTotalConsumption(total);
-      } catch (err) {
-        console.error("Failed to fetch usage data:", err);
-        setError("Failed to load energy data. Please try again.");
-        
-        // Set fallback data for development
-        const fallbackData = generateFallbackData(timeFrame);
-        setUsageData(fallbackData);
-        setTotalConsumption(fallbackData.reduce((sum, item) => sum + item.value, 0));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUsageData();
-  }, [userId, token, timeFrame, apiUrl]);
-
-  // Process raw usage data into chart-friendly format
-  const processUsageData = (data: UsageData[], timeFrame: string): ProcessedData[] => {
-    // Sort data by timestamp
-    const sortedData = [...data].sort((a, b) => 
-      new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-    );
-    
-    // Group data based on timeframe
-    const groupedData: Record<string, number> = {};
-    
-    sortedData.forEach(item => {
-      const date = new Date(item.timestamp);
-      let key = '';
-      
-      switch (timeFrame) {
-        case "day":
-          key = `${date.getHours()}:00`;
-          break;
-        case "week":
-          key = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][date.getDay()];
-          break;
-        case "month":
-          key = `${date.getDate()}`;
-          break;
-        case "year":
-          key = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][date.getMonth()];
-          break;
-      }
-      
-      groupedData[key] = (groupedData[key] || 0) + (item.energy_consumed || 0);
-    });
-    
-    // Convert to array format for chart
-    const result: ProcessedData[] = Object.entries(groupedData).map(([name, value]) => ({
-      name,
-      value: Number(value.toFixed(2))
-    }));
-    
-    return result;
-  };
-
-  // Generate fallback data for development
-  const generateFallbackData = (timeFrame: string): ProcessedData[] => {
-    switch (timeFrame) {
-      case "day":
-        return Array.from({ length: 24 }, (_, i) => ({
-          name: `${i}:00`,
-          value: Math.floor(Math.random() * 20) + 5
-        }));
-      case "week":
-        return ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map(day => ({
-          name: day,
-          value: Math.floor(Math.random() * 100) + 20
-        }));
-      case "month":
-        return Array.from({ length: 30 }, (_, i) => ({
-          name: `${i + 1}`,
-          value: Math.floor(Math.random() * 40) + 10
-        }));
-      case "year":
-        return ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(month => ({
-          name: month,
-          value: Math.floor(Math.random() * 400) + 100
-        }));
-      default:
-        return [];
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center p-4 h-full">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500 mb-2" />
-        <p className="text-sm text-gray-500">Loading energy data...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center p-4 h-full">
-        <ZapOff className="w-8 h-8 text-red-500 mb-2" />
-        <p className="text-sm text-gray-500">{error}</p>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          className="mt-2"
-          onClick={() => setIsLoading(true)}
-        >
-          Retry
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Energy Consumption</h3>
-        <Select
-          value={timeFrame}
-          onValueChange={setTimeFrame}
-        >
-          <SelectTrigger className="w-32">
-            <SelectValue placeholder="Select timeframe" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="day">Day</SelectItem>
-            <SelectItem value="week">Week</SelectItem>
-            <SelectItem value="month">Month</SelectItem>
-            <SelectItem value="year">Year</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      
-      <div className="grid grid-cols-2 gap-2 mb-4">
-        <Card className="p-3">
-          <p className="text-xs text-gray-500">Est. Cost</p>
-          <div className="flex items-baseline">
-            <span className="text-2xl font-bold">${(totalConsumption * 0.23).toFixed(2)}</span>
-            <span className="text-xs ml-1">USD</span>
-          </div>
-        </Card>
-        <Card className="p-3">
-          <p className="text-xs text-gray-500">Total Consumption</p>
-          <div className="flex items-baseline">
-            <span className="text-2xl font-bold">{totalConsumption.toFixed(1)}</span>
-            <span className="text-xs ml-1">kWh</span>
-          </div>
-        </Card>
-      </div>
-      
-      <Card className="p-4">
-        <div className="h-64">
-          {usageData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={usageData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip 
-                  formatter={(value) => [`${value} kWh`, 'Energy']}
-                  labelFormatter={(label) => `${label}`}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="value" 
-                  stroke="#3b82f6" 
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                  activeDot={{ r: 5 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full">
-              <Activity className="h-8 w-8 text-gray-400 mb-2" />
-              <p className="text-sm text-gray-500">No energy data available for this period</p>
-            </div>
-          )}
-        </div>
-      </Card>
-      
-      <div className="text-xs text-gray-500 text-center mt-2">
-        Data shown is based on connected smart devices in your home
-      </div>
-    </div>
-  );
-}
-
-export default function DashboardPage() {
-  // You would typically get these from your auth context/provider
-  const userId = "user123"; // Example user ID
-  const token = "dXNlcjEyMzpwYXNzd29yZA=="; // Example token (Base64 encoded username:password)
+export default function Page() {
+  const router = useRouter();
+  const { user } = useUser(); // Use the user context
   
+  const [rooms, setRooms] = useState([
+    { id: "1", name: "Living Room", consumption: 45 },
+    { id: "2", name: "Bedroom", consumption: 18 },
+    { id: "3", name: "Kitchen", consumption: 72 },
+    { id: "4", name: "Bathroom", consumption: 12 },
+    { id: "5", name: "Office", consumption: 35 },
+  ]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [widgets, setWidgets] = useState(initialWidgets);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [userPermissions, setUserPermissions] = useState({
+    statisticalData: true,
+    addAutomation: true,
+    roomControl: true
+  });
+
+  // Use the user data from context instead of making separate API calls
+  useEffect(() => {
+    // If we have actual permissions endpoints, we can fetch them here
+    // For now, we'll use default permissions or mock them based on the user's email
+    if (user) {
+      // This is a simplified mock - in a real app, you'd fetch real permissions from your API
+      const mockPermissions = {
+        statisticalData: true,
+        addAutomation: user.email.includes("admin") ? true : false,
+        roomControl: true
+      };
+      
+      setUserPermissions(mockPermissions);
+      
+      // Filter widgets based on permissions
+      const filteredWidgets = initialWidgets.filter((widget) => {
+        if (widget.id === "energy" && !mockPermissions.statisticalData) return false;
+        if (widget.id === "automation" && !mockPermissions.addAutomation) return false;
+        return true;
+      });
+      
+      setWidgets(filteredWidgets);
+    }
+  }, [user]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
+  function handleDragEnd(event: any) {
+    const { active, over } = event;
+
+    if (active.id !== over.id) {
+      setWidgets((items) => {
+        const oldIndex = items.findIndex((item) => item.id === active.id);
+        const newIndex = items.findIndex((item) => item.id === over.id);
+        return arrayMove(items, oldIndex, newIndex);
+      });
+    }
+  }
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+    },
+  };
+
+  const handleRequestAccess = (feature: string) => {
+    // In a real application, this would send a request to the admin
+    toast({
+      title: "Access Requested",
+      description: `Your request for access to ${feature} has been sent to the admin.`,
+    });
+  };
+
+  // Wrap the entire dashboard in the ProtectedRoute component
   return (
-    <div className="container mx-auto py-6">
-      <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-      <div className="grid md:grid-cols-2 gap-6">
-        <div>
-          <EnergyConsumption userId={userId} token={token} />
-        </div>
-        <div>
-          {/* Other dashboard components can go here */}
+    <ProtectedRoute>
+      <div className={`p-6 min-h-screen ${isDarkMode ? "bg-gray-900 text-white" : "bg-gray-50 text-gray-900"}`}>
+        <NavigationSidebar />
+        <div className="ml-[72px]">
+          <motion.header variants={itemVariants} className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center shadow-lg">
+                <span className="text-white font-bold text-xl">Sy</span>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">Welcome Home, {user?.email?.split("@")[0] || "User"}</h1>
+                <p className="text-sm text-gray-500">Your smart home dashboard</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              {userPermissions.addAutomation && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsEditing(!isEditing)}
+                  className={isEditing ? "bg-blue-100" : ""}
+                >
+                  <Edit2 className="h-5 w-5" />
+                </Button>
+              )}
+              <Button variant="ghost" size="icon">
+                <Download className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <Bell className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <Command className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <HelpCircle className="h-5 w-5" />
+              </Button>
+              <Button variant="ghost" size="icon" onClick={() => setIsDarkMode(!isDarkMode)}>
+                {isDarkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </Button>
+            </div>
+          </motion.header>
+
+          <div className="grid grid-cols-12 gap-6">
+            <motion.div variants={itemVariants} className="col-span-12 lg:col-span-8">
+              {userPermissions.roomControl ? (
+                <Card className={`mb-6 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+                  <CardHeader>
+                    <CardTitle>Room Energy Overview</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <RoomEnergyConsumption rooms={rooms} />
+                  </CardContent>
+                </Card>
+              ) : (
+                <Card className={`mb-6 ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+                  <CardContent className="flex flex-col items-center justify-center p-6">
+                    <Lock className="w-12 h-12 text-gray-400 mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Access Required</h3>
+                    <p className="text-sm text-gray-500 text-center mb-4">
+                      You don't have permission to view room control data.
+                    </p>
+                    <Button onClick={() => handleRequestAccess("Room Control")}>Request Access</Button>
+                  </CardContent>
+                </Card>
+              )}
+              <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <SortableContext items={widgets.map((w) => w.id)} strategy={rectSortingStrategy}>
+                    {widgets.map((widget) => (
+                      <SortableWidget key={widget.id} id={widget.id} isEditing={isEditing}>
+                        <Card className={`h-full ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+                          <CardContent className="p-4">
+                            {/* Pass user information from the context */}
+                            <widget.component 
+                              userId={user?.id} 
+                              email={user?.email}
+                              token={user?.token}
+                            />
+                          </CardContent>
+                        </Card>
+                      </SortableWidget>
+                    ))}
+                  </SortableContext>
+                </div>
+              </DndContext>
+            </motion.div>
+            <motion.div variants={itemVariants} className="col-span-12 lg:col-span-4">
+              <Card className={`h-full ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
+                <CardHeader>
+                  <CardTitle>Family Members</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <FamilyMembers />
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </div>
       </div>
-    </div>
+    </ProtectedRoute>
   );
 }

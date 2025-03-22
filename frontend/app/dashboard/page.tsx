@@ -36,13 +36,7 @@ export default function Page() {
   const router = useRouter();
   const { user } = useUser(); // Use the user context
   
-  const [rooms, setRooms] = useState([
-    { id: "1", name: "Living Room", consumption: 45 },
-    { id: "2", name: "Bedroom", consumption: 18 },
-    { id: "3", name: "Kitchen", consumption: 72 },
-    { id: "4", name: "Bathroom", consumption: 12 },
-    { id: "5", name: "Office", consumption: 35 },
-  ]);
+  const [rooms, setRooms] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [widgets, setWidgets] = useState(initialWidgets);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -51,30 +45,136 @@ export default function Page() {
     addAutomation: true,
     roomControl: true
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Use the user data from context instead of making separate API calls
-  useEffect(() => {
-    // If we have actual permissions endpoints, we can fetch them here
-    // For now, we'll use default permissions or mock them based on the user's email
-    if (user) {
-      // This is a simplified mock - in a real app, you'd fetch real permissions from your API
-      const mockPermissions = {
-        statisticalData: true,
-        addAutomation: user.email.includes("admin") ? true : false,
-        roomControl: true
-      };
-      
-      setUserPermissions(mockPermissions);
-      
-      // Filter widgets based on permissions
-      const filteredWidgets = initialWidgets.filter((widget) => {
-        if (widget.id === "energy" && !mockPermissions.statisticalData) return false;
-        if (widget.id === "automation" && !mockPermissions.addAutomation) return false;
-        return true;
-      });
-      
-      setWidgets(filteredWidgets);
+  // Function to create headers with HTTP Basic Authentication
+  const createAuthHeaders = () => {
+    if (!user || !user.username || !user.password) {
+      return {};
     }
+    const credentials = btoa(`${user.username}:${user.password}`);
+    return {
+      'Authorization': `Basic ${credentials}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
+  // Fetch user's rooms from the backend
+  useEffect(() => {
+    const fetchRooms = async () => {
+      if (!user) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch(`${API_URL}/rooms`, {
+          headers: createAuthHeaders()
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error fetching rooms: ${response.statusText}`);
+        }
+        
+        const roomsData = await response.json();
+        
+        // Fetch usage data for each room to get energy consumption
+        const roomsWithConsumption = await Promise.all(roomsData.map(async (room) => {
+          try {
+            // Get devices in this room
+            const devicesResponse = await fetch(`${API_URL}/devices?room_id=${room.id}`, {
+              headers: createAuthHeaders()
+            });
+            
+            if (!devicesResponse.ok) {
+              return { ...room, consumption: 0 };
+            }
+            
+            const devices = await devicesResponse.json();
+            let totalConsumption = 0;
+            
+            // For each device, get its energy consumption
+            for (const device of devices) {
+              const usageResponse = await fetch(`${API_URL}/usage?device_id=${device.id}&limit=30`, {
+                headers: createAuthHeaders()
+              });
+              
+              if (usageResponse.ok) {
+                const usageData = await usageResponse.json();
+                totalConsumption += usageData.reduce((sum, record) => 
+                  sum + (record.energy_consumed || 0), 0);
+              }
+            }
+            
+            return {
+              ...room,
+              consumption: parseFloat(totalConsumption.toFixed(2))
+            };
+          } catch (error) {
+            console.error(`Error fetching consumption for room ${room.id}:`, error);
+            return { ...room, consumption: 0 };
+          }
+        }));
+        
+        setRooms(roomsWithConsumption);
+      } catch (error) {
+        console.error("Error fetching rooms:", error);
+        setError(error.message);
+        // If API fails, use fallback data
+        setRooms([
+          { id: "1", name: "Living Room", consumption: 45 },
+          { id: "2", name: "Bedroom", consumption: 18 },
+          { id: "3", name: "Kitchen", consumption: 72 },
+          { id: "4", name: "Bathroom", consumption: 12 },
+          { id: "5", name: "Office", consumption: 35 },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
+  }, [user]);
+
+  // Check user's access to features based on role
+  useEffect(() => {
+    const checkUserPermissions = async () => {
+      if (!user) return;
+
+      try {
+        // Get user profile
+        const response = await fetch(`${API_URL}/users/${user.id}`, {
+          headers: createAuthHeaders()
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Error fetching user profile: ${response.statusText}`);
+        }
+        
+        const userData = await response.json();
+        
+        // Set permissions based on user role
+        const isAdmin = userData.role === 'admin';
+        setUserPermissions({
+          statisticalData: true, // Everyone can see stats
+          addAutomation: isAdmin, // Only admins can add automations
+          roomControl: true // Everyone can control rooms
+        });
+        
+        // Filter widgets based on permissions
+        const filteredWidgets = initialWidgets.filter((widget) => {
+          if (widget.id === "energy" && !userPermissions.statisticalData) return false;
+          if (widget.id === "automation" && !userPermissions.addAutomation) return false;
+          return true;
+        });
+        
+        setWidgets(filteredWidgets);
+      } catch (error) {
+        console.error("Error checking user permissions:", error);
+        // Fallback to default permissions on error
+      }
+    };
+
+    checkUserPermissions();
   }, [user]);
 
   const sensors = useSensors(
@@ -84,7 +184,7 @@ export default function Page() {
     }),
   );
 
-  function handleDragEnd(event: any) {
+  function handleDragEnd(event) {
     const { active, over } = event;
 
     if (active.id !== over.id) {
@@ -114,12 +214,124 @@ export default function Page() {
     },
   };
 
-  const handleRequestAccess = (feature: string) => {
-    // In a real application, this would send a request to the admin
-    toast({
-      title: "Access Requested",
-      description: `Your request for access to ${feature} has been sent to the admin.`,
-    });
+  const handleRequestAccess = (feature) => {
+    // Create a notification requesting access
+    const createNotification = async () => {
+      try {
+        const response = await fetch(`${API_URL}/notifications`, {
+          method: 'POST',
+          headers: createAuthHeaders(),
+          body: JSON.stringify({
+            user_id: user.id,
+            title: `Access Request: ${feature}`,
+            message: `User ${user.username} is requesting access to ${feature}.`,
+            type: "info",
+            priority: "medium",
+            source: "system",
+            read: false
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to send request: ${response.statusText}`);
+        }
+        
+        toast({
+          title: "Access Requested",
+          description: `Your request for access to ${feature} has been sent to the admin.`,
+        });
+      } catch (error) {
+        console.error("Error requesting access:", error);
+        toast({
+          title: "Request Failed",
+          description: "There was an error sending your access request. Please try again.",
+          variant: "destructive"
+        });
+      }
+    };
+    
+    createNotification();
+  };
+
+  // Function to generate an energy report
+  const handleGenerateReport = async () => {
+    try {
+      const response = await fetch(`${API_URL}/reports`, {
+        method: 'POST',
+        headers: createAuthHeaders(),
+        body: JSON.stringify({
+          user_id: user.id,
+          format: "pdf",
+          report_type: "energy",
+          title: "Energy Usage Report"
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to generate report: ${response.statusText}`);
+      }
+      
+      const reportData = await response.json();
+      
+      toast({
+        title: "Report Generated",
+        description: "Your energy report is being generated. You'll be notified when it's ready to download.",
+      });
+      
+      // Poll for report completion
+      const checkReportStatus = async () => {
+        const statusResponse = await fetch(`${API_URL}/reports/${reportData.id}`, {
+          headers: createAuthHeaders()
+        });
+        
+        if (statusResponse.ok) {
+          const status = await statusResponse.json();
+          
+          if (status.status === "completed" && status.download_url) {
+            toast({
+              title: "Report Ready",
+              description: "Your energy report is ready. Click here to download.",
+              action: (
+                <Button variant="outline" onClick={() => window.open(`${API_URL}${status.download_url}`, '_blank')}>
+                  Download
+                </Button>
+              )
+            });
+            return true;
+          } else if (status.status === "failed") {
+            toast({
+              title: "Report Failed",
+              description: "There was an error generating your report. Please try again.",
+              variant: "destructive"
+            });
+            return true;
+          }
+        }
+        
+        return false;
+      };
+      
+      // Check status every 3 seconds for up to 30 seconds
+      let attempts = 0;
+      const maxAttempts = 10;
+      
+      const intervalId = setInterval(async () => {
+        attempts++;
+        const isDone = await checkReportStatus();
+        
+        if (isDone || attempts >= maxAttempts) {
+          clearInterval(intervalId);
+        }
+      }, 3000);
+      
+    } catch (error) {
+      console.error("Error generating report:", error);
+      toast({
+        title: "Report Generation Failed",
+        description: "There was an error generating your report. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
   // Wrap the entire dashboard in the ProtectedRoute component
@@ -134,7 +346,7 @@ export default function Page() {
                 <span className="text-white font-bold text-xl">Sy</span>
               </div>
               <div>
-                <h1 className="text-2xl font-bold">Welcome Home, {user?.email?.split("@")[0] || "User"}</h1>
+                <h1 className="text-2xl font-bold">Welcome Home, {user?.username || "User"}</h1>
                 <p className="text-sm text-gray-500">Your smart home dashboard</p>
               </div>
             </div>
@@ -149,7 +361,7 @@ export default function Page() {
                   <Edit2 className="h-5 w-5" />
                 </Button>
               )}
-              <Button variant="ghost" size="icon">
+              <Button variant="ghost" size="icon" onClick={handleGenerateReport}>
                 <Download className="h-5 w-5" />
               </Button>
               <Button variant="ghost" size="icon">
@@ -175,7 +387,20 @@ export default function Page() {
                     <CardTitle>Room Energy Overview</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <RoomEnergyConsumption rooms={rooms} />
+                    {loading ? (
+                      <div className="flex justify-center items-center h-40">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                      </div>
+                    ) : error ? (
+                      <div className="text-center text-red-500">
+                        <p>Error loading room data.</p>
+                        <Button variant="outline" onClick={() => window.location.reload()} className="mt-2">
+                          Retry
+                        </Button>
+                      </div>
+                    ) : (
+                      <RoomEnergyConsumption rooms={rooms} />
+                    )}
                   </CardContent>
                 </Card>
               ) : (
@@ -197,11 +422,12 @@ export default function Page() {
                       <SortableWidget key={widget.id} id={widget.id} isEditing={isEditing}>
                         <Card className={`h-full ${isDarkMode ? "bg-gray-800" : "bg-white"}`}>
                           <CardContent className="p-4">
-                            {/* Pass user information from the context */}
                             <widget.component 
                               userId={user?.id} 
-                              email={user?.email}
-                              token={user?.token}
+                              username={user?.username}
+                              createAuthHeaders={createAuthHeaders}
+                              apiUrl={API_URL}
+                              isDarkMode={isDarkMode}
                             />
                           </CardContent>
                         </Card>
@@ -217,7 +443,12 @@ export default function Page() {
                   <CardTitle>Family Members</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <FamilyMembers />
+                  <FamilyMembers 
+                    userId={user?.id}
+                    createAuthHeaders={createAuthHeaders}
+                    apiUrl={API_URL}
+                    isDarkMode={isDarkMode}
+                  />
                 </CardContent>
               </Card>
             </motion.div>

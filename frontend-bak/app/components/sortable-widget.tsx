@@ -1,68 +1,39 @@
-"use client";
+"use client"
 
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { GripVertical } from "lucide-react";
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { GripVertical } from "lucide-react"
+import type React from "react"
 
 interface SortableWidgetProps {
-  id: string;
-  children: ReactNode;
-  isEditing: boolean;
+  id: string
+  isEditing: boolean
+  children: React.ReactNode
 }
 
-export function SortableWidget({ id, children, isEditing }: SortableWidgetProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id });
+export function SortableWidget({ id, isEditing, children }: SortableWidgetProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id })
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isDragging ? 10 : 1,
-  };
-
-  // Animation variants
-  const widgetVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        duration: 0.3,
-      }
-    }
-  };
+    zIndex: isDragging ? 1000 : "auto",
+    opacity: isDragging ? 0.5 : 1,
+  }
 
   return (
-    <motion.div
-      ref={setNodeRef}
-      style={style}
-      initial="hidden"
-      animate="visible"
-      variants={widgetVariants}
-      className={cn(
-        "relative",
-        isDragging && "opacity-50"
-      )}
-    >
+    <div ref={setNodeRef} style={style} className="relative group">
       {isEditing && (
         <div
+          className="absolute right-2 top-2 cursor-move z-50 opacity-0 group-hover:opacity-100 transition-opacity"
           {...attributes}
           {...listeners}
-          className="absolute top-0 right-0 p-1 cursor-grab active:cursor-grabbing z-10"
         >
-          <GripVertical className="w-5 h-5 text-gray-400" />
+          <GripVertical className="h-5 w-5 text-gray-400" />
         </div>
       )}
       {children}
-    </motion.div>
-  );
+    </div>
+  )
 }
+

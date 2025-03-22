@@ -11,6 +11,9 @@ import hashlib
 import json
 from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime, timedelta
+from passlib.context import CryptContext
+
+pc = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Try to import pymongo and faker, install if not available
 try:
@@ -69,7 +72,8 @@ def generate_uuid() -> str:
 
 def hash_password(password: str) -> str:
     """Create a hashed password."""
-    return hashlib.sha256(password.encode()).hexdigest()
+    # return hashlib.sha256(password.encode()).hexdigest()
+    return pc.hash(password)
 
 def random_date(start_date: datetime, end_date: datetime) -> datetime:
     """Generate a random date between start_date and end_date."""

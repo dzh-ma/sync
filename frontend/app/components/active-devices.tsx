@@ -1,94 +1,208 @@
-"use client"
+// components/active-devices.tsx
+import { useState, useEffect } from "react";
+import { Light, Thermometer, Lock, Camera, Smartphone } from "lucide-react";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Toggle } from "@/components/ui/toggle";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import { Lightbulb, Thermometer, Fan, Tv, Maximize2, Minimize2 } from "lucide-react"
-import styles from './ActiveDevices.module.css'
-
+// Define types to match the backend models
 interface Device {
-  id: string
-  name: string
-  type: string
-  room: string
-  status: "on" | "off"
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  last_online: string;
+  room_id: string;
+  settings: any;
 }
 
-const deviceIcons: Record<string, any> = {
-  light: Lightbulb,
-  thermostat: Thermometer,
-  fan: Fan,
-  tv: Tv,
+interface Room {
+  id: string;
+  name: string;
 }
 
-export function ActiveDevices() {
-  const [devices, setDevices] = useState<Device[]>([])
-  const [isMaximized, setIsMaximized] = useState(false)
+interface ActiveDevicesProps {
+  userId: string;
+  createAuthHeaders: () => Record<string, string>;
+  apiUrl: string;
+  isDarkMode?: boolean;
+}
 
+export function ActiveDevices({ userId, createAuthHeaders, apiUrl, isDarkMode = false }: ActiveDevicesProps) {
+  const [devices, setDevices] = useState<Device[]>([]);
+  const [rooms, setRooms] = useState<Record<string, Room>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch devices from the backend
   useEffect(() => {
-    const storedDevices = JSON.parse(localStorage.getItem("devices") || "[]")
-    setDevices(storedDevices)
-  }, [])
+    const fetchDevices = async () => {
+      if (!userId) return;
 
-  const toggleDevice = (id: string) => {
-    setDevices(
-      devices.map((device) => {
-        if (device.id === id) {
-          const updatedDevice = {
-            ...device,
-            status: device.status === "on" ? "off" : "on",
-          }
-          // Update in localStorage
-          const allDevices = JSON.parse(localStorage.getItem("devices") || "[]")
-          const updatedDevices = allDevices.map((d: Device) => (d.id === id ? updatedDevice : d))
-          localStorage.setItem("devices", JSON.stringify(updatedDevices))
-          return updatedDevice
+      try {
+        setLoading(true);
+        const response = await fetch(`${apiUrl}/devices?user_id=${userId}&status=online`, {
+          headers: createAuthHeaders()
+        });
+
+        if (!response.ok) {
+          throw new Error(`Error fetching devices: ${response.statusText}`);
         }
-        return device
-      }),
-    )
+
+        const devicesData = await response.json();
+        setDevices(devicesData.slice(0, 5)); // Show only the first 5 devices
+
+        // Fetch rooms to map room_id to room names
+        const roomsResponse = await fetch(`${apiUrl}/rooms?user_id=${userId}`, {
+          headers: createAuthHeaders()
+        });
+
+        if (roomsResponse.ok) {
+          const roomsData = await roomsResponse.json();
+          const roomsMap = roomsData.reduce((acc: Record<string, Room>, room: Room) => {
+            acc[room.id] = room;
+            return acc;
+          }, {});
+          setRooms(roomsMap);
+        }
+      } catch (error) {
+        console.error("Error fetching devices:", error);
+        setError("Failed to load devices. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDevices();
+  }, [userId, apiUrl, createAuthHeaders]);
+
+  // Toggle device on/off
+  const toggleDevice = async (deviceId: string, isOn: boolean) => {
+    try {
+      const deviceToUpdate = devices.find(d => d.id === deviceId);
+      if (!deviceToUpdate) return;
+
+      // Create a copy of the settings with the updated state
+      const newSettings = {
+        ...deviceToUpdate.settings,
+        on: !isOn
+      };
+
+      // Update the device in the backend
+      const response = await fetch(`${apiUrl}/devices/${deviceId}`, {
+        method: 'PATCH',
+        headers: createAuthHeaders(),
+        body: JSON.stringify({
+          settings: newSettings
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to update device: ${response.statusText}`);
+      }
+
+      // Update local state
+      setDevices(devices.map(device => 
+        device.id === deviceId 
+          ? {...device, settings: newSettings} 
+          : device
+      ));
+    } catch (error) {
+      console.error("Error toggling device:", error);
+    }
+  };
+
+  // Get device icon based on type
+  const getDeviceIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'light':
+        return <Light className="h-5 w-5" />;
+      case 'thermostat':
+        return <Thermometer className="h-5 w-5" />;
+      case 'lock':
+        return <Lock className="h-5 w-5" />;
+      case 'camera':
+        return <Camera className="h-5 w-5" />;
+      default:
+        return <Smartphone className="h-5 w-5" />;
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium">Active Devices</h3>
+        <div className="animate-pulse space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-12 bg-gray-200 rounded-md"></div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-2">
+        <h3 className="text-sm font-medium">Active Devices</h3>
+        <div className={`p-4 rounded-md ${isDarkMode ? 'bg-red-900/20' : 'bg-red-50'} text-red-500`}>
+          {error}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <Card className={`${isMaximized ? styles.cardMaximizedA : ""} h-full`}>
-      <CardHeader className={styles.cardTitleA}>
-        <CardTitle>Active Devices</CardTitle>
-        <Button variant="ghost" size="sm" onClick={() => setIsMaximized(!isMaximized)}>
-          {isMaximized ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <div className={styles.deviceListA}>
-          {devices.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No devices added yet</p>
-          ) : (
-            devices.slice(0, isMaximized ? devices.length : 4).map((device) => {
-              const Icon = deviceIcons[device.type] || Lightbulb
-              return (
-                <div key={device.id} className={styles.deviceItemA}>
-                  <div className="flex items-center space-x-4">
-                    <div
-                      className={`${styles.deviceIconWrapperA} ${device.status === "on" ? styles.deviceIconOn : styles.deviceIconOff}`}
-                    >
-                      <Icon className={`${styles.deviceIconA} ${device.status === "on" ? "text-[#00B2FF]" : "text-gray-500"}`} />
-                    </div>
-                    <div>
-                      <p className={styles.deviceNameA}>{device.name}</p>
-                      <p className={styles.deviceRoomA}>{device.room}</p>
-                    </div>
+    <div className="space-y-2">
+      <h3 className="text-sm font-medium">Active Devices</h3>
+      <div className="space-y-3">
+        {devices.length === 0 ? (
+          <div className={`p-4 rounded-md ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'} text-center`}>
+            No active devices found
+          </div>
+        ) : (
+          devices.map((device) => {
+            // Get is device on/off from settings
+            const isOn = device.settings?.on === true;
+            // Get brightness percentage if available
+            const brightness = device.settings?.brightness || 0;
+            const roomName = device.room_id && rooms[device.room_id] ? rooms[device.room_id].name : "Unknown Room";
+
+            return (
+              <div
+                key={device.id}
+                className={`p-2 rounded-lg flex items-center justify-between ${
+                  isDarkMode ? 'bg-gray-800' : 'bg-gray-100'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <div className={`p-2 rounded-full ${isOn ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-500'}`}>
+                    {getDeviceIcon(device.type)}
                   </div>
-                  <Switch
-                    checked={device.status === "on"}
-                    onCheckedChange={() => toggleDevice(device.id)}
-                    className={styles.deviceStatusSwitchA}
+                  <div>
+                    <h4 className="text-sm font-medium">{device.name}</h4>
+                    <p className="text-xs text-gray-500">{roomName}</p>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  {device.type === 'light' && (
+                    <div className="w-16">
+                      <Progress value={brightness} max={100} className="h-1" />
+                    </div>
+                  )}
+                  <Toggle
+                    aria-label={`Toggle ${device.name}`}
+                    pressed={isOn}
+                    onPressedChange={() => toggleDevice(device.id, isOn)}
+                    size="sm"
+                    variant={isOn ? "default" : "outline"}
                   />
                 </div>
-              )
-            })
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  )
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
 }

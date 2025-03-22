@@ -1,120 +1,74 @@
-"use client";
+// contexts/UserContext.tsx
+"use client"
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface User {
   id: string;
-  username: string;
+  email: string;
+  isAuthenticated: boolean;
   token: string;
-  active: boolean;
-  role: string;
+  role?: string;
 }
 
 interface UserContextType {
   user: User | null;
-  isLoading: boolean;
-  login: (username: string, password: string) => Promise<boolean>;
+  login: (userData: User) => void;
   logout: () => void;
+  isLoading: boolean;
 }
 
-// Create context with a default value
 const UserContext = createContext<UserContextType>({
   user: null,
-  isLoading: true,
-  login: async () => false,
+  login: () => {},
   logout: () => {},
+  isLoading: true
 });
 
-// API URL from environment variables
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+export const useUser = () => useContext(UserContext);
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
+interface UserProviderProps {
+  children: ReactNode;
+}
+
+export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  // Check for stored user data on initial load
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+    // Check if user data exists in localStorage
+    const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       try {
-        const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
-      } catch (error) {
-        console.error("Failed to parse stored user:", error);
-        localStorage.removeItem("user");
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error('Failed to parse user data from localStorage');
+        localStorage.removeItem('currentUser');
       }
     }
     setIsLoading(false);
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
-    try {
-      setIsLoading(true);
-      
-      // Create Basic Auth token
-      const token = btoa(`${username}:${password}`);
-      
-      // Attempt to authenticate
-      const response = await fetch(`${API_URL}/users`, {
-        headers: {
-          'Authorization': `Basic ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Authentication failed: ${response.status}`);
-      }
-      
-      // Get the current user's details
-      const currentUserResponse = await fetch(`${API_URL}/users/${username}`, {
-        headers: {
-          'Authorization': `Basic ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      if (!currentUserResponse.ok) {
-        throw new Error(`Failed to fetch user details: ${currentUserResponse.status}`);
-      }
-      
-      const userData = await currentUserResponse.json();
-      
-      // Create user object
-      const authenticatedUser: User = {
-        id: userData.id,
-        username: userData.username,
-        token: token,
-        active: userData.active,
-        role: userData.role || "user" // Default to regular user if no role specified
-      };
-      
-      // Store in state and localStorage
-      setUser(authenticatedUser);
-      localStorage.setItem("user", JSON.stringify(authenticatedUser));
-      
-      return true;
-    } catch (error) {
-      console.error("Login error:", error);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
+  const login = (userData: User) => {
+    setUser(userData);
+    localStorage.setItem('currentUser', JSON.stringify(userData));
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('token_type');
+    router.push('/login');
   };
 
-  const value = {
-    user,
-    isLoading,
-    login,
-    logout,
-  };
+  return (
+    <UserContext.Provider value={{ user, login, logout, isLoading }}>
+      {children}
+    </UserContext.Provider>
+  );
+};
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
-}
-
-export const useUser = () => useContext(UserContext);
+export default UserContext;
