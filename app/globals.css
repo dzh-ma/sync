@@ -1,0 +1,338 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 199 100% 50%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 199 100% 50%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 199 100% 50%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 199 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Chart styling */
+.chart-container {
+  width: 100%;
+  height: 100%;
+  min-height: 250px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  padding: 0.5rem;
+  overflow: hidden;
+}
+
+/* Recharts specific styles */
+.recharts-wrapper {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 auto;
+}
+
+.recharts-surface {
+  overflow: visible;
+}
+
+.recharts-responsive-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Pie chart specific styles */
+.recharts-pie {
+  transform-origin: center;
+}
+
+.recharts-pie-label-text {
+  font-size: 12px;
+  font-weight: 500;
+  fill: #00B2FF;
+}
+
+.recharts-sector {
+  transition: opacity 0.2s;
+}
+
+.recharts-sector:hover {
+  opacity: 0.85;
+}
+
+/* Bar chart specific styles */
+.recharts-bar-rectangle {
+  transition: opacity 0.2s ease;
+}
+
+.recharts-bar-rectangle:hover {
+  opacity: 0.8;
+}
+
+/* Line chart specific styles */
+.recharts-line-curve {
+  stroke-width: 2;
+  stroke: #00B2FF;
+}
+
+.recharts-dot {
+  fill: #00B2FF;
+}
+
+/* Tooltip styles */
+.recharts-tooltip-wrapper {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  border: none !important;
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+
+.recharts-default-tooltip {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: white !important;
+  padding: 6px 10px !important;
+  border-radius: 4px;
+}
+
+.recharts-tooltip-label {
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 12px !important;
+}
+
+.recharts-tooltip-item {
+  color: white !important;
+  font-size: 11px !important;
+}
+
+/* Legend styles */
+.recharts-legend-wrapper {
+  display: flex;
+  justify-content: center;
+  padding-top: 10px;
+}
+
+.recharts-legend-item {
+  cursor: pointer;
+  margin: 0 8px;
+}
+
+.recharts-legend-item-text {
+  font-size: 12px;
+  color: #555;
+}
+
+/* Axis styles */
+.recharts-cartesian-axis-line {
+  stroke: #e0e0e0;
+  stroke-width: 1;
+}
+
+.recharts-cartesian-axis-tick-line {
+  stroke: #e0e0e0;
+  stroke-width: 1;
+}
+
+.recharts-cartesian-axis-tick-value {
+  font-size: 11px;
+  fill: #888;
+  font-weight: 400;
+}
+
+/* Grid styles */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #f0f0f0;
+  stroke-dasharray: 3 3;
+  stroke-opacity: 0.8;
+}
+
+/* Energy chart specific styles */
+.energy-usage-chart .recharts-legend-item-text,
+.cost-breakdown-chart .recharts-legend-item-text {
+  color: #00B2FF;
+}
+
+/* Custom label colors for pie charts */
+.energy-usage-chart .recharts-pie-label {
+  fill: #00B2FF;
+}
+
+.recharts-label-list text {
+  fill: #00B2FF;
+  font-weight: 500;
+}
+
+/* Ensure the charts are properly centered */
+.recharts-pie-label-line {
+  stroke: #ccc;
+  stroke-width: 1;
+}
+
+/* Device efficiency card styling */
+.device-efficiency-card {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.device-efficiency-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Progress bar styling */
+.progress-container {
+  width: 100%;
+  height: 8px;
+  background-color: #f3f4f6;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+/* Custom progress bar colors */
+.progress-bar-excellent {
+  background-color: #10B981; /* green-500 */
+  height: 100%;
+  border-radius: 4px;
+}
+
+.progress-bar-good {
+  background-color: #FBBF24; /* yellow-400 */
+  height: 100%;
+  border-radius: 4px;
+}
+
+.progress-bar-fair {
+  background-color: #F59E0B; /* amber-500 */
+  height: 100%;
+  border-radius: 4px;
+}
+
+.progress-bar-poor {
+  background-color: #EF4444; /* red-500 */
+  height: 100%;
+  border-radius: 4px;
+}
+
+/* Custom styling for Progress component */
+.progress-root {
+  position: relative;
+  overflow: hidden;
+  background: #f3f4f6;
+  border-radius: 9999px;
+  height: 8px;
+  transform: translateZ(0);
+}
+
+.progress-indicator {
+  background-color: #0091FF;
+  height: 100%;
+  transition: transform 0.2s ease;
+  width: 100%;
+  border-radius: 9999px;
+}
+
+/* Efficiency colors */
+.efficiency-excellent {
+  color: #10B981; /* green-500 */
+}
+
+.efficiency-good {
+  color: #FBBF24; /* yellow-400 */
+}
+
+.efficiency-fair {
+  color: #F59E0B; /* amber-500 */
+}
+
+.efficiency-poor {
+  color: #EF4444; /* red-500 */
+}
+
+/* Device icon background styles */
+.device-icon-bg {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 178, 255, 0.1);
+  margin-right: 12px;
+}
+
+.device-icon {
+  color: #00B2FF;
+  width: 20px;
+  height: 20px;
+}
+
