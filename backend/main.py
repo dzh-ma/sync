@@ -23,13 +23,14 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
 from reportlab.lib import colors
+from enhanced_report_generator import generate_energy_report
 
 # Initialize FastAPI
 app = FastAPI()
 
 # Database connection
 client = AsyncIOMotorClient("mongodb://localhost:27017")
-db = client.project_test
+db = client.project_testmain
 devices_collection = db['devices']
 user_devices_collection = db['user_devices']  # New collection to link users and devices
 permissions_collection = db['permissions']  # New collection for permissions
@@ -2989,7 +2990,7 @@ def generate_energy_report(energy_data, user_data=None, format="pdf", start_date
             elements = []
             
             # Title
-            title = "Energy Consumption Report"
+            title = "Sync Energy Consumption Report"
             if start_date and end_date:
                 title += f" ({start_date} to {end_date})"
             elements.append(Paragraph(title, styles['Title']))
@@ -3092,6 +3093,4 @@ def generate_energy_report(energy_data, user_data=None, format="pdf", start_date
     except Exception as e:
         print(f"Error in basic report generation: {str(e)}")
         return None
-
-# TODO: Add CLI command for report generation
 
