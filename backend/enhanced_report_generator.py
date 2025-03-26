@@ -162,7 +162,7 @@ def create_title_page(pdf, user_data, df, start_date, end_date):
     ax_title.axis('off')
     
     # Title with blue styling
-    ax_title.text(0.5, 0.7, "Energy Consumption Report", 
+    ax_title.text(0.5, 0.7, "SYNC Energy Consumption Report", 
              fontsize=28, ha='center', weight='bold', color=PRIMARY_COLOR,
              bbox=dict(facecolor='white', edgecolor=SECONDARY_COLOR, boxstyle='round,pad=0.5', alpha=0.1))
     
