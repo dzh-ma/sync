@@ -8,7 +8,6 @@ import { motion } from "framer-motion"
 import { ArrowLeft, Bell, Zap, Clock, BarChart2, Database, Smartphone } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { toast } from "@/components/ui/use-toast"
-import { use } from "react"
 
 interface FamilyMember {
   id: string
@@ -36,8 +35,7 @@ interface Permissions {
 
 export default function ManageProfileAccessPage({ params }: { params: { id: string } }) {
   const router = useRouter()
-  const unwrappedParams = use(params)
-  const memberId = unwrappedParams.id
+  const memberId = params.id
   const [member, setMember] = useState<FamilyMember | null>(null)
   const [permissions, setPermissions] = useState<Permissions>({
     notifications: true,
@@ -66,8 +64,11 @@ export default function ManageProfileAccessPage({ params }: { params: { id: stri
         return
       }
 
+      // Use environment variable for API URL
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+
       // Fetch member details
-      const response = await fetch(`http://localhost:8000/api/household-members?household_id=${currentUser.householdId}`)
+      const response = await fetch(`${API_URL}/api/household-members?household_id=${currentUser.householdId}`)
       
       if (!response.ok) {
         throw new Error("Failed to fetch household members")
@@ -94,7 +95,7 @@ export default function ManageProfileAccessPage({ params }: { params: { id: stri
         setPermissions(member.permissions)
       } else {
         // Otherwise fetch permissions separately
-        const permissionsResponse = await fetch(`http://localhost:8000/api/permissions/${memberId}`)
+        const permissionsResponse = await fetch(`${API_URL}/api/permissions/${memberId}`)
         
         if (permissionsResponse.ok) {
           const permissionsData = await permissionsResponse.json()
@@ -128,28 +129,62 @@ export default function ManageProfileAccessPage({ params }: { params: { id: stri
       
       console.log("Saving permissions:", permissions)
       
-      const response = await fetch(`http://localhost:8000/api/permissions/update`, {
+      // Use environment variable for API URL
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
+      
+      // Prepare the payload
+      const payload = {
+        member_id: memberId,
+        household_id: currentUser.householdId,
+        permissions: permissions
+      }
+      
+      console.log("Sending permission update payload:", payload)
+      
+      const response = await fetch(`${API_URL}/api/permissions/update`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          member_id: memberId,
-          household_id: currentUser.householdId,
-          permissions: permissions
-        }),
+        body: JSON.stringify(payload),
       })
       
       if (!response.ok) {
         const errorText = await response.text()
         console.error("Failed to update permissions:", errorText)
-        throw new Error("Failed to update permissions")
+        
+        // More specific error message based on status code
+        if (response.status === 404) {
+          throw new Error("Member not found")
+        } else if (response.status === 403) {
+          throw new Error("You don't have permission to update this member")
+        } else if (response.status === 422) {
+          throw new Error("Invalid permission format")
+        } else {
+          throw new Error(`Server error (${response.status}): Failed to update permissions`)
+        }
       }
       
       toast({
         title: "Success",
         description: "Permissions updated successfully",
       })
+      
+      // Update local storage for the user if it exists there
+      try {
+        const storedMember = localStorage.getItem("currentMember")
+        if (storedMember) {
+          const memberData = JSON.parse(storedMember)
+          if (memberData.id === memberId) {
+            // Update permissions in localStorage for this member
+            memberData.permissions = permissions
+            localStorage.setItem("currentMember", JSON.stringify(memberData))
+            console.log("Updated permissions in localStorage")
+          }
+        }
+      } catch (e) {
+        console.error("Error updating localStorage permissions:", e)
+      }
       
       router.push("/profile")
     } catch (error: any) {

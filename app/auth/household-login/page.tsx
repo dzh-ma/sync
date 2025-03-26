@@ -53,7 +53,6 @@ export default function HouseholdLoginPage() {
       })
       
       console.log("Login response:", response.data);
-      console.log("Permissions received:", response.data.permissions);
 
       // Set a flag for fresh login to clear previous data
       localStorage.setItem("freshLogin", "true");
@@ -63,6 +62,25 @@ export default function HouseholdLoginPage() {
       
       // Make sure we have a household ID
       const householdId = response.data.household_id || `household-member-${Date.now()}`;
+
+      // Check if we have member_id to fetch permissions
+      let permissions = response.data.permissions || {};
+      
+      if (response.data.member_id && !response.data.permissions) {
+        try {
+          // Fetch latest permissions from API
+          const permissionsResponse = await axios.get(`${API_URL}/api/permissions/${response.data.member_id}`);
+          if (permissionsResponse.data) {
+            console.log("Fetched permissions from API:", permissionsResponse.data);
+            permissions = permissionsResponse.data;
+          }
+        } catch (permError) {
+          console.error("Failed to fetch permissions:", permError);
+          // Continue with empty permissions object
+        }
+      }
+      
+      console.log("Final permissions to store:", permissions);
 
       // Store member data in localStorage
       localStorage.setItem(
@@ -74,7 +92,7 @@ export default function HouseholdLoginPage() {
           name: response.data.name,
           accountType: response.data.account_type,
           householdId: householdId,
-          permissions: response.data.permissions,
+          permissions: permissions
         })
       )
 

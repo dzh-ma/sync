@@ -336,3 +336,14 @@
   height: 20px;
 }
 
+/* Add styles for navigation tooltip */
+.navigation-tooltip {
+  z-index: 9999 !important;
+  position: relative;
+}
+
+/* Ensure tooltip portal is rendered above all other page content */
+[data-radix-tooltip-portal] {
+  z-index: 9999 !important;
+}
+

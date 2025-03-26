@@ -60,9 +60,9 @@ export default function ProfilePage() {
         const storedMember = localStorage.getItem("currentMember");
         
         if (!storedUser && !storedMember) {
-          router.push("/auth/login");
-          return;
-        }
+      router.push("/auth/login");
+      return;
+    }
         
         // Initialize with localStorage data first
         let userData = null;
@@ -73,30 +73,95 @@ export default function ProfilePage() {
           userData = currentUser;
           
           if (currentUser.id) {
-            try {
-              // Fetch the latest data from the backend
-              const response = await fetch(`${API_URL}/api/user/${currentUser.id}`);
-              
-              if (response.ok) {
-                const apiData = await response.json();
+            // Flag to track API availability
+            let isApiAvailable = true;
+            
+            // Check if API_URL is defined
+            if (!API_URL) {
+              console.warn("API_URL is not defined, using localStorage data only");
+              isApiAvailable = false;
+            }
+            
+            // Check network connectivity
+            if (!navigator.onLine) {
+              console.warn("Browser is offline, using cached data");
+              isApiAvailable = false;
+            }
+            
+            // Only attempt to fetch from API if it might be available
+            if (isApiAvailable) {
+              // Try to ping the API to see if it's available
+              try {
+                const pingRequest = fetch(`${API_URL}/ping`, {
+                  method: 'GET',
+                  cache: 'no-cache',
+                  signal: AbortSignal.timeout(2000) // Quick 2-second timeout just for the ping
+                });
                 
-                // Format the user data
-                userData = {
-                  id: apiData._id,
-                  type: "admin",
-                  email: apiData.admin_email,
-                  name: `${apiData.firstName || ""} ${apiData.lastName || ""}`.trim() || "Admin",
-                  role: "Admin",
-                  householdId: apiData.household_id,
-                  avatar: apiData.avatar,
-                };
+                // Using Promise.race to avoid unhandled promise rejection
+                const pingResult = await Promise.race([
+                  pingRequest,
+                  new Promise(resolve => setTimeout(() => resolve(null), 2000))
+                ]);
                 
-                // Update localStorage with fresh data
-                localStorage.setItem("currentUser", JSON.stringify(userData));
+                if (!pingResult || !(pingResult as Response).ok) {
+                  console.warn("API server is not responding, using cached data");
+                  isApiAvailable = false;
+                }
+              } catch (pingError) {
+                console.warn("API ping failed:", pingError);
+                isApiAvailable = false;
               }
-            } catch (error) {
-              console.error("Error fetching user data from API:", error);
-              // Continue with localStorage data
+            }
+            
+            // Only proceed with the main fetch if API is available
+            if (isApiAvailable) {
+              try {
+                // Now fetch the actual user data
+                console.log(`Fetching user data from: ${API_URL}/api/user/${currentUser.id}`);
+                
+                // Create AbortController for timeout handling
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+                
+                const response = await fetch(`${API_URL}/api/user/${currentUser.id}`, {
+                  method: 'GET',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache',
+                  },
+                  cache: 'no-cache',
+                  signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                  const apiData = await response.json();
+                  console.log("Successfully retrieved user data from API:", apiData);
+                  
+                  // Format the user data
+                  userData = {
+                    id: apiData._id || apiData.id || currentUser.id,
+                    type: "admin",
+                    email: apiData.admin_email || apiData.email || currentUser.email,
+                    name: `${apiData.firstName || ""} ${apiData.lastName || ""}`.trim() || apiData.name || currentUser.name || "Admin",
+                    role: "Admin",
+                    householdId: apiData.household_id || apiData.householdId || currentUser.householdId,
+                    avatar: apiData.avatar || currentUser.avatar,
+                    permissions: apiData.permissions || currentUser.permissions || {}
+                  };
+                  
+                  // Update localStorage with fresh data
+                  localStorage.setItem("currentUser", JSON.stringify(userData));
+                } else {
+                  console.warn(`API responded with ${response.status}: ${response.statusText}`);
+                  // Continue with localStorage data
+                }
+              } catch (fetchError) {
+                console.warn("Error fetching user data from API:", fetchError);
+                // Continue with localStorage data - do not update or throw error
+              }
             }
           }
         } else if (storedMember) {
@@ -105,32 +170,96 @@ export default function ProfilePage() {
           userData = currentMember;
           
           if (currentMember.email) {
-            try {
-              // Fetch the latest data from the backend
-              const response = await fetch(`${API_URL}/api/household-member/${currentMember.email}`);
-              
-              if (response.ok) {
-                const apiData = await response.json();
+            // Flag to track API availability
+            let isApiAvailable = true;
+            
+            // Check if API_URL is defined
+            if (!API_URL) {
+              console.warn("API_URL is not defined, using localStorage data only");
+              isApiAvailable = false;
+            }
+            
+            // Check network connectivity
+            if (!navigator.onLine) {
+              console.warn("Browser is offline, using cached data");
+              isApiAvailable = false;
+            }
+            
+            // Only attempt to fetch from API if it might be available
+            if (isApiAvailable) {
+              // Try to ping the API to see if it's available
+              try {
+                const pingRequest = fetch(`${API_URL}/ping`, {
+                  method: 'GET',
+                  cache: 'no-cache',
+                  signal: AbortSignal.timeout(2000) // Quick 2-second timeout just for the ping
+                });
                 
-                // Format the member data
-                userData = {
-                  id: apiData._id,
-                  type: "member",
-                  email: apiData.email,
-                  name: apiData.name,
-                  role: apiData.role || "Family Member",
-                  householdId: apiData.household_id,
-                  avatar: apiData.avatar,
-                  accountType: apiData.account_type,
-                  permissions: apiData.permissions,
-                };
+                // Using Promise.race to avoid unhandled promise rejection
+                const pingResult = await Promise.race([
+                  pingRequest,
+                  new Promise(resolve => setTimeout(() => resolve(null), 2000))
+                ]);
                 
-                // Update localStorage with fresh data
-                localStorage.setItem("currentMember", JSON.stringify(userData));
+                if (!pingResult || !(pingResult as Response).ok) {
+                  console.warn("API server is not responding, using cached data");
+                  isApiAvailable = false;
+                }
+              } catch (pingError) {
+                console.warn("API ping failed:", pingError);
+                isApiAvailable = false;
               }
-            } catch (error) {
-              console.error("Error fetching member data from API:", error);
-              // Continue with localStorage data
+            }
+            
+            // Only proceed with the main fetch if API is available
+            if (isApiAvailable) {
+              try {
+                // Now fetch the actual member data
+                console.log(`Fetching member data from: ${API_URL}/api/household-member/${encodeURIComponent(currentMember.email)}`);
+                
+                // Create AbortController for timeout handling
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+                
+                const response = await fetch(`${API_URL}/api/household-member/${encodeURIComponent(currentMember.email)}`, {
+                  method: 'GET',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Cache-Control': 'no-cache',
+                  },
+                  cache: 'no-cache',
+                  signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                  const apiData = await response.json();
+                  console.log("Successfully retrieved member data from API:", apiData);
+                  
+                  // Format the member data
+                  userData = {
+                    id: apiData._id || apiData.id || currentMember.id,
+                    type: "member",
+                    email: apiData.email || currentMember.email,
+                    name: apiData.name || currentMember.name,
+                    role: apiData.role || currentMember.role || "Family Member",
+                    householdId: apiData.household_id || apiData.householdId || currentMember.householdId,
+                    avatar: apiData.avatar || currentMember.avatar,
+                    accountType: apiData.account_type || apiData.accountType || currentMember.accountType,
+                    permissions: apiData.permissions || currentMember.permissions || {}
+                  };
+                  
+                  // Update localStorage with fresh data
+                  localStorage.setItem("currentMember", JSON.stringify(userData));
+                } else {
+                  console.warn(`API responded with ${response.status}: ${response.statusText}`);
+                  // Continue with localStorage data
+                }
+              } catch (fetchError) {
+                console.warn("Error fetching member data from API:", fetchError);
+                // Continue with localStorage data - do not update or throw error
+              }
             }
           }
         }
@@ -146,12 +275,39 @@ export default function ProfilePage() {
           router.push("/auth/login");
         }
       } catch (error) {
-        console.error("Error loading user data:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load profile data",
-          variant: "destructive",
-        });
+        console.warn("Error loading user data:", error);
+        
+        // Try to recover by using what's in localStorage directly
+        try {
+          const storedUser = localStorage.getItem("currentUser");
+          const storedMember = localStorage.getItem("currentMember");
+          
+          if (storedUser) {
+            const userData = JSON.parse(storedUser);
+            setUser(userData);
+            setEditProfileData({
+              name: userData.name || "",
+              email: userData.email || "",
+              avatar: userData.avatar || "",
+            });
+          } else if (storedMember) {
+            const userData = JSON.parse(storedMember);
+            setUser(userData);
+    setEditProfileData({
+              name: userData.name || "",
+              email: userData.email || "",
+              avatar: userData.avatar || "",
+            });
+          } else {
+            // No recovery possible - but don't show an error toast
+            console.warn("No stored user data available for recovery");
+            router.push("/auth/login");
+          }
+        } catch (recoveryError) {
+          // Last resort recovery failed - but don't show an error toast
+          console.warn("Recovery attempt failed:", recoveryError);
+          router.push("/auth/login");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -180,18 +336,18 @@ export default function ProfilePage() {
         // Call API to update admin profile
         const response = await fetch(`${API_URL}/api/update-admin-profile`, {
           method: "PUT",
-          headers: {
+        headers: {
             "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
+        },
+        body: JSON.stringify({
             email: editProfileData.email,
-            firstName,
-            lastName,
+          firstName,
+          lastName,
             avatar: editProfileData.avatar,
-          }),
-        });
-        
-        if (!response.ok) {
+        }),
+      });
+
+      if (!response.ok) {
           throw new Error("Failed to update profile");
         }
         
@@ -423,6 +579,23 @@ export default function ProfilePage() {
                             ).length + " permissions enabled"
                           : "Basic access"}
                       </p>
+                      {/* Display actual enabled permissions */}
+                      {user.permissions && (
+                        <div className="mt-2 flex flex-wrap gap-1">
+                          {Object.entries(user.permissions).map(([key, value]) => 
+                            value ? (
+                              <div key={key} className="text-xs inline-block py-1 px-2 bg-[#00B2FF]/10 text-[#00B2FF] rounded">
+                                {key === 'deviceControl' ? 'Device Control' : 
+                                 key === 'roomControl' ? 'Room Management' :
+                                 key === 'addAutomation' ? 'Automation' :
+                                 key === 'statisticalData' ? 'Statistics' :
+                                 key === 'energyAlerts' ? 'Energy Alerts' :
+                                 key === 'notifications' ? 'Notifications' : key}
+                              </div>
+                            ) : null
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -430,29 +603,51 @@ export default function ProfilePage() {
                   <h3 className="text-lg font-semibold text-gray-800 mb-4">Need More Access?</h3>
                   <p className="text-gray-500 mb-4">Request additional permissions from your admin</p>
                   <div className="space-y-2">
-                    {!user.permissions?.deviceControl && (
-                      <button
-                        onClick={() => handleRequestAccess("Device Control")}
-                        className="w-full px-4 py-2 bg-[#00B2FF]/10 text-[#00B2FF] rounded hover:bg-[#00B2FF]/20 transition-colors text-sm font-medium"
-                      >
-                        Request Device Control
-                      </button>
+                    {user.permissions && (
+                      <>
+                        {!user.permissions.deviceControl && (
+                          <button
+                            onClick={() => handleRequestAccess("Device Control")}
+                            className="w-full px-4 py-2 bg-[#00B2FF]/10 text-[#00B2FF] rounded hover:bg-[#00B2FF]/20 transition-colors text-sm font-medium"
+                          >
+                            Request Device Control
+                          </button>
+                        )}
+                        {!user.permissions.roomControl && (
+                          <button
+                            onClick={() => handleRequestAccess("Room Management")}
+                            className="w-full px-4 py-2 bg-[#00B2FF]/10 text-[#00B2FF] rounded hover:bg-[#00B2FF]/20 transition-colors text-sm font-medium"
+                          >
+                            Request Room Management
+                          </button>
+                        )}
+                        {!user.permissions.statisticalData && (
+                          <button
+                            onClick={() => handleRequestAccess("Statistics Access")}
+                            className="w-full px-4 py-2 bg-[#00B2FF]/10 text-[#00B2FF] rounded hover:bg-[#00B2FF]/20 transition-colors text-sm font-medium"
+                          >
+                            Request Statistics Access
+                          </button>
+                        )}
+                        {!user.permissions.addAutomation && (
+                          <button
+                            onClick={() => handleRequestAccess("Automation Access")}
+                            className="w-full px-4 py-2 bg-[#00B2FF]/10 text-[#00B2FF] rounded hover:bg-[#00B2FF]/20 transition-colors text-sm font-medium"
+                          >
+                            Request Automation Access
+                          </button>
+                        )}
+                        {Object.values(user.permissions).every(value => value) && (
+                          <p className="text-center text-sm text-gray-500">
+                            You already have all available permissions.
+                          </p>
+                        )}
+                      </>
                     )}
-                    {!user.permissions?.roomAccess && (
-                      <button
-                        onClick={() => handleRequestAccess("Room Management")}
-                        className="w-full px-4 py-2 bg-[#00B2FF]/10 text-[#00B2FF] rounded hover:bg-[#00B2FF]/20 transition-colors text-sm font-medium"
-                      >
-                        Request Room Management
-                      </button>
-                    )}
-                    {!user.permissions?.automationAccess && (
-                      <button
-                        onClick={() => handleRequestAccess("Automation Access")}
-                        className="w-full px-4 py-2 bg-[#00B2FF]/10 text-[#00B2FF] rounded hover:bg-[#00B2FF]/20 transition-colors text-sm font-medium"
-                      >
-                        Request Automation Access
-                      </button>
+                    {!user.permissions && (
+                      <p className="text-center text-sm text-gray-500">
+                        Loading your permissions...
+                      </p>
                     )}
                   </div>
                 </div>
@@ -463,15 +658,15 @@ export default function ProfilePage() {
       </div>
 
       {/* Edit Profile Dialog */}
-      <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit Profile</DialogTitle>
+          <Dialog open={isEditProfileOpen} onOpenChange={setIsEditProfileOpen}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Edit Profile</DialogTitle>
             <DialogDescription>
               Make changes to your profile information here. Click save when you're done.
             </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
             <div className="flex flex-col items-center space-y-4 mb-4">
               <div
                 className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center cursor-pointer relative overflow-hidden"
@@ -499,73 +694,73 @@ export default function ProfilePage() {
                 Change Avatar
               </button>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">
-                Name
-              </Label>
-              <Input
+                    Name
+                  </Label>
+                  <Input
                 id="name"
-                value={editProfileData.name}
-                onChange={(e) => setEditProfileData({ ...editProfileData, name: e.target.value })}
-                className="col-span-3"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+                    value={editProfileData.name}
+                    onChange={(e) => setEditProfileData({ ...editProfileData, name: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input
+                    Email
+                  </Label>
+                  <Input
                 id="email"
-                type="email"
-                value={editProfileData.email}
-                onChange={(e) => setEditProfileData({ ...editProfileData, email: e.target.value })}
-                className="col-span-3"
-              />
-            </div>
-          </div>
-          <DialogFooter>
+                    type="email"
+                    value={editProfileData.email}
+                    onChange={(e) => setEditProfileData({ ...editProfileData, email: e.target.value })}
+                    className="col-span-3"
+                  />
+                </div>
+              </div>
+              <DialogFooter>
             <Button variant="outline" onClick={() => setIsEditProfileOpen(false)}>
               Cancel
-            </Button>
+                </Button>
             <Button onClick={handleEditProfile}>Save changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
       {/* Avatar Select Dialog */}
-      <Dialog open={isAvatarSelectOpen} onOpenChange={setIsAvatarSelectOpen}>
+          <Dialog open={isAvatarSelectOpen} onOpenChange={setIsAvatarSelectOpen}>
         <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Select Avatar</DialogTitle>
+              <DialogHeader>
+                <DialogTitle>Select Avatar</DialogTitle>
             <DialogDescription>Choose an avatar for your profile</DialogDescription>
-          </DialogHeader>
+              </DialogHeader>
           <div className="grid grid-cols-3 gap-4 py-4">
-            {AVATAR_OPTIONS.male.map((avatar, index) => (
+                    {AVATAR_OPTIONS.male.map((avatar, index) => (
               <div
-                key={`male-${index}`}
+                        key={`male-${index}`}
                 className="relative w-24 h-24 cursor-pointer mx-auto"
-                onClick={() => handleAvatarSelect(avatar)}
-              >
-                <Image
-                  src={avatar}
-                  alt={`Male avatar ${index + 1}`}
+                        onClick={() => handleAvatarSelect(avatar)}
+                      >
+                        <Image
+                          src={avatar}
+                          alt={`Male avatar ${index + 1}`}
                   fill
                   className="object-cover rounded-full"
-                />
+                        />
               </div>
-            ))}
-            {AVATAR_OPTIONS.female.map((avatar, index) => (
+                    ))}
+                    {AVATAR_OPTIONS.female.map((avatar, index) => (
               <div
-                key={`female-${index}`}
+                        key={`female-${index}`}
                 className="relative w-24 h-24 cursor-pointer mx-auto"
-                onClick={() => handleAvatarSelect(avatar)}
-              >
-                <Image
-                  src={avatar}
-                  alt={`Female avatar ${index + 1}`}
+                        onClick={() => handleAvatarSelect(avatar)}
+                      >
+                        <Image
+                          src={avatar}
+                          alt={`Female avatar ${index + 1}`}
                   fill
                   className="object-cover rounded-full"
-                />
+                        />
               </div>
             ))}
           </div>
@@ -574,8 +769,8 @@ export default function ProfilePage() {
               Cancel
             </Button>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
+            </DialogContent>
+          </Dialog>
     </div>
   );
 }

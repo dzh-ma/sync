@@ -48,6 +48,24 @@ export default function LoginPage() {
       // Make sure we have a household ID
       const householdId = userData.household_id || `household-${Date.now()}`;
 
+      // Use permissions directly from the backend if they exist
+      // Do not set default permissions
+      console.log("Backend user data:", userData);
+      
+      // Define admin default permissions if none provided from backend
+      const adminDefaultPermissions = {
+        notifications: true,
+        energyAlerts: true,
+        addAutomation: true,
+        statisticalData: true,
+        deviceControl: true,
+        roomControl: true
+      };
+      
+      // Use permissions from backend or set defaults for admin
+      const permissions = userData.permissions || adminDefaultPermissions;
+      console.log("Admin permissions to store:", permissions);
+
       localStorage.setItem(
         "currentUser",
         JSON.stringify({
@@ -57,10 +75,11 @@ export default function LoginPage() {
           name: userData.firstName || "Admin",
           role: "Admin",
           householdId: householdId,
+          permissions: permissions
         })
       );
 
-      router.push("/dashboard"); // Update with your dashboard path
+      router.push("/dashboard");
     } catch (error) {
       const errorMessage =
         (error as any).response?.data?.detail ||

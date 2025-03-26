@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Cloud, CloudRain, Sun, Thermometer, Wind, Zap } from "lucide-react"
+import { Cloud, CloudRain, Sun, Thermometer, Wind, Zap, RefreshCw } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 import axios from "axios"
 
 interface WeatherData {
@@ -26,23 +27,26 @@ interface WeatherEnergyWidgetProps {
 export function WeatherEnergyWidget({ city = "Dubai", units = "metric" }: WeatherEnergyWidgetProps) {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const fetchWeatherData = async () => {
-      try {
-        setLoading(true)
-        const response = await axios.get(`/api/weather?city=${encodeURIComponent(city)}&units=${units}`)
-        setWeatherData(response.data)
-        setError(null)
-      } catch (err) {
-        console.error("Error fetching weather data:", err)
-        setError("Could not load weather data")
-      } finally {
-        setLoading(false)
-      }
+  const fetchWeatherData = async () => {
+    try {
+      setIsRefreshing(true)
+      const timestamp = new Date().getTime() // Add timestamp to prevent caching
+      const response = await axios.get(`/api/weather?city=${encodeURIComponent(city)}&units=${units}&_t=${timestamp}`)
+      setWeatherData(response.data)
+      setError(null)
+    } catch (err) {
+      console.error("Error fetching weather data:", err)
+      setError("Could not load weather data")
+    } finally {
+      setLoading(false)
+      setIsRefreshing(false)
     }
+  }
 
+  useEffect(() => {
     fetchWeatherData()
 
     // Refresh weather data every 30 minutes
@@ -50,6 +54,10 @@ export function WeatherEnergyWidget({ city = "Dubai", units = "metric" }: Weathe
     
     return () => clearInterval(intervalId)
   }, [city, units])
+
+  const handleRefresh = () => {
+    fetchWeatherData()
+  }
 
   const getWeatherIcon = () => {
     if (!weatherData) {
@@ -151,7 +159,19 @@ export function WeatherEnergyWidget({ city = "Dubai", units = "metric" }: Weathe
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-medium">Weather & Energy</CardTitle>
+        <CardTitle className="text-lg font-medium flex justify-between items-center">
+          Weather & Energy
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="h-8 w-8 p-0"
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <span className="sr-only">Refresh</span>
+          </Button>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex items-center justify-between">

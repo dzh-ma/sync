@@ -38,16 +38,58 @@ export default function AddRoomPage() {
 
   const fetchRooms = async () => {
     try {
-      const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-      const householdId = currentUser.householdId;
+      // Get user info from localStorage
+      const storedUser = localStorage.getItem("currentUser");
+      const storedMember = localStorage.getItem("currentMember");
+      
+      let householdId;
+      
+      if (storedUser) {
+        const currentUser = JSON.parse(storedUser);
+        householdId = currentUser.householdId;
+      } else if (storedMember) {
+        const currentMember = JSON.parse(storedMember);
+        householdId = currentMember.householdId;
+      }
 
+      // If no householdId found, check for a generated one or create a new one
       if (!householdId) {
-        toast({
-          title: "Error",
-          description: "Household ID not found. Please login again.",
-          variant: "destructive",
-        });
-        return;
+        console.warn("Missing householdId for fetching rooms. Checking for generated ID.");
+        
+        // Check if we have a generated householdId in localStorage
+        const generatedHouseholdId = localStorage.getItem("generatedHouseholdId");
+        
+        if (generatedHouseholdId) {
+          console.log("Using previously generated householdId for fetching rooms:", generatedHouseholdId);
+          householdId = generatedHouseholdId;
+          
+          // Update the user object with this generated householdId
+          if (storedUser) {
+            const currentUser = JSON.parse(storedUser);
+            currentUser.householdId = householdId;
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+          } else if (storedMember) {
+            const currentMember = JSON.parse(storedMember);
+            currentMember.householdId = householdId;
+            localStorage.setItem("currentMember", JSON.stringify(currentMember));
+          }
+        } else {
+          // Generate a new household ID
+          householdId = `household-${Date.now()}`;
+          console.log("Generated new householdId for fetching rooms:", householdId);
+          localStorage.setItem("generatedHouseholdId", householdId);
+          
+          // Update the user object
+          if (storedUser) {
+            const currentUser = JSON.parse(storedUser);
+            currentUser.householdId = householdId;
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+          } else if (storedMember) {
+            const currentMember = JSON.parse(storedMember);
+            currentMember.householdId = householdId;
+            localStorage.setItem("currentMember", JSON.stringify(currentMember));
+          }
+        }
       }
 
       const response = await fetch(`http://localhost:8000/api/rooms?household_id=${householdId}`);
@@ -97,11 +139,60 @@ export default function AddRoomPage() {
     setIsLoading(true);
 
     try {
-      const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-      const householdId = currentUser.householdId;
+      // Get user info from localStorage
+      const storedUser = localStorage.getItem("currentUser");
+      const storedMember = localStorage.getItem("currentMember");
+      
+      let userId, householdId;
+      
+      if (storedUser) {
+        const currentUser = JSON.parse(storedUser);
+        userId = currentUser.id;
+        householdId = currentUser.householdId;
+      } else if (storedMember) {
+        const currentMember = JSON.parse(storedMember);
+        userId = currentMember.id;
+        householdId = currentMember.householdId;
+      }
 
+      // If no householdId found, check for a generated one or create a new one
       if (!householdId) {
-        throw new Error("Household ID not found. Please login again.");
+        console.warn("Missing householdId. Checking for generated ID or creating a new one.");
+        
+        // Check if we have a generated householdId in localStorage
+        const generatedHouseholdId = localStorage.getItem("generatedHouseholdId");
+        
+        if (generatedHouseholdId) {
+          console.log("Using previously generated householdId:", generatedHouseholdId);
+          householdId = generatedHouseholdId;
+          
+          // Update the user object with this generated householdId
+          if (storedUser) {
+            const currentUser = JSON.parse(storedUser);
+            currentUser.householdId = householdId;
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+          } else if (storedMember) {
+            const currentMember = JSON.parse(storedMember);
+            currentMember.householdId = householdId;
+            localStorage.setItem("currentMember", JSON.stringify(currentMember));
+          }
+        } else {
+          // Generate a new household ID
+          householdId = `household-${Date.now()}`;
+          console.log("Generated new householdId:", householdId);
+          localStorage.setItem("generatedHouseholdId", householdId);
+          
+          // Update the user object
+          if (storedUser) {
+            const currentUser = JSON.parse(storedUser);
+            currentUser.householdId = householdId;
+            localStorage.setItem("currentUser", JSON.stringify(currentUser));
+          } else if (storedMember) {
+            const currentMember = JSON.parse(storedMember);
+            currentMember.householdId = householdId;
+            localStorage.setItem("currentMember", JSON.stringify(currentMember));
+          }
+        }
       }
 
       const finalImage = formData.image || "/minimal2.png";
@@ -147,11 +238,33 @@ export default function AddRoomPage() {
 
   const handleDelete = async (id: string) => {
     try {
-      const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-      const householdId = currentUser.householdId;
+      // Get user info from localStorage
+      const storedUser = localStorage.getItem("currentUser");
+      const storedMember = localStorage.getItem("currentMember");
+      
+      let householdId;
+      
+      if (storedUser) {
+        const currentUser = JSON.parse(storedUser);
+        householdId = currentUser.householdId;
+      } else if (storedMember) {
+        const currentMember = JSON.parse(storedMember);
+        householdId = currentMember.householdId;
+      }
 
+      // If no householdId found, check for a generated one or create a new one
       if (!householdId) {
-        throw new Error("Household ID not found. Please login again.");
+        console.warn("Missing householdId for delete operation. Checking for generated ID.");
+        
+        // Check if we have a generated householdId in localStorage
+        const generatedHouseholdId = localStorage.getItem("generatedHouseholdId");
+        
+        if (generatedHouseholdId) {
+          console.log("Using previously generated householdId for delete:", generatedHouseholdId);
+          householdId = generatedHouseholdId;
+        } else {
+          throw new Error("Household ID not found. Please login again.");
+        }
       }
 
       const response = await fetch(`http://localhost:8000/api/rooms/delete?room_id=${id}&household_id=${householdId}`, {
@@ -205,9 +318,9 @@ export default function AddRoomPage() {
         <motion.div initial="hidden" animate="visible" variants={containerVariants} className="p-6">
           <motion.header variants={itemVariants} className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center">
+              {/* <div className="w-10 h-10 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-xl">Sy</span>
-              </div>
+              </div> */}
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">Add New Room</h1>
                 <p className="text-sm text-gray-500">Create a new room in your smart home</p>
@@ -279,7 +392,12 @@ export default function AddRoomPage() {
                           <Button
                             type="button"
                             variant="outline"
-                            onClick={() => document.querySelector('input[type="file"]')?.click()}
+                            onClick={() => {
+                              const fileInput = document.querySelector('input[type="file"]');
+                              if (fileInput && fileInput instanceof HTMLInputElement) {
+                                fileInput.click();
+                              }
+                            }}
                             className="border-[#00B2FF] text-[#00B2FF] hover:bg-[#00B2FF] hover:text-white"
                           >
                             Select Image

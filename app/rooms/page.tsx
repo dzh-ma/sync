@@ -82,7 +82,21 @@ export default function RoomsPage() {
         }
       }
 
-      const response = await fetch(`http://localhost:8000/api/rooms?household_id=${householdId}`);
+      if (!householdId) {
+        throw new Error("Household ID not found. Please login again.");
+      }
+
+      // Build the URL with appropriate parameters
+      let apiUrl = `http://localhost:8000/api/rooms?`;
+      if (householdId) {
+        apiUrl += `household_id=${householdId}`;
+      } else if (userId) {
+        apiUrl += `user_id=${userId}`;
+      } else {
+        throw new Error("No user or household ID found. Please login again.");
+      }
+
+      const response = await fetch(apiUrl);
       
       if (!response.ok) {
         if (response.status === 422) {
@@ -256,9 +270,9 @@ export default function RoomsPage() {
       <div className="ml-[72px] p-6">
         <header className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-10 h-10 bg-[#00B2FF] rounded-full flex items-center justify-center">
+            {/* <div className="w-10 h-10 bg-[#00B2FF] rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-xl">Sy</span>
-            </div>
+            </div> */}
             <h1 className="text-2xl font-bold">Room List</h1>
           </div>
           <Button variant="ghost" size="icon">

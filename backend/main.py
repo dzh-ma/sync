@@ -1,22 +1,27 @@
-from fastapi import FastAPI, HTTPException, Body, Depends, BackgroundTasks, Request, Response
+from fastapi import FastAPI, HTTPException, Body, Depends, BackgroundTasks, Request, Response, File, UploadFile, Query
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any, Union
+from enum import Enum
+import pymongo
+import json
+import os
+import bcrypt
+import random
+import string
+import hashlib
+import uuid
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from bson import ObjectId
+from datetime import datetime, timedelta
+import time
+import asyncio
+from fastapi.encoders import jsonable_encoder
 from motor.motor_asyncio import AsyncIOMotorClient
 from passlib.context import CryptContext
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import random
-import datetime as dt
-from datetime import datetime, timedelta, time, date
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from bson import ObjectId
-import asyncio
-import threading
-import time as time_module
-from typing import List, Optional, Dict, Any, Union
-import os
-import json
-import uuid
 
 # Initialize FastAPI
 app = FastAPI()
@@ -380,9 +385,35 @@ class TrackEnergyRequest(BaseModel):
 # Update endpoints to use request body models
 @app.get("/api/user/devices")
 async def get_user_devices(user_id: str, household_id: str = None):
-    query = {'user_id': user_id}
-    if household_id:
-        query['household_id'] = household_id
+    # First, check if this is a household member
+    is_household_member = False
+    try:
+        # Try to find the user as a household member
+        if user_id:
+            member = None
+            # Check by ID first
+            if ObjectId.is_valid(user_id):
+                member = await household_members_collection.find_one({"_id": ObjectId(user_id)})
+            # If not found, check by email
+            if not member:
+                member = await household_members_collection.find_one({"email": user_id})
+                
+            if member:
+                is_household_member = True
+                # Use household_id from member if it's not provided
+                if not household_id and "household_id" in member:
+                    household_id = member["household_id"]
+    except Exception as e:
+        print(f"Error checking if user is household member: {str(e)}")
+
+    # If this is a household member and we have a household_id, fetch all devices for the household
+    if is_household_member and household_id:
+        query = {'household_id': household_id}
+    else:
+        # Otherwise, use the original query logic
+        query = {'user_id': user_id}
+        if household_id:
+            query['household_id'] = household_id
     
     user_devices = await user_devices_collection.find(
         query,
@@ -1073,9 +1104,44 @@ async def add_room(data: RoomRequest):
         )
 
 @app.get("/api/rooms")
-async def get_rooms(household_id: str):
+async def get_rooms(household_id: str, user_id: str = None):
     try:
-        rooms = await db.rooms.find({"household_id": household_id}).to_list(length=100)
+        # Simple case - if we have household_id, return all rooms for that household
+        if household_id:
+            rooms = await db.rooms.find({"household_id": household_id}).to_list(length=100)
+        # If no household_id but we have user_id, try to find the household
+        elif user_id:
+            # First check if this is an admin user
+            admin_user = None
+            if ObjectId.is_valid(user_id):
+                admin_user = await admin_users_collection.find_one({"_id": ObjectId(user_id)})
+            
+            if admin_user and "householdId" in admin_user:
+                # If admin user has householdId, use that
+                rooms = await db.rooms.find({"household_id": admin_user["householdId"]}).to_list(length=100)
+            elif admin_user and "household_id" in admin_user:
+                # Alternative field name
+                rooms = await db.rooms.find({"household_id": admin_user["household_id"]}).to_list(length=100)
+            else:
+                # Check if this is a household member
+                member = None
+                if ObjectId.is_valid(user_id):
+                    member = await household_members_collection.find_one({"_id": ObjectId(user_id)})
+                if not member:
+                    member = await household_members_collection.find_one({"email": user_id})
+                
+                if member and "household_id" in member:
+                    # Get rooms for this member's household
+                    rooms = await db.rooms.find({"household_id": member["household_id"]}).to_list(length=100)
+                else:
+                    # No household found
+                    return []
+        else:
+            # No household_id or user_id provided
+            raise HTTPException(
+                status_code=400,
+                detail={"message": "Either household_id or user_id must be provided"}
+            )
         
         # Transform the rooms to include string IDs
         transformed_rooms = []
@@ -1086,6 +1152,8 @@ async def get_rooms(household_id: str):
             
         return transformed_rooms
     
+    except HTTPException as he:
+        raise he
     except Exception as e:
         raise HTTPException(
             status_code=500,
@@ -2624,3 +2692,467 @@ async def force_collect_statistics(user_id: str = None, household_id: str = None
             status_code=500,
             detail={"message": "Internal server error", "error": str(e)}
         )
+
+        # Create an appropriate directory for report storage
+REPORTS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "generated_reports")
+os.makedirs(REPORTS_DIR, exist_ok=True)
+
+# Report-related schemas
+class ReportFormat(str, Enum):
+    PDF = "pdf"
+    CSV = "csv"
+
+class ReportCreateRequest(BaseModel):
+    title: str
+    format: ReportFormat
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    device_ids: Optional[List[str]] = None
+
+# Report endpoints
+@app.post("/api/reports/create")
+async def create_report(report_data: ReportCreateRequest, background_tasks: BackgroundTasks, user_id: str):
+    try:
+        # Generate a UUID for the report
+        report_id = str(uuid.uuid4())
+        
+        # Create the report record
+        now = datetime.utcnow()
+        report = {
+            "id": report_id,
+            "user_id": user_id,
+            "title": report_data.title,
+            "format": report_data.format,
+            "start_date": report_data.start_date,
+            "end_date": report_data.end_date,
+            "device_ids": report_data.device_ids or [],
+            "status": "pending",
+            "created": now,
+            "updated": now
+        }
+        
+        # Insert into database
+        await reports_collection.insert_one(report)
+        
+        # Generate the report in background
+        background_tasks.add_task(generate_report, report_id)
+        
+        return {
+            "message": "Report generation started",
+            "report_id": report_id,
+            "status": "pending"
+        }
+        
+    except Exception as e:
+        print(f"Error creating report: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail={"message": "Failed to create report", "error": str(e)}
+        )
+
+@app.get("/api/reports")
+async def list_reports(user_id: str):
+    try:
+        reports = await reports_collection.find(
+            {"user_id": user_id}
+        ).sort("created", -1).to_list(length=100)
+        
+        # Format for response
+        formatted_reports = []
+        for report in reports:
+            formatted_reports.append({
+                "id": report["id"],
+                "title": report["title"],
+                "format": report["format"],
+                "status": report["status"],
+                "created": report["created"].isoformat() if isinstance(report["created"], datetime) else report["created"],
+                "completed": report.get("completed", "").isoformat() if isinstance(report.get("completed"), datetime) else report.get("completed", ""),
+                "file_path": report.get("file_path", "")
+            })
+            
+        return formatted_reports
+        
+    except Exception as e:
+        print(f"Error listing reports: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail={"message": "Failed to list reports", "error": str(e)}
+        )
+
+@app.get("/api/reports/{report_id}")
+async def get_report(report_id: str):
+    try:
+        report = await reports_collection.find_one({"id": report_id})
+        
+        if not report:
+            raise HTTPException(status_code=404, detail="Report not found")
+        
+        return {
+            "id": report["id"],
+            "title": report["title"],
+            "format": report["format"],
+            "status": report["status"],
+            "created": report["created"].isoformat() if isinstance(report["created"], datetime) else report["created"],
+            "completed": report.get("completed", "").isoformat() if isinstance(report.get("completed"), datetime) else report.get("completed", ""),
+            "file_path": report.get("file_path", ""),
+            "error_message": report.get("error_message", "")
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error getting report: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail={"message": "Failed to get report", "error": str(e)}
+        )
+
+@app.get("/api/reports/{report_id}/download")
+async def download_report(report_id: str):
+    try:
+        report = await reports_collection.find_one({"id": report_id})
+        
+        if not report:
+            raise HTTPException(status_code=404, detail="Report not found")
+        
+        if report["status"] != "completed":
+            raise HTTPException(status_code=400, detail=f"Report not ready. Status: {report['status']}")
+        
+        file_path = report.get("file_path")
+        if not file_path or not os.path.exists(file_path):
+            raise HTTPException(status_code=404, detail="Report file not found")
+        
+        # Determine content type based on format
+        content_type = "application/pdf" if report["format"] == "pdf" else "text/csv"
+        
+        # Return the file as a response
+        return FileResponse(
+            path=file_path,
+            filename=os.path.basename(file_path),
+            media_type=content_type
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error downloading report: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail={"message": "Failed to download report", "error": str(e)}
+        )
+
+# Report generation function
+async def generate_report(report_id: str):
+    try:
+        # Get report data
+        report = await reports_collection.find_one({"id": report_id})
+        if not report:
+            print(f"Report {report_id} not found")
+            return
+        
+        # Update status to generating
+        await reports_collection.update_one(
+            {"id": report_id},
+            {"$set": {"status": "generating", "updated": datetime.utcnow()}}
+        )
+        
+        # Fetch energy data for the specified date range
+        start_date = None
+        end_date = None
+        
+        if report.get("start_date"):
+            start_date = datetime.strptime(report["start_date"], "%Y-%m-%d")
+        if report.get("end_date"):
+            end_date = datetime.strptime(report["end_date"], "%Y-%m-%d") + timedelta(days=1) - timedelta(seconds=1)
+        
+        # Get the user's devices
+        device_ids = report.get("device_ids", [])
+        if not device_ids:
+            # If no device IDs are specified, get all devices for the user
+            user_devices = await user_devices_collection.find(
+                {"user_id": report["user_id"]}
+            ).to_list(length=100)
+            device_ids = [device["device_name"] for device in user_devices]
+        
+        # Query for energy usage data
+        query = {}
+        
+        # Filter by devices if specified
+        if device_ids:
+            # Loop through device_types array to find matching devices
+            query["$or"] = [
+                {"device_types.type": {"$in": device_ids}},
+                {"devices": {"$in": device_ids}} 
+            ]
+        
+        # Filter by user or household
+        if ObjectId.is_valid(report["user_id"]):
+            # It's likely an admin user ID
+            admin_user = await admin_users_collection.find_one({"_id": ObjectId(report["user_id"])})
+            if admin_user and admin_user.get("household_id"):
+                query["household_id"] = admin_user["household_id"]
+        else:
+            # It might be a household member
+            query["user_id"] = report["user_id"]
+        
+        # Add date range filter
+        if start_date or end_date:
+            date_filter = {}
+            if start_date:
+                date_filter["$gte"] = start_date
+            if end_date:
+                date_filter["$lte"] = end_date
+                
+            if date_filter:
+                query["timestamp"] = date_filter
+        
+        # Fetch statistics records
+        records = await statistics_collection.find(query).sort("timestamp", 1).to_list(length=1000)
+        
+        if not records:
+            # No data found, create sample data
+            await reports_collection.update_one(
+                {"id": report_id},
+                {
+                    "$set": {
+                        "status": "failed", 
+                        "error_message": "No energy data found for the specified criteria",
+                        "updated": datetime.utcnow()
+                    }
+                }
+            )
+            return
+        
+        # Process data for the report generator
+        energy_data = []
+        for record in records:
+            # Process device types from the record
+            if "device_types" in record:
+                for device_type in record["device_types"]:
+                    energy_data.append({
+                        "timestamp": record.get("timestamp"),
+                        "device_id": device_type["type"],
+                        "energy_consumed": device_type["energy"],
+                        "location": record.get("room", "Unknown")
+                    })
+            else:
+                # Fallback for records without device_types
+                energy_data.append({
+                    "timestamp": record.get("timestamp"),
+                    "device_id": "Unknown",
+                    "energy_consumed": record.get("total_energy", 0),
+                    "location": record.get("room", "Unknown")
+                })
+        
+        # Get user data for personalization
+        user_data = {}
+        if ObjectId.is_valid(report["user_id"]):
+            admin_user = await admin_users_collection.find_one({"_id": ObjectId(report["user_id"])})
+            if admin_user:
+                user_data = {
+                    "email": admin_user.get("admin_email"),
+                    "username": f"{admin_user.get('firstName', '')} {admin_user.get('lastName', '')}"
+                }
+        else:
+            # Might be a household member
+            member = await household_members_collection.find_one({"email": report["user_id"]})
+            if member:
+                user_data = {
+                    "email": member.get("email"),
+                    "username": member.get("name")
+                }
+        
+        # Create the report file
+        # Note: You'll need to import and implement the report_generator functionality
+        from report_generator import generate_energy_report
+        
+        report_path = generate_energy_report(
+            energy_data=energy_data,
+            user_data=user_data,
+            format=report["format"].lower(),
+            start_date=report.get("start_date"),
+            end_date=report.get("end_date")
+        )
+        
+        if not report_path:
+            await reports_collection.update_one(
+                {"id": report_id},
+                {
+                    "$set": {
+                        "status": "failed", 
+                        "error_message": "Failed to generate report file",
+                        "updated": datetime.utcnow()
+                    }
+                }
+            )
+            return
+        
+        # Update report record with success
+        await reports_collection.update_one(
+            {"id": report_id},
+            {
+                "$set": {
+                    "status": "completed",
+                    "file_path": report_path,
+                    "completed": datetime.utcnow(),
+                    "updated": datetime.utcnow()
+                }
+            }
+        )
+        
+        print(f"Report {report_id} generated successfully: {report_path}")
+        
+    except Exception as e:
+        print(f"Error generating report {report_id}: {str(e)}")
+        # Update report record with failure
+        await reports_collection.update_one(
+            {"id": report_id},
+            {
+                "$set": {
+                    "status": "failed",
+                    "error_message": str(e),
+                    "updated": datetime.utcnow()
+                }
+            }
+        )
+
+# Create a simple wrapper function for the existing energy report generator
+def generate_energy_report(energy_data, user_data=None, format="pdf", start_date=None, end_date=None):
+    try:
+        # Generate report filename
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{REPORTS_DIR}/energy_report_{timestamp}.{format}"
+        
+        # Create a basic report
+        if format.lower() == "csv":
+            # Generate CSV report
+            with open(filename, 'w') as f:
+                # Write header
+                f.write("Timestamp,Device,Energy Consumed (kWh),Location\n")
+                
+                # Write data rows
+                for item in energy_data:
+                    timestamp = item.get('timestamp', '')
+                    if isinstance(timestamp, datetime):
+                        timestamp = timestamp.strftime("%Y-%m-%d %H:%M:%S")
+                    
+                    f.write(f"{timestamp},{item.get('device_id', 'Unknown')},{item.get('energy_consumed', 0)},{item.get('location', 'Unknown')}\n")
+        else:
+            # Generate PDF report (requires reportlab)
+            from reportlab.lib.pagesizes import letter
+            from reportlab.lib.styles import getSampleStyleSheet
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+            from reportlab.lib import colors
+            
+            doc = SimpleDocTemplate(filename, pagesize=letter)
+            styles = getSampleStyleSheet()
+            
+            elements = []
+            
+            # Title
+            title = "Energy Consumption Report"
+            if start_date and end_date:
+                title += f" ({start_date} to {end_date})"
+            elements.append(Paragraph(title, styles['Title']))
+            elements.append(Spacer(1, 12))
+            
+            # User info
+            if user_data and user_data.get('email'):
+                elements.append(Paragraph(f"Report for: {user_data.get('email')}", styles['Normal']))
+            
+            elements.append(Paragraph(f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", styles['Normal']))
+            elements.append(Spacer(1, 12))
+            
+            # Summary
+            elements.append(Paragraph("Summary", styles['Heading2']))
+            
+            # Calculate total energy and group by device
+            total_energy = sum(item.get('energy_consumed', 0) for item in energy_data)
+            
+            # Group by device
+            devices = {}
+            for item in energy_data:
+                device_id = item.get('device_id', 'Unknown')
+                energy = item.get('energy_consumed', 0)
+                
+                if device_id not in devices:
+                    devices[device_id] = 0
+                devices[device_id] += energy
+            
+            # Create summary table
+            summary_data = [['Metric', 'Value']]
+            summary_data.append(['Total Energy Consumption', f"{total_energy:.2f} kWh"])
+            summary_data.append(['Total Estimated Cost', f"{total_energy * 0.45:.2f} AED"])  # Assuming 0.45 AED per kWh
+            
+            if start_date and end_date:
+                summary_data.append(['Date Range', f"{start_date} to {end_date}"])
+            
+            summary_table = Table(summary_data, colWidths=[200, 200])
+            summary_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+                ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (1, 0), 14),
+                ('BOTTOMPADDING', (0, 0), (1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('BOX', (0, 0), (-1, -1), 1, colors.black),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            
+            elements.append(summary_table)
+            elements.append(Spacer(1, 12))
+            
+            # Device breakdown
+            elements.append(Paragraph("Device Breakdown", styles['Heading2']))
+            
+            device_data = [['Device', 'Energy (kWh)', 'Percentage', 'Cost (AED)']]
+            for device, energy in sorted(devices.items(), key=lambda x: x[1], reverse=True):
+                percentage = (energy / total_energy * 100) if total_energy > 0 else 0
+                cost = energy * 0.45  # Assuming 0.45 AED per kWh
+                device_data.append([device, f"{energy:.2f}", f"{percentage:.1f}%", f"{cost:.2f}"])
+            
+            device_table = Table(device_data, colWidths=[120, 100, 100, 100])
+            device_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 12),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('BOX', (0, 0), (-1, -1), 1, colors.black),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black),
+                ('ALIGN', (1, 1), (-1, -1), 'RIGHT')
+            ]))
+            
+            elements.append(device_table)
+            elements.append(Spacer(1, 12))
+            
+            # Recommendations
+            elements.append(Paragraph("Energy Saving Recommendations", styles['Heading2']))
+            
+            tips = [
+                "Use LED bulbs instead of traditional incandescent bulbs to save up to 80% on lighting energy.",
+                "Set your thermostat to 24°C (75°F) in summer and 20°C (68°F) in winter to optimize energy use.",
+                "Unplug electronics and appliances when not in use to eliminate phantom power usage.",
+                "Consider installing smart power strips that cut power to devices when they're not in use.",
+                "Use natural light when possible and turn off lights when leaving a room."
+            ]
+            
+            for tip in tips:
+                elements.append(Paragraph(f"• {tip}", styles['Normal']))
+                elements.append(Spacer(1, 6))
+            
+            # Build the PDF
+            doc.build(elements)
+            
+        # Return the path to the generated file
+        return filename
+        
+    except Exception as e:
+        print(f"Error in basic report generation: {str(e)}")
+        return None
+
+# TODO: Add CLI command for report generation
+

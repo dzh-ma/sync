@@ -90,6 +90,7 @@ export default function AutomationsPage() {
   })
   const [notifications, setNotifications] = useState<string[]>([])
   const [lastCheckTime, setLastCheckTime] = useState<Date>(new Date())
+  const [expandedDeviceLists, setExpandedDeviceLists] = useState<Record<string, boolean>>({})
 
   useEffect(() => {
     // Load user data from localStorage
@@ -635,25 +636,38 @@ export default function AutomationsPage() {
                     className="col-span-3"
                   />
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="devices" className="text-right">
+                <div className="grid grid-cols-4 gap-4">
+                  <Label className="text-right pt-2">
                     Devices
                   </Label>
-                  <Select
-                    value={newAutomation.devices[0] || ""}
-                    onValueChange={(value) => setNewAutomation({ ...newAutomation, devices: [value] })}
-                  >
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue placeholder="Select device" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {devices.map((device) => (
-                        <SelectItem key={device.id} value={device.id}>
-                          {device.name} ({device.room})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="col-span-3 border rounded-md p-3 max-h-[200px] overflow-y-auto">
+                    {devices.length === 0 ? (
+                      <p className="text-sm text-gray-500">No devices available</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {devices.map((device) => (
+                          <div key={device.id} className="flex items-center space-x-2">
+                            <Checkbox
+                              id={`device-${device.id}`}
+                              checked={newAutomation.devices.includes(device.id)}
+                              onCheckedChange={(checked) => {
+                                const updatedDevices = checked
+                                  ? [...newAutomation.devices, device.id]
+                                  : newAutomation.devices.filter((id) => id !== device.id);
+                                setNewAutomation({
+                                  ...newAutomation,
+                                  devices: updatedDevices,
+                                });
+                              }}
+                            />
+                            <Label htmlFor={`device-${device.id}`} className="text-sm flex items-center gap-2">
+                              {device.name} <span className="text-gray-500 text-xs">({device.room})</span>
+                            </Label>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               <DialogFooter>
@@ -715,18 +729,51 @@ export default function AutomationsPage() {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="text-blue-600 border-blue-600">
-                          {automation.devices.length} devices
-                        </Badge>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm" onClick={() => handleEditAutomation(automation)}>
-                            <Edit className="w-4 h-4 text-blue-500" />
-                          </Button>
-                          <Button variant="outline" size="sm" onClick={() => handleDeleteAutomation(automation._id || automation.id!)}>
-                            <Trash2 className="w-4 h-4 text-red-500" />
-                          </Button>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center">
+                            <Badge variant="outline" className="text-blue-600 border-blue-600">
+                              {automation.devices.length} {automation.devices.length === 1 ? 'device' : 'devices'}
+                            </Badge>
+                            {automation.devices.length > 0 && (
+                              <button 
+                                className="ml-2 text-xs text-blue-500 hover:underline focus:outline-none"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpandedDeviceLists(prev => ({
+                                    ...prev,
+                                    [`${automation._id || automation.id}`]: !prev[`${automation._id || automation.id}`]
+                                  }))
+                                }}
+                              >
+                                {expandedDeviceLists[`${automation._id || automation.id}`] ? 'Hide' : 'Show'} details
+                              </button>
+                            )}
+                          </div>
+                          <div className="flex space-x-2">
+                            <Button variant="outline" size="sm" onClick={() => handleEditAutomation(automation)}>
+                              <Edit className="w-4 h-4 text-blue-500" />
+                            </Button>
+                            <Button variant="outline" size="sm" onClick={() => handleDeleteAutomation(automation._id || automation.id!)}>
+                              <Trash2 className="w-4 h-4 text-red-500" />
+                            </Button>
+                          </div>
                         </div>
+                        {expandedDeviceLists[`${automation._id || automation.id}`] && (
+                          <div className="text-xs text-gray-600 pl-1 mt-2">
+                            {automation.devices.map(deviceId => {
+                              const device = devices.find(d => d.id === deviceId);
+                              return device ? (
+                                <div key={deviceId} className="flex items-center mt-1">
+                                  <div className={`w-2 h-2 rounded-full mr-1 ${device.status === 'on' ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                                  <span>{device.name} <span className="text-gray-400">({device.room})</span></span>
+                                </div>
+                              ) : (
+                                <div key={deviceId} className="mt-1">Unknown device</div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
                     </CardContent>
                   </Card>

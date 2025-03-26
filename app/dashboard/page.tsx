@@ -420,6 +420,7 @@ export default function DashboardPage() {
     const initializeData = async () => {
       try {
         setLoading(true)
+        console.log("Initializing dashboard data...")
         
         // Get user info from localStorage
         const storedUser = localStorage.getItem("currentUser")
@@ -432,10 +433,14 @@ export default function DashboardPage() {
           const currentUser = JSON.parse(storedUser)
           userId = currentUser.id
           householdId = currentUser.householdId
+          console.log("Found current user:", { userId, householdId })
         } else if (storedMember) {
           const currentMember = JSON.parse(storedMember)
           userId = currentMember.id
           householdId = currentMember.householdId
+          console.log("Found current member:", { userId, householdId })
+        } else {
+          console.warn("No user or member found in localStorage")
         }
         
         // Generate a default householdId if not found
@@ -446,10 +451,12 @@ export default function DashboardPage() {
           const generatedHouseholdId = localStorage.getItem("generatedHouseholdId")
           
           if (generatedHouseholdId) {
+            console.log("Using previously generated householdId:", generatedHouseholdId)
             householdId = generatedHouseholdId
           } else {
             // Generate a random household ID for this session
             householdId = `default-household-${Date.now()}`
+            console.log("Generated new householdId:", householdId)
             localStorage.setItem("generatedHouseholdId", householdId)
           }
           
@@ -458,10 +465,25 @@ export default function DashboardPage() {
             const currentUser = JSON.parse(storedUser)
             currentUser.householdId = householdId
             localStorage.setItem("currentUser", JSON.stringify(currentUser))
+            console.log("Updated currentUser with generated householdId")
           } else if (storedMember) {
             const currentMember = JSON.parse(storedMember)
             currentMember.householdId = householdId
             localStorage.setItem("currentMember", JSON.stringify(currentMember))
+            console.log("Updated currentMember with generated householdId")
+          } else {
+            // Create a new user if none exists
+            const newUser = {
+              id: `user-${Date.now()}`,
+              type: "admin",
+              email: "default@example.com",
+              name: "Default User",
+              role: "Admin",
+              householdId: householdId
+            }
+            localStorage.setItem("currentUser", JSON.stringify(newUser))
+            userId = newUser.id
+            console.log("Created new default user with generated householdId")
           }
         }
         
@@ -473,6 +495,8 @@ export default function DashboardPage() {
           localStorage.removeItem("automations")
           localStorage.setItem("freshLogin", "false")
         }
+        
+        console.log("Using userId and householdId:", { userId, householdId })
         
         // Use localStorage data as fallback only if the same householdId
         let storedRooms: Room[] = []
@@ -551,9 +575,8 @@ export default function DashboardPage() {
             // Don't show old rooms if fetch fails - just empty the array
             const axiosError = error as AxiosError
             if (axiosError.response?.status === 422) {
-              console.warn("Household ID may be missing or invalid. Clearing rooms data.")
-              localStorage.setItem("rooms", JSON.stringify([]))
-              setRooms([])
+              console.warn("Using local data for rooms since API returned 422")
+              // Keep using the local data we loaded earlier
             }
           }
           
@@ -609,9 +632,8 @@ export default function DashboardPage() {
             console.error("Error fetching devices:", error)
             const axiosError = error as AxiosError
             if (axiosError.response?.status === 422) {
-              console.warn("Household ID may be missing or invalid. Clearing devices data.")
-              localStorage.setItem("devices", JSON.stringify([]))
-              setDevices([])
+              console.warn("Using local data for devices since API returned 422")
+              // Keep using the local data we loaded earlier
             }
           }
           
@@ -640,27 +662,47 @@ export default function DashboardPage() {
               // Update localStorage and state
               localStorage.setItem("automations", JSON.stringify(backendAutomations))
               setAutomations(backendAutomations)
+              
+              console.log("Updated automations from backend:", backendAutomations.length);
+              loadedFromBackend = true;
             }
           } catch (error) {
             console.error("Error fetching automations:", error)
-            // Keep showing old automations as fallback
+            const axiosError = error as AxiosError
+            if (axiosError.response?.status === 422) {
+              console.warn("Using local data for automations since API returned 422")
+              // Keep using the local data we loaded earlier
+            }
           }
+        } else {
+          console.warn("No userId or householdId available, skipping API calls")
         }
         
-        // Final console log after all data fetching is done
-        console.log("Final data after initialization:", {
-          roomsCount: rooms.length,
-          devicesCount: devices.length,
-          loadedFromBackend: loadedFromBackend
-        });
+        // If we have devices but no rooms, create a default room
+        if (storedDevices.length > 0 && storedRooms.length === 0 && !loadedFromBackend) {
+          console.log("Creating default room since we have devices but no rooms")
+          const defaultRoom: Room = {
+            id: `room-${Date.now()}`,
+            name: "Living Room",
+            image: "/minimal2.png"
+          }
+          setRooms([defaultRoom])
+          localStorage.setItem("rooms", JSON.stringify([defaultRoom]))
+        }
         
-      } catch (e) {
-        console.error("Error initializing data:", e)
-        toast({
-          title: "Error",
-          description: "Failed to load your smart home data. Please try again.",
-          variant: "destructive",
-        })
+        // Generate sample energy data
+        const newEnergyData = calculateEnergyData(storedDevices)
+        setEnergyData(newEnergyData)
+        
+        // Generate suggestions
+        const newSuggestions = generateDeviceSpecificTips(storedDevices)
+        setSuggestions(newSuggestions)
+        
+        // Initialize widgets
+        initializeWidgets()
+        
+      } catch (error) {
+        console.error("Error initializing dashboard:", error)
       } finally {
         setLoading(false)
       }
@@ -1239,9 +1281,9 @@ export default function DashboardPage() {
           {/* Header */}
           <header className="flex justify-between items-center mb-8">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center shadow-lg">
+              {/* <div className="w-12 h-12 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-xl">Sy</span>
-              </div>
+              </div> */}
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
                 <p className="text-sm text-gray-500">Your smart home overview</p>
@@ -1287,25 +1329,94 @@ export default function DashboardPage() {
           </motion.div>
         </div>
 
-        {/* PDF Viewer Dialog */}
-        <Dialog open={guideOpen} onOpenChange={setGuideOpen}>
-          <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
-            <DialogHeader>
-              <DialogTitle>Smart Home Energy Guide</DialogTitle>
-            </DialogHeader>
-            <Tabs defaultValue="overview" className="flex-1 flex flex-col">
-              <TabsList className="mx-auto mb-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="setup">Setup Guide</TabsTrigger>
-                <TabsTrigger value="energy">Energy Saving</TabsTrigger>
-                <TabsTrigger value="faq">FAQ</TabsTrigger>
-              </TabsList>
-              <div className="flex-1 overflow-auto border rounded-md p-4 bg-white">
-                  {/* Tab content stays the same */}
-              </div>
-            </Tabs>
-          </DialogContent>
-        </Dialog>
+          {/* PDF Viewer Dialog */}
+          <Dialog open={guideOpen} onOpenChange={setGuideOpen}>
+            <DialogContent className="max-w-4xl h-[80vh] flex flex-col">
+              <DialogHeader>
+                <DialogTitle>Smart Home Energy Guide</DialogTitle>
+              </DialogHeader>
+              <Tabs defaultValue="overview" className="flex-1 flex flex-col">
+                <TabsList className="mx-auto mb-4 bg-gray-100 rounded-lg p-1">
+                  <TabsTrigger 
+                    value="overview"
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Overview
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="setup" 
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Setup Guide
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="energy" 
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Energy Saving
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="faq" 
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      FAQ
+                  </TabsTrigger>
+                </TabsList>
+                <div className="flex-1 overflow-auto border rounded-md p-4 bg-white">
+                  {/* Overview Tab */}
+                  <TabsContent value="overview">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">Overview</h2>
+                  <p className="text-gray-600 mb-4">
+                    This guide helps you set up and manage your smart home to save energy and simplify your life.
+                  </p>
+                  <ul className="list-disc pl-5 text-gray-600">
+                    <li>Connect and control your devices easily.</li>
+                    <li>Learn tips to reduce energy use.</li>
+                    <li>Automate tasks for convenience.</li>
+                  </ul>
+                  </TabsContent>
+
+                  {/* Setup Guide Tab */}
+                  <TabsContent value="setup">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">Setup Guide</h2>
+                  <p className="text-gray-600 mb-4">Follow these steps to get started:</p>
+                  <ol className="list-decimal pl-5 text-gray-600 space-y-2">
+                    <li>Add rooms in the "Add Room" section.</li>
+                    <li>Connect devices in the "Add Device" section.</li>
+                    <li>Set up automations to save time.</li>
+                  </ol>
+                </TabsContent>
+
+                {/* Energy Saving Tab */}
+                <TabsContent value="energy">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">Energy Saving</h2>
+                  <p className="text-gray-600 mb-4">Save energy with these tips:</p>
+                  <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                    <li>Turn off lights when not needed.</li>
+                    <li>Set thermostats to 24°C in summer.</li>
+                    <li>Use devices during off-peak hours.</li>
+                  </ul>
+                </TabsContent>
+
+                {/* FAQ Tab */}
+                <TabsContent value="faq">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">FAQ</h2>
+                  <div className="space-y-4 text-gray-600">
+                  <div>
+                    <h3 className="font-medium">How do I add a device?</h3>
+                    <p>Go to "Add Device", select the type, and follow the steps.</p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Why isn’t my device working?</h3>
+                    <p>Check if it’s on and connected to Wi-Fi. Restart if needed.</p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">How do I save energy?</h3>
+                    <p>Check the Energy Saving tab for tips.</p>
+                  </div>
+                  </div>
+                </TabsContent>
+                </div>
+              </Tabs>
+            </DialogContent>
+            
+          </Dialog>
         </div>
       </div>
     )
@@ -1321,9 +1432,9 @@ export default function DashboardPage() {
             {/* Header */}
             <header className="flex justify-between items-center mb-8">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center shadow-lg">
+                {/* <div className="w-12 h-12 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center shadow-lg">
                   <span className="text-white font-bold text-xl">Sy</span>
-                </div>
+                </div> */}
                 <div>
                   <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
                   <p className="text-sm text-gray-500">Your smart home overview</p>
@@ -1489,14 +1600,82 @@ export default function DashboardPage() {
                 <DialogTitle>Smart Home Energy Guide</DialogTitle>
               </DialogHeader>
               <Tabs defaultValue="overview" className="flex-1 flex flex-col">
-                <TabsList className="mx-auto mb-4">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="setup">Setup Guide</TabsTrigger>
-                  <TabsTrigger value="energy">Energy Saving</TabsTrigger>
-                  <TabsTrigger value="faq">FAQ</TabsTrigger>
+                <TabsList className="mx-auto mb-4 bg-gray-100 rounded-lg p-1">
+                  <TabsTrigger 
+                    value="overview"
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Overview
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="setup" 
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Setup Guide
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="energy" 
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Energy Saving
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="faq" 
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      FAQ
+                  </TabsTrigger>
                 </TabsList>
                 <div className="flex-1 overflow-auto border rounded-md p-4 bg-white">
-                  {/* Tab content stays the same */}
+                  {/* Overview Tab */}
+                  <TabsContent value="overview">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">Overview</h2>
+                  <p className="text-gray-600 mb-4">
+                    This guide helps you set up and manage your smart home to save energy and simplify your life.
+                  </p>
+                  <ul className="list-disc pl-5 text-gray-600">
+                    <li>Connect and control your devices easily.</li>
+                    <li>Learn tips to reduce energy use.</li>
+                    <li>Automate tasks for convenience.</li>
+                  </ul>
+                  </TabsContent>
+
+                  {/* Setup Guide Tab */}
+                  <TabsContent value="setup">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">Setup Guide</h2>
+                  <p className="text-gray-600 mb-4">Follow these steps to get started:</p>
+                  <ol className="list-decimal pl-5 text-gray-600 space-y-2">
+                    <li>Add rooms in the "Add Room" section.</li>
+                    <li>Connect devices in the "Add Device" section.</li>
+                    <li>Set up automations to save time.</li>
+                  </ol>
+                </TabsContent>
+
+                {/* Energy Saving Tab */}
+                <TabsContent value="energy">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">Energy Saving</h2>
+                  <p className="text-gray-600 mb-4">Save energy with these tips:</p>
+                  <ul className="list-disc pl-5 text-gray-600 space-y-2">
+                    <li>Turn off lights when not needed.</li>
+                    <li>Set thermostats to 24°C in summer.</li>
+                    <li>Use devices during off-peak hours.</li>
+                  </ul>
+                </TabsContent>
+
+                {/* FAQ Tab */}
+                <TabsContent value="faq">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-4">FAQ</h2>
+                  <div className="space-y-4 text-gray-600">
+                  <div>
+                    <h3 className="font-medium">How do I add a device?</h3>
+                    <p>Go to "Add Device", select the type, and follow the steps.</p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Why isn’t my device working?</h3>
+                    <p>Check if it’s on and connected to Wi-Fi. Restart if needed.</p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium">How do I save energy?</h3>
+                    <p>Check the Energy Saving tab for tips.</p>
+                  </div>
+                  </div>
+                </TabsContent>
                 </div>
               </Tabs>
             </DialogContent>
@@ -1515,9 +1694,9 @@ export default function DashboardPage() {
         <div className="flex-1 ml-[72px] p-6">
           <header className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center shadow-lg">
+              {/* <div className="w-12 h-12 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center shadow-lg">
                 <span className="text-white font-bold text-xl">Sy</span>
-              </div>
+              </div> */}
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
                 <p className="text-sm text-gray-500">Your smart home overview</p>
@@ -1570,13 +1749,81 @@ export default function DashboardPage() {
               </DialogHeader>
               <Tabs defaultValue="overview" className="flex-1 flex flex-col">
                 <TabsList className="mx-auto mb-4">
-                  <TabsTrigger value="overview">Overview</TabsTrigger>
-                  <TabsTrigger value="setup">Setup Guide</TabsTrigger>
-                  <TabsTrigger value="energy">Energy Saving</TabsTrigger>
-                  <TabsTrigger value="faq">FAQ</TabsTrigger>
+                  <TabsTrigger 
+                    value="overview"
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Overview
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="setup"
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Setup Guide
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="energy"
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Energy Saving
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="faq"
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      FAQ
+                  </TabsTrigger>
                 </TabsList>
                 <div className="flex-1 overflow-auto border rounded-md p-4 bg-white">
-                  {/* Tab content stays the same */}
+                  {/* Overview Tab */}
+          <TabsContent value="overview">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Overview</h2>
+            <p className="text-gray-600 mb-4">
+              This guide helps you set up and manage your smart home to save energy and simplify your life.
+            </p>
+            <ul className="list-disc pl-5 text-gray-600">
+              <li>Connect and control your devices easily.</li>
+              <li>Learn tips to reduce energy use.</li>
+              <li>Automate tasks for convenience.</li>
+            </ul>
+          </TabsContent>
+
+          {/* Setup Guide Tab */}
+          <TabsContent value="setup">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Setup Guide</h2>
+            <p className="text-gray-600 mb-4">Follow these steps to get started:</p>
+            <ol className="list-decimal pl-5 text-gray-600 space-y-2">
+              <li>Add rooms in the "Add Room" section.</li>
+              <li>Connect devices in the "Add Device" section.</li>
+              <li>Set up automations to save time.</li>
+            </ol>
+          </TabsContent>
+
+          {/* Energy Saving Tab */}
+          <TabsContent value="energy">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Energy Saving</h2>
+            <p className="text-gray-600 mb-4">Save energy with these tips:</p>
+            <ul className="list-disc pl-5 text-gray-600 space-y-2">
+              <li>Turn off lights when not needed.</li>
+              <li>Set thermostats to 24°C in summer.</li>
+              <li>Use devices during off-peak hours.</li>
+            </ul>
+          </TabsContent>
+
+          {/* FAQ Tab */}
+          <TabsContent value="faq">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">FAQ</h2>
+            <div className="space-y-4 text-gray-600">
+              <div>
+                <h3 className="font-medium">How do I add a device?</h3>
+                <p>Go to "Add Device", select the type, and follow the steps.</p>
+              </div>
+              <div>
+                <h3 className="font-medium">Why isn’t my device working?</h3>
+                <p>Check if it’s on and connected to Wi-Fi. Restart if needed.</p>
+              </div>
+              <div>
+                <h3 className="font-medium">How do I save energy?</h3>
+                <p>Check the Energy Saving tab for tips.</p>
+              </div>
+            </div>
+          </TabsContent>
                 </div>
               </Tabs>
             </DialogContent>
@@ -1593,9 +1840,9 @@ export default function DashboardPage() {
       <div className="flex-1 ml-[72px] p-6">
         <header className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center shadow-lg">
+            {/* <div className="w-12 h-12 bg-gradient-to-br from-[#00B2FF] to-[#0085FF] rounded-full flex items-center justify-center shadow-lg">
               <span className="text-white font-bold text-xl">Sy</span>
-            </div>
+            </div> */}
             <div>
               <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
               <p className="text-sm text-gray-500">Your smart home overview</p>
@@ -1655,13 +1902,81 @@ export default function DashboardPage() {
             </DialogHeader>
             <Tabs defaultValue="overview" className="flex-1 flex flex-col">
               <TabsList className="mx-auto mb-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="setup">Setup Guide</TabsTrigger>
-                <TabsTrigger value="energy">Energy Saving</TabsTrigger>
-                <TabsTrigger value="faq">FAQ</TabsTrigger>
+              <TabsTrigger 
+                    value="overview"
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Overview
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="setup"
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Setup Guide
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="energy"
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      Energy Saving
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="faq"
+                    className="px-4 py-2 text-sm font-medium rounded-md data-[state=active]:bg-white data-[state=active]:text-[#00B2FF] data-[state=active]:shadow-sm transition-all">
+                      FAQ
+                  </TabsTrigger>
               </TabsList>
               <div className="flex-1 overflow-auto border rounded-md p-4 bg-white">
-                  {/* Tab content stays the same */}
+                                    {/* Overview Tab */}
+          <TabsContent value="overview">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Overview</h2>
+            <p className="text-gray-600 mb-4">
+              This guide helps you set up and manage your smart home to save energy and simplify your life.
+            </p>
+            <ul className="list-disc pl-5 text-gray-600">
+              <li>Connect and control your devices easily.</li>
+              <li>Learn tips to reduce energy use.</li>
+              <li>Automate tasks for convenience.</li>
+            </ul>
+          </TabsContent>
+
+          {/* Setup Guide Tab */}
+          <TabsContent value="setup">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Setup Guide</h2>
+            <p className="text-gray-600 mb-4">Follow these steps to get started:</p>
+            <ol className="list-decimal pl-5 text-gray-600 space-y-2">
+              <li>Add rooms in the "Add Room" section.</li>
+              <li>Connect devices in the "Add Device" section.</li>
+              <li>Set up automations to save time.</li>
+            </ol>
+          </TabsContent>
+
+          {/* Energy Saving Tab */}
+          <TabsContent value="energy">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Energy Saving</h2>
+            <p className="text-gray-600 mb-4">Save energy with these tips:</p>
+            <ul className="list-disc pl-5 text-gray-600 space-y-2">
+              <li>Turn off lights when not needed.</li>
+              <li>Set thermostats to 24°C in summer.</li>
+              <li>Use devices during off-peak hours.</li>
+            </ul>
+          </TabsContent>
+
+          {/* FAQ Tab */}
+          <TabsContent value="faq">
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">FAQ</h2>
+            <div className="space-y-4 text-gray-600">
+              <div>
+                <h3 className="font-medium">How do I add a device?</h3>
+                <p>Go to "Add Device", select the type, and follow the steps.</p>
+              </div>
+              <div>
+                <h3 className="font-medium">Why isn’t my device working?</h3>
+                <p>Check if it’s on and connected to Wi-Fi. Restart if needed.</p>
+              </div>
+              <div>
+                <h3 className="font-medium">How do I save energy?</h3>
+                <p>Check the Energy Saving tab for tips.</p>
+              </div>
+            </div>
+          </TabsContent>
               </div>
             </Tabs>
           </DialogContent>

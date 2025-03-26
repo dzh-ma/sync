@@ -15,6 +15,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { NavigationSidebar } from "@/app/components/navigation-sidebar"
 import axios from "axios"
 import { v4 as uuidv4 } from "uuid"
+import useEnergySync from "@/app/hooks/useEnergySync"
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -172,24 +173,17 @@ export default function DevicesPage() {
   const [devices, setDevices] = useState<Device[]>([])
   const [editingDevice, setEditingDevice] = useState<Device | null>(null)
   const { toast } = useToast()
+  const { syncEnergyConsumption } = useEnergySync()
 
     useEffect(() => {
         const fetchDevices = async () => {
       try {
-        // Get devices from localStorage first
-        const storedDevices = JSON.parse(localStorage.getItem("devices") || "[]");
-        
-        // Create a map of devices by name for quick lookup
-        const deviceMap = new Map();
-        storedDevices.forEach((device: Device) => {
-          deviceMap.set(device.name, device);
-        });
-        
-        // Get user info
+        // Get user info first
         const storedUser = localStorage.getItem("currentUser");
         const storedMember = localStorage.getItem("currentMember");
         
-        let userId, householdId;
+        let userId: string | undefined = undefined;
+        let householdId: string | undefined = undefined;
         
         if (storedUser) {
           const currentUser = JSON.parse(storedUser);
@@ -203,98 +197,104 @@ export default function DevicesPage() {
         
         if (!userId) {
           console.error("No user ID found");
+          // Use localStorage devices as fallback only if no user ID
+          const storedDevices = JSON.parse(localStorage.getItem("devices") || "[]");
           setDevices(storedDevices);
           return;
         }
         
-        // Set devices from localStorage immediately for quick display
-        setDevices(storedDevices);
-        
-        // Then fetch from backend
+        // First try to fetch from backend - prioritize backend data over localStorage
         try {
           const response = await axios.get(`${API_URL}/api/user/devices`, {
             params: {
               user_id: userId,
-              household_id: householdId
+              household_id: householdId || ''
             }
           });
           
           const backendDevices = response.data || [];
           console.log("Backend devices:", backendDevices);
           
-          // Merge devices from backend and localStorage
-          const mergedDevices = [...storedDevices];
-          let hasChanges = false;
+          // As a fallback, get devices from localStorage
+          const storedDevices = JSON.parse(localStorage.getItem("devices") || "[]");
+          
+          // Create a map of stored devices by name for quick lookup
+          const deviceMap = new Map();
+          storedDevices.forEach((device: Device) => {
+            deviceMap.set(device.name, device);
+          });
+          
+          // Process and merge devices from backend
+          const mergedDevices: Device[] = [];
           
           backendDevices.forEach((backendDevice: any) => {
             const deviceName = backendDevice.name;
-            const existingDevice = mergedDevices.find(d => d.name === deviceName);
+            const existingDevice = deviceMap.get(deviceName);
             
             // Get the base power consumption from backend or generate a new one
             const basePowerConsumption = 
-                                        backendDevice.base_power_consumption || 
-                                        (existingDevice?.basePowerConsumption) || 
-                                        generateRandomPowerConsumption(backendDevice.type);
-            
+                backendDevice.base_power_consumption || 
+                (existingDevice?.basePowerConsumption) || 
+                generateRandomPowerConsumption(backendDevice.type);
+                
             console.log(`Device ${deviceName} (${backendDevice.type}): basePowerConsumption = ${basePowerConsumption}`);
             
-            if (!existingDevice) {
-              // Add new device from backend
-              hasChanges = true;
-              mergedDevices.push({
-                id: `${backendDevice.type}-${Date.now()}`,
-                name: deviceName,
-                type: backendDevice.type,
-                room: backendDevice.room,
-                status: (backendDevice.status || "off") as "on" | "off",
-                basePowerConsumption: basePowerConsumption,
-                powerConsumption: backendDevice.status === "on" ? basePowerConsumption : 0,
-                totalEnergyConsumed: backendDevice.total_energy_consumed || 0,
-                lastStatusChange: backendDevice.last_status_change ? new Date(backendDevice.last_status_change).getTime() : Date.now(),
-                brightness: backendDevice.settings?.brightness,
-                temperature: backendDevice.settings?.temperature,
-                speed: backendDevice.settings?.speed,
-              });
-            } else {
-              // Update existing device with backend data
-              const index = mergedDevices.indexOf(existingDevice);
-              
-              // Only update if there are differences
-              if (backendDevice.status !== existingDevice.status || 
-                  backendDevice.base_power_consumption !== existingDevice.basePowerConsumption) {
-                
-                hasChanges = true;
-                mergedDevices[index] = {
-                  ...existingDevice,
-                  status: (backendDevice.status || existingDevice.status) as "on" | "off",
-                  basePowerConsumption: basePowerConsumption,
-                  powerConsumption: backendDevice.status === "on" ? basePowerConsumption : 0,
-                  totalEnergyConsumed: backendDevice.total_energy_consumed || existingDevice.totalEnergyConsumed || 0,
-                  lastStatusChange: backendDevice.last_status_change ? 
-                    new Date(backendDevice.last_status_change).getTime() : existingDevice.lastStatusChange,
-                  brightness: backendDevice.settings?.brightness || existingDevice.brightness,
-                  temperature: backendDevice.settings?.temperature || existingDevice.temperature,
-                  speed: backendDevice.settings?.speed || existingDevice.speed,
-                };
-              }
-            }
+            // Add device with backend status as priority
+            mergedDevices.push({
+              id: existingDevice?.id || `${backendDevice.type}-${Date.now()}`,
+              name: deviceName,
+              type: backendDevice.type,
+              room: backendDevice.room,
+              status: (backendDevice.status || "off") as "on" | "off",
+              basePowerConsumption: basePowerConsumption,
+              powerConsumption: backendDevice.status === "on" ? basePowerConsumption : 0,
+              totalEnergyConsumed: backendDevice.total_energy_consumed || 0,
+              lastStatusChange: backendDevice.last_status_change ? 
+                new Date(backendDevice.last_status_change).getTime() : Date.now(),
+              brightness: backendDevice.settings?.brightness || existingDevice?.brightness,
+              temperature: backendDevice.settings?.temperature || existingDevice?.temperature,
+              speed: backendDevice.settings?.speed || existingDevice?.speed,
+            });
+            
+            // Remove this device from the map so we know it's been processed
+            deviceMap.delete(deviceName);
           });
           
-          if (hasChanges) {
-            setDevices(mergedDevices);
-            localStorage.setItem("devices", JSON.stringify(mergedDevices));
-          }
+          // If there are any devices in localStorage that aren't in the backend,
+          // we'll add them to our merged list as well for a comprehensive view
+          deviceMap.forEach((device: Device) => {
+            mergedDevices.push(device);
+          });
+          
+          // Update state and localStorage with merged devices
+          setDevices(mergedDevices);
+          localStorage.setItem("devices", JSON.stringify(mergedDevices));
+          
+          // Force synchronization with backend for energy consumption values
+          await syncEnergyConsumption();
+          
         } catch (error) {
           console.error("Error fetching from backend:", error);
-          // Still use localStorage devices if backend fails
+          // Fall back to localStorage devices if backend fails
+          const storedDevices = JSON.parse(localStorage.getItem("devices") || "[]");
+          setDevices(storedDevices);
         }
       } catch (error) {
         console.error("Error in fetchDevices:", error);
       }
     }
     
-    fetchDevices()
-  }, [])
+    // Initial fetch
+    fetchDevices();
+    
+    // Set up periodic refresh for device data and energy consumption
+    const refreshInterval = setInterval(() => {
+      fetchDevices();
+    }, 60000); // Refresh every 60 seconds
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(refreshInterval);
+  }, [syncEnergyConsumption])
 
   const toggleDevice = async (id: string) => {
     try {
@@ -307,7 +307,8 @@ export default function DevicesPage() {
       const storedUser = localStorage.getItem("currentUser");
       const storedMember = localStorage.getItem("currentMember");
       
-      let userId, householdId;
+      let userId: string | undefined = undefined;
+      let householdId: string | undefined = undefined;
       
       if (storedUser) {
         const currentUser = JSON.parse(storedUser);
@@ -347,7 +348,7 @@ export default function DevicesPage() {
             },
             body: JSON.stringify({
               userId,
-              householdId
+              householdId: householdId || ''
             }),
           });
           
@@ -406,7 +407,7 @@ export default function DevicesPage() {
       // Call API to update backend
       try {
         // Toggle the device via API
-        const response = await fetch(`${API_URL}/api/user/toggle-device?user_id=${encodeURIComponent(userId)}&device_name=${encodeURIComponent(deviceToUpdate.name)}&household_id=${encodeURIComponent(householdId)}&status=${newStatus}`, {
+        const response = await fetch(`${API_URL}/api/user/toggle-device?user_id=${encodeURIComponent(userId || '')}&device_name=${encodeURIComponent(deviceToUpdate.name)}&household_id=${encodeURIComponent(householdId || '')}&status=${newStatus}`, {
           method: "PUT",
         });
         
@@ -435,12 +436,23 @@ export default function DevicesPage() {
               },
               body: JSON.stringify({
                 userId,
-                householdId
+                householdId: householdId || ''
               }),
             });
             
             if (statsResponse.ok) {
               console.log("Statistics collection triggered successfully after toggle");
+              
+              // Fetch the latest energy consumption data after toggle
+              setTimeout(async () => {
+                try {
+                  // Use the energy sync hook to update all devices
+                  await syncEnergyConsumption();
+                  console.log(`Updated energy consumption for ${deviceToUpdate.name} from backend`);
+                } catch (error) {
+                  console.error("Error updating energy consumption after toggle:", error);
+                }
+              }, 2000); // Wait 2 seconds after stats collection to ensure data is updated
             } else {
               console.warn("Failed to trigger statistics collection after toggle");
             }
@@ -476,7 +488,8 @@ export default function DevicesPage() {
       const storedUser = localStorage.getItem("currentUser");
       const storedMember = localStorage.getItem("currentMember");
       
-      let userId, householdId;
+      let userId: string | undefined = undefined;
+      let householdId: string | undefined = undefined;
       
       if (storedUser) {
         const currentUser = JSON.parse(storedUser);
@@ -562,7 +575,8 @@ export default function DevicesPage() {
       const storedUser = localStorage.getItem("currentUser");
       const storedMember = localStorage.getItem("currentMember");
       
-      let userId, householdId;
+      let userId: string | undefined = undefined;
+      let householdId: string | undefined = undefined;
       
       if (storedUser) {
         const currentUser = JSON.parse(storedUser);
@@ -648,7 +662,8 @@ export default function DevicesPage() {
       const storedUser = localStorage.getItem("currentUser");
       const storedMember = localStorage.getItem("currentMember");
       
-      let userId, householdId;
+      let userId: string | undefined = undefined;
+      let householdId: string | undefined = undefined;
       
       if (storedUser) {
         const currentUser = JSON.parse(storedUser);
@@ -733,7 +748,8 @@ export default function DevicesPage() {
       const storedUser = localStorage.getItem("currentUser");
       const storedMember = localStorage.getItem("currentMember");
       
-      let userId, householdId;
+      let userId: string | undefined = undefined;
+      let householdId: string | undefined = undefined;
       
       if (storedUser) {
         const currentUser = JSON.parse(storedUser);
@@ -949,7 +965,8 @@ export default function DevicesPage() {
         const storedUser = localStorage.getItem("currentUser");
         const storedMember = localStorage.getItem("currentMember");
         
-        let userId, householdId;
+        let userId: string | undefined = undefined;
+        let householdId: string | undefined = undefined;
         
         if (storedUser) {
           const currentUser = JSON.parse(storedUser);
