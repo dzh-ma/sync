@@ -35,6 +35,7 @@ permissions_collection = db['permissions']  # New collection for permissions
 admin_users_collection = db['admin_users']
 household_members_collection = db['household_members']
 statistics_collection = db['statistics']  # New collection for energy statistics
+reports_collection = db['reports']
 
 async def set_default_permissions(household_id, email):
     default_permissions = {
@@ -3153,6 +3154,3 @@ def generate_energy_report(energy_data, user_data=None, format="pdf", start_date
     except Exception as e:
         print(f"Error in basic report generation: {str(e)}")
         return None
-
-# TODO: Add CLI command for report generation
-
