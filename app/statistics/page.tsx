@@ -1118,7 +1118,7 @@ export default function StatisticsPage() {
       localStorage.setItem('devices', JSON.stringify(devices));
 
       // Now send data to backend via API
-      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
+      const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:8000";
 
       // Add rooms to backend
       for (const room of rooms) {
